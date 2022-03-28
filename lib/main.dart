@@ -1,33 +1,31 @@
-import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:picartsso/inherited_cameras.dart';
-
-import 'camera_page.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:picartsso/display_picture_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Obtain a list of the available cameras on the device.
-  final cameras = await availableCameras();
+  //final cameras = await availableCameras();
 
 // Get a specific camera from the list of available cameras.
-  final firstCamera = cameras.first;
+  //final firstCamera = cameras.first;
 
   runApp(
     MaterialApp(
       title: 'PicArtsso',
       theme: ThemeData.dark(),
-      home: MainPage(
-        camera: firstCamera,
-      ),
+      home: MainPage(),
     ),
   );
 }
 
 class MainPage extends StatelessWidget {
-  final CameraDescription camera;
-  const MainPage({
+  final ImagePicker _picker = ImagePicker();
+  //final CameraDescription camera;
+
+  MainPage({
     Key? key,
-    required this.camera,
+    //required this.camera,
   }) : super(key: key);
 
   @override
@@ -43,16 +41,29 @@ class MainPage extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           FloatingActionButton(
+            heroTag: 'image_lib',
             onPressed: () async {
               try {
                 // If the picture was taken, display it on a new screen.
-                await Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => CameraPage(
-                      camera: camera,
+                // await Navigator.of(context).push(
+                //   MaterialPageRoute(
+                //     builder: (context) => CameraPage(
+                //       camera: camera,
+                //     ),
+                //   ),
+                // );
+                final XFile? image =
+                    await _picker.pickImage(source: ImageSource.gallery);
+
+                if (image != null) {
+                  await Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => DisplayPicturePage(
+                        imagePath: image.path,
+                      ),
                     ),
-                  ),
-                );
+                  );
+                }
               } catch (e) {
                 // If an error occurs, log the error to the console.
                 print(e);
@@ -65,16 +76,28 @@ class MainPage extends StatelessWidget {
             height: 10.0,
           ),
           FloatingActionButton(
+            heroTag: 'pic_cam',
             onPressed: () async {
               try {
                 // If the picture was taken, display it on a new screen.
-                await Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => CameraPage(
-                      camera: camera,
+                // await Navigator.of(context).push(
+                //   MaterialPageRoute(
+                //     builder: (context) => CameraPage(
+                //       camera: camera,
+                //     ),
+                //   ),
+                // );
+                final XFile? photo =
+                    await _picker.pickImage(source: ImageSource.camera);
+                if (photo != null) {
+                  await Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => DisplayPicturePage(
+                        imagePath: photo.path,
+                      ),
                     ),
-                  ),
-                );
+                  );
+                }
               } catch (e) {
                 // If an error occurs, log the error to the console.
                 print(e);

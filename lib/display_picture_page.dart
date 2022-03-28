@@ -11,11 +11,18 @@ class DisplayPicturePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var mediaQuery = MediaQuery.of(context);
     return Scaffold(
       appBar: AppBar(title: const Text('Display the Picture')),
       // The image is stored as a file on the device. Use the `Image.file`
       // constructor with the given path to display the image.
-      body: Image.file(File(imagePath)),
+      body: Container(
+        height: mediaQuery.size.height,
+        width: mediaQuery.size.width,
+        child: Image.file(
+          File(imagePath),
+        ),
+      ),
     );
   }
 }
