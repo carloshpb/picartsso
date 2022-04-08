@@ -8,6 +8,8 @@
 		<string>Permitir que o app PicArtsso acesse o seu microfone?</string> -->
 		<key>NSPhotoLibraryUsageDescription</key>
 		<string>Permitir que o app PicArtsso acesse a sua biblioteca de imagens?</string>
+		<key>NSPhotoLibraryAddUsageDescription</key>
+		<string>Permitir que o app PicArtsso adicione a image em sua biblioteca de imagens?</string>
 		<key>CFBundleDevelopmentRegion</key>
 		<string>$(DEVELOPMENT_LANGUAGE)</string>
 		<key>CFBundleDisplayName</key>
