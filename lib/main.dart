@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:picartsso/display_picture_page.dart';
+import 'package:tflite_flutter/tflite_flutter.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,14 +45,6 @@ class MainPage extends StatelessWidget {
             heroTag: 'image_lib',
             onPressed: () async {
               try {
-                // If the picture was taken, display it on a new screen.
-                // await Navigator.of(context).push(
-                //   MaterialPageRoute(
-                //     builder: (context) => CameraPage(
-                //       camera: camera,
-                //     ),
-                //   ),
-                // );
                 final XFile? image =
                     await _picker.pickImage(source: ImageSource.gallery);
 
@@ -69,7 +62,7 @@ class MainPage extends StatelessWidget {
                 print(e);
               }
             },
-            tooltip: 'Adicionar Foto',
+            tooltip: 'Adicionar Foto da galeria',
             child: const Icon(Icons.image),
           ),
           const SizedBox(
@@ -79,16 +72,9 @@ class MainPage extends StatelessWidget {
             heroTag: 'pic_cam',
             onPressed: () async {
               try {
-                // If the picture was taken, display it on a new screen.
-                // await Navigator.of(context).push(
-                //   MaterialPageRoute(
-                //     builder: (context) => CameraPage(
-                //       camera: camera,
-                //     ),
-                //   ),
-                // );
                 final XFile? photo =
                     await _picker.pickImage(source: ImageSource.camera);
+
                 if (photo != null) {
                   await Navigator.of(context).push(
                     MaterialPageRoute(
@@ -103,7 +89,7 @@ class MainPage extends StatelessWidget {
                 print(e);
               }
             },
-            tooltip: 'Adicionar Foto',
+            tooltip: 'Adicionar foto tirada pela câmera',
             child: const Icon(
               Icons.camera_alt,
             ),
