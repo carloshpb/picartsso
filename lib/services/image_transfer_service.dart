@@ -6,8 +6,8 @@ import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:image/image.dart' as imageFormatter;
 
 class ImageTransferService with ChangeNotifier {
-  final _predictionModelFile = 'assets/models/style_predict.tflite';
-  final _transformModelFile = 'assets/models/style_transform.tflite';
+  final _predictionModelFile = 'models/style_predict.tflite';
+  final _transformModelFile = 'models/style_transform.tflite';
 
   static const int MODEL_TRANSFER_IMAGE_SIZE = 384;
   static const int MODEL_PREDICTION_IMAGE_SIZE = 256;
@@ -22,7 +22,9 @@ class ImageTransferService with ChangeNotifier {
   }
 
   Future<Uint8List> loadImagePath(String imagePath) async {
+    print("Image Path : $imagePath");
     var styleImageByteData = await rootBundle.load(imagePath);
+    print("ByteData : ${styleImageByteData.toString()}");
     return styleImageByteData.buffer.asUint8List();
   }
 

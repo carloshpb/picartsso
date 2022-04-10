@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:loader_overlay/loader_overlay.dart';
 import 'package:picartsso/display_picture_page.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
 
@@ -15,7 +16,9 @@ Future<void> main() async {
     MaterialApp(
       title: 'PicArtsso',
       theme: ThemeData.dark(),
-      home: MainPage(),
+      home: LoaderOverlay(
+        child: MainPage(),
+      ),
     ),
   );
 }
@@ -52,7 +55,7 @@ class MainPage extends StatelessWidget {
                   await Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (context) => DisplayPicturePage(
-                        imagePath: image.path,
+                        image: image,
                       ),
                     ),
                   );
@@ -79,7 +82,7 @@ class MainPage extends StatelessWidget {
                   await Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (context) => DisplayPicturePage(
-                        imagePath: photo.path,
+                        image: photo,
                       ),
                     ),
                   );
