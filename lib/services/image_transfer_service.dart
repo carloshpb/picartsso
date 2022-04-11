@@ -29,20 +29,28 @@ class ImageTransferService with ChangeNotifier {
   }
 
   Future<Uint8List> transfer(Uint8List originData, Uint8List styleData) async {
+    var count = 1;
     var originImage = imageFormatter.decodeImage(originData);
+
     if (originImage == null) {
       return Future.error("Invalid origin image");
     }
+    //Resize images
     var modelTransferImage = imageFormatter.copyResize(originImage,
         width: MODEL_TRANSFER_IMAGE_SIZE, height: MODEL_TRANSFER_IMAGE_SIZE);
+
     var modelTransferInput = _imageToByteListUInt8(
         modelTransferImage, MODEL_TRANSFER_IMAGE_SIZE, 0, 255);
 
     var styleImage = imageFormatter.decodeImage(styleData);
     // style_image 256 256 3
+
     if (styleImage == null) {
       return Future.error("Invalid style image");
     }
+    print(
+        "Style Image Size : ${styleImage.height} ${styleImage.width} ${styleImage.xOffset} ${styleImage.yOffset}");
+
     var modelPredictionImage = imageFormatter.copyResize(styleImage,
         width: MODEL_PREDICTION_IMAGE_SIZE,
         height: MODEL_PREDICTION_IMAGE_SIZE);
@@ -51,8 +59,14 @@ class ImageTransferService with ChangeNotifier {
     var modelPredictionInput = _imageToByteListUInt8(
         modelPredictionImage, MODEL_PREDICTION_IMAGE_SIZE, 0, 255);
 
+    // var modelPredictionInputImage =
+    //     imageFormatter.decodeImage(modelPredictionInput);
+    // print(
+    //     "Prediction Image Size : ${modelPredictionInputImage?.height} ${modelPredictionInputImage?.width} ${modelPredictionInputImage?.xOffset} ${modelPredictionInputImage?.yOffset}");
+
     // style_image 1 256 256 3
     var inputsForPrediction = [modelPredictionInput];
+
     // style_bottleneck 1 1 100
     var outputsForPrediction = <int, Object>{};
     var styleBottleneck = [
@@ -65,6 +79,9 @@ class ImageTransferService with ChangeNotifier {
     // style predict model
     interpreterPrediction.runForMultipleInputs(
         inputsForPrediction, outputsForPrediction);
+
+    print("TEST $count");
+    count++;
 
     // content_image + styleBottleneck
     var inputsForStyleTransfer = [modelTransferInput, styleBottleneck];
@@ -91,7 +108,9 @@ class ImageTransferService with ChangeNotifier {
     var flipOutputImage = imageFormatter.flipHorizontal(rotateOutputImage);
     var resultImage = imageFormatter.copyResize(flipOutputImage,
         width: originImage.width, height: originImage.height);
-    return Uint8List.fromList(imageFormatter.encodeJpg(resultImage));
+    var encodedImage =
+        Uint8List.fromList(imageFormatter.encodeJpg(resultImage));
+    return encodedImage;
   }
 
   imageFormatter.Image _convertArrayToImage(

@@ -91,27 +91,27 @@ class DisplayPicturePage extends StatelessWidget {
                   return Stack(
                     children: [
                       Positioned.fill(
-                        child: ValueListenableBuilder<String>(
-                            valueListenable: transformedImagePath,
-                            builder: (context, transformedImagePath, _) {
-                              return (transformedImagePath.isEmpty)
+                        child: ValueListenableBuilder<Uint8List?>(
+                            valueListenable: transformedImage,
+                            builder: (context, transformedImage, _) {
+                              return (transformedImage == null)
                                   ? Image.file(
                                       File(image.path),
                                     )
-                                  : Image.file(
-                                      File(transformedImagePath),
-                                    );
+                                  : Image.memory(transformedImage);
                             }),
                       ),
                       Positioned(
                         bottom: 10.0,
+                        left: 10.0,
+                        right: 0.0,
                         child: SizedBox(
                           height: 100.0,
                           child: ListView.separated(
                             scrollDirection: Axis.horizontal,
-                            physics: const ClampingScrollPhysics(
-                              parent: AlwaysScrollableScrollPhysics(),
-                            ),
+                            // physics: const ClampingScrollPhysics(
+                            //   parent: AlwaysScrollableScrollPhysics(),
+                            // ),
                             shrinkWrap: true,
                             itemBuilder: (ctx, index) => GestureDetector(
                               onTap: () async {
@@ -124,10 +124,10 @@ class DisplayPicturePage extends StatelessWidget {
                                 transformedImage.value =
                                     await _imageTransferService.transfer(
                                         uint8image, chosenStyleData);
+                                print("TRANSFER COMPLETED");
                                 if (transformedImage.value != null) {
-                                  var file =
-                                      File.fromRawPath(transformedImage.value!);
-                                  transformedImagePath.value = file.path;
+                                  //var file = File.fromRawPath(transformedImage.value!);
+                                  //transformedImagePath.value = file.path;
                                 } else {
                                   //TODO : Tratar erro caso transferencia não tenha funcionado
                                 }
