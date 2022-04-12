@@ -14,6 +14,7 @@ class DisplayPicturePage extends StatelessWidget {
   final XFile image;
   final ValueNotifier<String> transformedImagePath = ValueNotifier('');
   final ValueNotifier<Uint8List?> transformedImage = ValueNotifier(null);
+  final List<String> imageStylesPaths = <String>[];
 
   DisplayPicturePage({
     Key? key,
@@ -26,6 +27,10 @@ class DisplayPicturePage extends StatelessWidget {
     // Preparing Servide
     var _imageTransferService = ImageTransferService();
     _imageTransferService.loadModel();
+
+    for (var i = 0; i <= 25; i++) {
+      imageStylesPaths.add("assets/style_imgs/style$i.jpg");
+    }
 
     //Uint8List? pictureData;
 
@@ -69,7 +74,7 @@ class DisplayPicturePage extends StatelessWidget {
                     quality: 60,
                     name: "transformedImage${DateTime.now().toIso8601String()}",
                   );
-                  Navigator.of(context).pop(true);
+                  //Navigator.of(context).pop(true);
                 }
               },
             ),
@@ -104,7 +109,7 @@ class DisplayPicturePage extends StatelessWidget {
                       Positioned(
                         bottom: 10.0,
                         left: 10.0,
-                        right: 0.0,
+                        right: 10.0,
                         child: SizedBox(
                           height: 100.0,
                           child: ListView.separated(
@@ -116,10 +121,14 @@ class DisplayPicturePage extends StatelessWidget {
                             itemBuilder: (ctx, index) => GestureDetector(
                               onTap: () async {
                                 context.loaderOverlay.show();
+                                // var chosenStyleData =
+                                //     await _imageTransferService.loadImagePath(
+                                //         StyleImageConstants
+                                //             .listStyleImages[index].path);
                                 var chosenStyleData =
                                     await _imageTransferService.loadImagePath(
-                                        StyleImageConstants
-                                            .listStyleImages[index].path);
+                                  imageStylesPaths[index],
+                                );
                                 var uint8image = await image.readAsBytes();
                                 transformedImage.value =
                                     await _imageTransferService.transfer(
@@ -137,31 +146,39 @@ class DisplayPicturePage extends StatelessWidget {
                                 height: 100.0,
                                 width: 100.0,
                                 decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.red.shade400,
+                                  ),
+                                  shape: BoxShape.rectangle,
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(8.0)),
                                   image: DecorationImage(
                                     fit: BoxFit.fill,
-                                    image: AssetImage(
-                                      StyleImageConstants
-                                          .listStyleImages[index].path,
-                                    ),
-                                  ),
-                                ),
-                                child: Align(
-                                  alignment: Alignment.bottomCenter,
-                                  child: Text(
-                                    StyleImageConstants
-                                        .listStyleImages[index].artName,
-                                    style: TextStyle(
-                                      color: Colors.amber.shade800,
-                                    ),
+                                    // image: AssetImage(
+                                    //   StyleImageConstants
+                                    //       .listStyleImages[index].path,
+                                    image: AssetImage(imageStylesPaths[index]),
                                   ),
                                 ),
                               ),
+                              // child: Align(
+                              //   alignment: Alignment.bottomCenter,
+                              //   child: Text(
+                              //     StyleImageConstants
+                              //         .listStyleImages[index].artName,
+                              //     style: TextStyle(
+                              //       color: Colors.amber.shade800,
+                              //     ),
+                              //   ),
+                              // ),
                             ),
+
                             separatorBuilder: (ctx, _) => const SizedBox(
                               width: 20.0,
                             ),
-                            itemCount:
-                                StyleImageConstants.listStyleImages.length,
+                            // itemCount:
+                            //     StyleImageConstants.listStyleImages.length,
+                            itemCount: imageStylesPaths.length,
                           ),
                         ),
                       ),
