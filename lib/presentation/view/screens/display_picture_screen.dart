@@ -3,26 +3,25 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:picartsso/services/image_transfer_service.dart';
 
-import 'constants/style_images_constants.dart';
-
-class DisplayPicturePage extends StatelessWidget {
+class DisplayPictureScreen extends ConsumerWidget {
   final XFile image;
   final ValueNotifier<String> transformedImagePath = ValueNotifier('');
   final ValueNotifier<Uint8List?> transformedImage = ValueNotifier(null);
   final List<String> imageStylesPaths = <String>[];
 
-  DisplayPicturePage({
+  DisplayPictureScreen({
     Key? key,
     required this.image,
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     var _mediaQuery = MediaQuery.of(context);
     // Preparing Servide
     var _imageTransferService = ImageTransferService();
@@ -110,7 +109,8 @@ class DisplayPicturePage extends StatelessWidget {
                         bottom: 10.0,
                         left: 10.0,
                         right: 10.0,
-                        child: SizedBox(
+                        child: Container(
+                          color: Colors.black,
                           height: 100.0,
                           child: ListView.separated(
                             scrollDirection: Axis.horizontal,

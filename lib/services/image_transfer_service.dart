@@ -3,18 +3,27 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
-import 'package:image/image.dart' as imageFormatter;
+import 'package:image/image.dart' as image_formatter;
 
 class ImageTransferService with ChangeNotifier {
   final _predictionModelFile = 'models/style_predict.tflite';
   final _transformModelFile = 'models/style_transform.tflite';
 
+  // A imagem do conteúdo deve ser (1, 384, 384, 3). Recortamos a imagem centralmente e a redimensionamos.
   static const int MODEL_TRANSFER_IMAGE_SIZE = 384;
+
+  // O tamanho da imagem do estilo deve ser (1, 256, 256, 3). Recortamos a imagem centralmente e a redimensionamos.
   static const int MODEL_PREDICTION_IMAGE_SIZE = 256;
 
+  // A classe Interpreter tem a função de carregar um modelo e conduzir a inferência do modelo.
+  // Inferência é o termo que descreve o ato de utilizar uma rede neural para
+  // fornecer insights após ela ter sido treinada. É como se alguém que
+  // estudou algum assunto (passou por treinamento) e se formou,
+  // estivesse indo trabalhar em um cenário da vida real (inferência).
   late Interpreter interpreterPrediction;
   late Interpreter interpreterTransform;
 
+  // Função que carregará os modelos
   Future<void> loadModel() async {
     // TODO Exception
     interpreterPrediction = await Interpreter.fromAsset(_predictionModelFile);
@@ -30,19 +39,19 @@ class ImageTransferService with ChangeNotifier {
 
   Future<Uint8List> transfer(Uint8List originData, Uint8List styleData) async {
     var count = 1;
-    var originImage = imageFormatter.decodeImage(originData);
+    var originImage = image_formatter.decodeImage(originData);
 
     if (originImage == null) {
       return Future.error("Invalid origin image");
     }
     //Resize images
-    var modelTransferImage = imageFormatter.copyResize(originImage,
+    var modelTransferImage = image_formatter.copyResize(originImage,
         width: MODEL_TRANSFER_IMAGE_SIZE, height: MODEL_TRANSFER_IMAGE_SIZE);
 
     var modelTransferInput = _imageToByteListUInt8(
         modelTransferImage, MODEL_TRANSFER_IMAGE_SIZE, 0, 255);
 
-    var styleImage = imageFormatter.decodeImage(styleData);
+    var styleImage = image_formatter.decodeImage(styleData);
     // style_image 256 256 3
 
     if (styleImage == null) {
@@ -51,7 +60,7 @@ class ImageTransferService with ChangeNotifier {
     print(
         "Style Image Size : ${styleImage.height} ${styleImage.width} ${styleImage.xOffset} ${styleImage.yOffset}");
 
-    var modelPredictionImage = imageFormatter.copyResize(styleImage,
+    var modelPredictionImage = image_formatter.copyResize(styleImage,
         width: MODEL_PREDICTION_IMAGE_SIZE,
         height: MODEL_PREDICTION_IMAGE_SIZE);
 
@@ -104,18 +113,19 @@ class ImageTransferService with ChangeNotifier {
 
     var outputImage =
         _convertArrayToImage(outputImageData, MODEL_TRANSFER_IMAGE_SIZE);
-    var rotateOutputImage = imageFormatter.copyRotate(outputImage, 90);
-    var flipOutputImage = imageFormatter.flipHorizontal(rotateOutputImage);
-    var resultImage = imageFormatter.copyResize(flipOutputImage,
+    var rotateOutputImage = image_formatter.copyRotate(outputImage, 90);
+    var flipOutputImage = image_formatter.flipHorizontal(rotateOutputImage);
+    var resultImage = image_formatter.copyResize(flipOutputImage,
         width: originImage.width, height: originImage.height);
     var encodedImage =
-        Uint8List.fromList(imageFormatter.encodeJpg(resultImage));
+        Uint8List.fromList(image_formatter.encodeJpg(resultImage));
     return encodedImage;
   }
 
-  imageFormatter.Image _convertArrayToImage(
+  image_formatter.Image _convertArrayToImage(
       List<List<List<List<double>>>> imageArray, int inputSize) {
-    imageFormatter.Image image = imageFormatter.Image.rgb(inputSize, inputSize);
+    image_formatter.Image image =
+        image_formatter.Image.rgb(inputSize, inputSize);
     for (var x = 0; x < imageArray[0].length; x++) {
       for (var y = 0; y < imageArray[0][0].length; y++) {
         var r = (imageArray[0][x][y][0] * 255).toInt();
@@ -128,7 +138,7 @@ class ImageTransferService with ChangeNotifier {
   }
 
   Uint8List _imageToByteListUInt8(
-    imageFormatter.Image image,
+    image_formatter.Image image,
     int inputSize,
     double mean,
     double std,
@@ -140,9 +150,9 @@ class ImageTransferService with ChangeNotifier {
     for (var i = 0; i < inputSize; i++) {
       for (var j = 0; j < inputSize; j++) {
         var pixel = image.getPixel(j, i);
-        buffer[pixelIndex++] = (imageFormatter.getRed(pixel) - mean) / std;
-        buffer[pixelIndex++] = (imageFormatter.getGreen(pixel) - mean) / std;
-        buffer[pixelIndex++] = (imageFormatter.getBlue(pixel) - mean) / std;
+        buffer[pixelIndex++] = (image_formatter.getRed(pixel) - mean) / std;
+        buffer[pixelIndex++] = (image_formatter.getGreen(pixel) - mean) / std;
+        buffer[pixelIndex++] = (image_formatter.getBlue(pixel) - mean) / std;
       }
     }
     return convertedBytes.buffer.asUint8List();
