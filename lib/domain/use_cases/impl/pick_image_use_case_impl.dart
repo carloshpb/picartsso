@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:image_picker/image_picker.dart';
 
 import '../../repositories/image_picker_repository.dart';
@@ -8,7 +10,8 @@ class PickImageUseCaseImpl implements PickImageUseCase {
 
   PickImageUseCaseImpl(this._imagePickerRepository);
 
-  Future<void> execute(ImageSource imageSource) async {
-    await _imagePickerRepository.pickImage(imageSource);
+  @override
+  Future<Uint8List> execute(ImageSource imageSource) async {
+    return await _imagePickerRepository.pickImage(imageSource);
   }
 }

@@ -30,12 +30,12 @@ class ImageTransferService with ChangeNotifier {
     interpreterTransform = await Interpreter.fromAsset(_transformModelFile);
   }
 
-  Future<Uint8List> loadImagePath(String imagePath) async {
-    print("Image Path : $imagePath");
-    var styleImageByteData = await rootBundle.load(imagePath);
-    print("ByteData : ${styleImageByteData.toString()}");
-    return styleImageByteData.buffer.asUint8List();
-  }
+  // Future<Uint8List> loadImagePath(String imagePath) async {
+  //   print("Image Path : $imagePath");
+  //   var styleImageByteData = await rootBundle.load(imagePath);
+  //   print("ByteData : ${styleImageByteData.toString()}");
+  //   return styleImageByteData.buffer.asUint8List();
+  // }
 
   Future<Uint8List> transfer(Uint8List originData, Uint8List styleData) async {
     var count = 1;

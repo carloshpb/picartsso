@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
+import 'package:enough_convert/enough_convert.dart';
 
 import '../../domain/models/style_image.dart';
 import '../../domain/repositories/arts_repository.dart';
@@ -57,12 +58,13 @@ class ArtsRepositoryImpl implements ArtsRepository {
   final _defaultArts = <StyleImage>[];
   final _customArts = <StyleImage>[];
 
-  ArtsRepositoryImpl();
+  final StoreDataRepository _storeDataRepository;
+
+  ArtsRepositoryImpl(this._storeDataRepository);
 
   @override
-  Future<List<StyleImage>> getArts() {
-    // TODO: implement getArts
-    throw UnimplementedError();
+  List<StyleImage> get defaultArts {
+    return [..._defaultArts];
   }
 
   @override
@@ -76,8 +78,14 @@ class ArtsRepositoryImpl implements ArtsRepository {
     );
   }
 
+  @override
   List<StyleImage> get customArts {
-    return _customArts;
+    return [..._customArts];
+  }
+
+  @override
+  void addCustomArt(StyleImage art) {
+    _customArts.add(art);
   }
 
   Future<Uint8List> _loadImagePath(String imagePath) async {
@@ -85,19 +93,44 @@ class ArtsRepositoryImpl implements ArtsRepository {
     return styleImageByteData.buffer.asUint8List();
   }
 
+  @override
   Future<void> loadDefaultImages() async {
     final manifestContent = await rootBundle.loadString("AssetManifest.json");
     final Map<String, dynamic> manifestMap = json.decode(manifestContent);
 
     final imagePaths = manifestMap.keys
-        .where((String key) => key.contains('style_imgs/'))
-        .where((String key) => key.contains('.jpg'))
+        .where((String key) => key.contains('assets/style_imgs/')) // 0 - 17
+        .where((String key) => key.contains('.jpg')) // 0 - 3
         .toList();
 
     imagePaths.sort();
 
-    imagePaths.forEach((path) {
-      //separar nome da arte e do artista e criar StyleImage do path inteiro
-    });
+    for (var artPath in imagePaths) {
+      var pathDecoded = Uri.decodeComponent(artPath);
+      var cleanedPath = pathDecoded.replaceAll('assets/style_imgs/', '');
+      cleanedPath = cleanedPath.replaceAll('.jpg', '');
+      cleanedPath = cleanedPath.replaceAll('_', ' ');
+      var separatedNames = cleanedPath.split('--');
+      var image = await _loadImagePath(pathDecoded);
+      var newStyleImage = StyleImage(
+        artName: separatedNames[0],
+        authorName: separatedNames[1],
+        image: image,
+      );
+      _defaultArts.add(newStyleImage);
+    }
+  }
+
+  @override
+  Future<void> loadCustomArts() async {
+    try {
+      var result = await _storeDataRepository.readLocalCustomArts();
+      result.sort((a, b) => a.artName.compareTo(b.artName));
+      for (var customArt in result) {
+        _customArts.add(customArt);
+      }
+    } on Exception {
+      //DO NOTHING YET
+    }
   }
 }

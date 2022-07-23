@@ -1,5 +1,10 @@
+import 'dart:typed_data';
+
 import 'package:image_picker/image_picker.dart';
 
+import '../models/style_image.dart';
+
 abstract class ImagePickerRepository {
-  Future<void> pickImage(ImageSource imageSource);
+  Future<Uint8List> pickImage(ImageSource imageSource);
+  Future<List<StyleImage>> pickAndAddNewArt();
 }
