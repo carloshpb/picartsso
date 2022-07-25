@@ -10,8 +10,10 @@ part 'pic_arts_state.freezed.dart';
 class PicArtsState with _$PicArtsState {
   const factory PicArtsState({
     required List<StyleImage> arts,
+    required Uint8List lastPicture,
     required Uint8List displayPicture,
     required String imageDataType,
     required bool isTransferedStyleToImage,
+    required bool isSaved,
   }) = _PicArtsState;
 }

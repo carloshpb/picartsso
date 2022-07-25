@@ -13,11 +13,13 @@ class App extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     var router = ref.watch(autoRouterProvider);
-    return MaterialApp.router(
-      title: 'PicArtsso',
-      theme: ThemeData.dark(),
-      routerDelegate: router.delegate(initialRoutes: [HomeRoute()]),
-      routeInformationParser: router.defaultRouteParser(),
+    return GlobalLoaderOverlay(
+      child: MaterialApp.router(
+        title: 'PicArtsso',
+        theme: ThemeData.dark(),
+        routerDelegate: router.delegate(initialRoutes: [HomeRoute()]),
+        routeInformationParser: router.defaultRouteParser(),
+      ),
     );
   }
 }

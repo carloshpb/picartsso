@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 import '../../domain/domain_provider_module.dart' as domain_provider_module;
 import '../../domain/models/style_image.dart';
@@ -13,7 +14,7 @@ import '../../domain/use_cases/transfer_style_use_case.dart';
 import 'state/pic_arts_state.dart';
 
 final displayPictureViewModelProvider = StateNotifierProvider.autoDispose<
-    DisplayPictureViewModel, AsyncValue<void>>(
+    DisplayPictureViewModel, AsyncValue<PicArtsState>>(
   (ref) => DisplayPictureViewModel(
     ref.watch(domain_provider_module.getChosenPicUseCase),
     ref.watch(domain_provider_module.saveImagesGalleryUseCase),
@@ -63,9 +64,11 @@ class DisplayPictureViewModel extends StateNotifier<AsyncValue<PicArtsState>> {
     state = AsyncValue.data(
       PicArtsState(
         arts: _arts,
+        lastPicture: kTransparentImage,
         displayPicture: _chosenPic,
         imageDataType: 'float16',
         isTransferedStyleToImage: false,
+        isSaved: false,
       ),
     );
   }
@@ -81,8 +84,18 @@ class DisplayPictureViewModel extends StateNotifier<AsyncValue<PicArtsState>> {
           transformedImagesMap['float16']!.isNotEmpty &&
           transformedImagesMap['int8'] != null &&
           transformedImagesMap['int8']!.isNotEmpty) {
-        _saveImagesGalleryUseCase.execute(transformedImagesMap);
-        state = AsyncValue.data(oldStateValue);
+        await _saveImagesGalleryUseCase.execute(transformedImagesMap);
+        state = AsyncValue.data(
+          PicArtsState(
+            arts: oldStateValue.arts,
+            lastPicture: oldStateValue.lastPicture,
+            displayPicture: oldStateValue.displayPicture,
+            imageDataType: oldStateValue.imageDataType,
+            isTransferedStyleToImage: oldStateValue.isTransferedStyleToImage,
+            isSaved: true,
+          ),
+        );
+        return null;
       } else {
         state = AsyncValue.data(oldStateValue);
         return 'Não há nenhuma foto / imagem transformada para salvar.';
@@ -91,29 +104,28 @@ class DisplayPictureViewModel extends StateNotifier<AsyncValue<PicArtsState>> {
       state = AsyncValue.data(oldStateValue);
       return e.toString();
     }
-    state = AsyncValue.data(oldStateValue);
   }
 
-  Map<String, Uint8List>? getTransformedPics() {
-    try {
-      var transformedImagesMap = _getTransformedImagesUseCase.execute();
-      if (transformedImagesMap.containsKey('float16') &&
-          transformedImagesMap.containsKey('int8') &&
-          transformedImagesMap['float16'] != null &&
-          transformedImagesMap['float16']!.isNotEmpty &&
-          transformedImagesMap['int8'] != null &&
-          transformedImagesMap['int8']!.isNotEmpty) {
-        return transformedImagesMap;
-      }
-      return null;
-    } on Exception {
-      return null;
-    }
-  }
+  // Map<String, Uint8List>? getTransformedPics() {
+  //   try {
+  //     var transformedImagesMap = _getTransformedImagesUseCase.execute();
+  //     if (transformedImagesMap.containsKey('float16') &&
+  //         transformedImagesMap.containsKey('int8') &&
+  //         transformedImagesMap['float16'] != null &&
+  //         transformedImagesMap['float16']!.isNotEmpty &&
+  //         transformedImagesMap['int8'] != null &&
+  //         transformedImagesMap['int8']!.isNotEmpty) {
+  //       return transformedImagesMap;
+  //     }
+  //     return null;
+  //   } on Exception {
+  //     return null;
+  //   }
+  // }
 
-  Uint8List getChosenPic() {
-    return _chosenPic;
-  }
+  // Uint8List getChosenPic() {
+  //   return _chosenPic;
+  // }
 
   // Uint8List? getSelectedTransformedPic() {
   //   var transf = getTransformedPics();
@@ -129,18 +141,20 @@ class DisplayPictureViewModel extends StateNotifier<AsyncValue<PicArtsState>> {
       state = AsyncValue.data(
         PicArtsState(
           arts: oldState.arts,
+          lastPicture: oldState.displayPicture,
           displayPicture: _transformedPics[type]!,
           imageDataType: type,
           isTransferedStyleToImage: oldState.isTransferedStyleToImage,
+          isSaved: oldState.isSaved,
         ),
       );
     }
   }
 
-  List<StyleImage> getListOfArts() {
-    var list = _getArtsUseCase.execute();
-    return list;
-  }
+  // List<StyleImage> getListOfArts() {
+  //   var list = _getArtsUseCase.execute();
+  //   return list;
+  // }
 
   Future<String?> transferStyle(Uint8List styleArt) async {
     var oldState = state.value!;
@@ -148,7 +162,7 @@ class DisplayPictureViewModel extends StateNotifier<AsyncValue<PicArtsState>> {
 
     try {
       _transformedPics =
-          await _transferStyleUseCase.execute(getChosenPic(), styleArt);
+          await _transferStyleUseCase.execute(_chosenPic, styleArt);
 
       if (_transformedPics.containsKey('float16') &&
           _transformedPics.containsKey('int8') &&
@@ -159,8 +173,11 @@ class DisplayPictureViewModel extends StateNotifier<AsyncValue<PicArtsState>> {
         state = AsyncValue.data(
           PicArtsState(
             arts: oldState.arts,
+            lastPicture: oldState.displayPicture,
             displayPicture: _transformedPics[oldState.imageDataType]!,
             imageDataType: oldState.imageDataType,
+            isTransferedStyleToImage: true,
+            isSaved: false,
           ),
         );
         return null;
@@ -182,8 +199,11 @@ class DisplayPictureViewModel extends StateNotifier<AsyncValue<PicArtsState>> {
       state = AsyncValue.data(
         PicArtsState(
           arts: newArtsList,
+          lastPicture: oldStateValue.lastPicture,
           displayPicture: oldStateValue.displayPicture,
           imageDataType: oldStateValue.imageDataType,
+          isTransferedStyleToImage: oldStateValue.isTransferedStyleToImage,
+          isSaved: oldStateValue.isSaved,
         ),
       );
     } on Exception {
