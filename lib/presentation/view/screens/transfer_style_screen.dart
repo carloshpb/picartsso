@@ -184,12 +184,33 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
                     //         .displayPicture,
                     //   ),
                     // ),
-                    child: Image.memory(
-                      ref
-                          .watch(transfer_style_view_model.provider)
-                          .value!
-                          .displayPicture,
-                      gaplessPlayback: true,
+                    // child: Image.memory(
+                    //   ref
+                    //       .watch(transfer_style_view_model.provider)
+                    //       .value!
+                    //       .displayPicture,
+                    //   gaplessPlayback: false,
+                    // ),
+                    child: Stack(
+                      children: [
+                        const Positioned.fill(
+                          child: Align(
+                            alignment: Alignment.center,
+                            child: CircularProgressIndicator(),
+                          ),
+                        ),
+                        Positioned.fill(
+                          child: FittedBox(
+                            fit: BoxFit.fitHeight,
+                            child: Image.memory(
+                              ref
+                                  .watch(transfer_style_view_model.provider)
+                                  .value!
+                                  .displayPicture,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
