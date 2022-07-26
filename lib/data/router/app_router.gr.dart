@@ -23,16 +23,21 @@ class _$AppRouter extends RootStackRouter {
       return MaterialPageX<dynamic>(
           routeData: routeData, child: HomeScreen(key: args.key));
     },
-    DisplayPictureRoute.name: (routeData) {
+    TransferStyleRoute.name: (routeData) {
       return MaterialPageX<dynamic>(
-          routeData: routeData, child: const DisplayPictureScreen());
+          routeData: routeData, child: const TransferStyleScreen());
+    },
+    FullSizePicRoute.name: (routeData) {
+      return MaterialPageX<dynamic>(
+          routeData: routeData, child: const FullSizePicScreen());
     }
   };
 
   @override
   List<RouteConfig> get routes => [
         RouteConfig(HomeRoute.name, path: '/'),
-        RouteConfig(DisplayPictureRoute.name, path: '/display-picture-screen')
+        RouteConfig(TransferStyleRoute.name, path: '/transfer-style-screen'),
+        RouteConfig(FullSizePicRoute.name, path: '/full-size-pic-screen')
       ];
 }
 
@@ -57,10 +62,19 @@ class HomeRouteArgs {
 }
 
 /// generated route for
-/// [DisplayPictureScreen]
-class DisplayPictureRoute extends PageRouteInfo<void> {
-  const DisplayPictureRoute()
-      : super(DisplayPictureRoute.name, path: '/display-picture-screen');
+/// [TransferStyleScreen]
+class TransferStyleRoute extends PageRouteInfo<void> {
+  const TransferStyleRoute()
+      : super(TransferStyleRoute.name, path: '/transfer-style-screen');
 
-  static const String name = 'DisplayPictureRoute';
+  static const String name = 'TransferStyleRoute';
+}
+
+/// generated route for
+/// [FullSizePicScreen]
+class FullSizePicRoute extends PageRouteInfo<void> {
+  const FullSizePicRoute()
+      : super(FullSizePicRoute.name, path: '/full-size-pic-screen');
+
+  static const String name = 'FullSizePicRoute';
 }

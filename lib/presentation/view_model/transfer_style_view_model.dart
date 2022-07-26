@@ -13,9 +13,9 @@ import '../../domain/use_cases/save_images_gallery_use_case.dart';
 import '../../domain/use_cases/transfer_style_use_case.dart';
 import 'state/pic_arts_state.dart';
 
-final displayPictureViewModelProvider = StateNotifierProvider.autoDispose<
-    DisplayPictureViewModel, AsyncValue<PicArtsState>>(
-  (ref) => DisplayPictureViewModel(
+final provider = StateNotifierProvider.autoDispose<TransferStyleViewModel,
+    AsyncValue<PicArtsState>>(
+  (ref) => TransferStyleViewModel(
     ref.watch(domain_provider_module.getChosenPicUseCase),
     ref.watch(domain_provider_module.saveImagesGalleryUseCase),
     ref.watch(domain_provider_module.getTransformedImagesUseCase),
@@ -25,7 +25,7 @@ final displayPictureViewModelProvider = StateNotifierProvider.autoDispose<
   ),
 );
 
-class DisplayPictureViewModel extends StateNotifier<AsyncValue<PicArtsState>> {
+class TransferStyleViewModel extends StateNotifier<AsyncValue<PicArtsState>> {
   final GetChosenPicUseCase _getChosenPicUseCase;
   final SaveImagesGalleryUseCase _saveImagesGalleryUseCase;
   final GetTransformedImagesUseCase _getTransformedImagesUseCase;
@@ -37,7 +37,7 @@ class DisplayPictureViewModel extends StateNotifier<AsyncValue<PicArtsState>> {
   late Map<String, Uint8List> _transformedPics;
   late List<StyleImage> _arts;
 
-  DisplayPictureViewModel(
+  TransferStyleViewModel(
     this._getChosenPicUseCase,
     this._saveImagesGalleryUseCase,
     this._getTransformedImagesUseCase,
@@ -157,8 +157,11 @@ class DisplayPictureViewModel extends StateNotifier<AsyncValue<PicArtsState>> {
   // }
 
   Future<String?> transferStyle(Uint8List styleArt) async {
-    var oldState = state.value!;
+    var oldStateValue = state.value!;
     state = const AsyncValue.loading();
+
+    // Put here to show Loader Overlay working - Screen freezes when TF is executed
+    await Future.delayed(const Duration(milliseconds: 300));
 
     try {
       _transformedPics =
@@ -172,21 +175,21 @@ class DisplayPictureViewModel extends StateNotifier<AsyncValue<PicArtsState>> {
           _transformedPics['int8']!.isNotEmpty) {
         state = AsyncValue.data(
           PicArtsState(
-            arts: oldState.arts,
-            lastPicture: oldState.displayPicture,
-            displayPicture: _transformedPics[oldState.imageDataType]!,
-            imageDataType: oldState.imageDataType,
+            arts: oldStateValue.arts,
+            lastPicture: oldStateValue.displayPicture,
+            displayPicture: _transformedPics[oldStateValue.imageDataType]!,
+            imageDataType: oldStateValue.imageDataType,
             isTransferedStyleToImage: true,
             isSaved: false,
           ),
         );
         return null;
       } else {
-        state = AsyncValue.data(oldState);
+        state = AsyncValue.data(oldStateValue);
         return "Não ocorreu a transferência de estilo da imagem. Tente novamente.";
       }
     } on Exception catch (e) {
-      state = AsyncValue.data(oldState);
+      state = AsyncValue.data(oldStateValue);
       return e.toString();
     }
   }

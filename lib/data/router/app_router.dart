@@ -1,8 +1,9 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 
-import '../../presentation/view/screens/display_picture_screen.dart';
+import '../../presentation/view/screens/full_size_pic_screen.dart';
 import '../../presentation/view/screens/home_screen.dart';
+import '../../presentation/view/screens/transfer_style_screen.dart';
 
 part 'app_router.gr.dart';
 
@@ -14,7 +15,10 @@ part 'app_router.gr.dart';
       initial: true,
     ),
     AutoRoute(
-      page: DisplayPictureScreen,
+      page: TransferStyleScreen,
+    ),
+    AutoRoute(
+      page: FullSizePicScreen,
     ),
   ],
 )
