@@ -36,6 +36,7 @@ dependencies:
   auto_size_text: ^3.0.0
   cupertino_icons: ^1.0.5
   enough_convert: ^1.6.0
+  flutter_launcher_icons: ^0.9.3
   flutter_overlay_loader: ^2.0.0
   flutter_native_splash: ^2.2.5
   flutter_riverpod: ^2.0.0-dev.9
@@ -80,6 +81,7 @@ flutter:
   assets:
     - assets/style_imgs/
     - assets/models/
+    - assets/logo/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.

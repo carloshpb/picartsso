@@ -25,6 +25,7 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final url = Uri.parse(_tensorFlowLiteUri);
+    var theme = Theme.of(context);
     ref.listen<AsyncValue>(
       homeViewModelProvider,
       (_, state) {
@@ -37,6 +38,10 @@ class HomeScreen extends ConsumerWidget {
     );
 
     var router = ref.watch(autoRouterProvider);
+
+    var backgroundColor = theme.backgroundColor;
+    var hex = '#${backgroundColor.value.toRadixString(16)}';
+    print("BACKGROUND COLOR HEX : $hex");
 
     return Scaffold(
       // appBar: AppBar(
@@ -174,7 +179,7 @@ class HomeScreen extends ConsumerWidget {
                       style: GoogleFonts.ebGaramond(
                         textStyle: const TextStyle(
                           fontSize: 30.0,
-                          color: Color.fromARGB(255, 199, 0, 189),
+                          color: Colors.black,
                         ),
                       ),
                       maxLines: 1,
@@ -220,7 +225,7 @@ class HomeScreen extends ConsumerWidget {
                       style: GoogleFonts.ebGaramond(
                         textStyle: const TextStyle(
                           fontSize: 30.0,
-                          color: Color.fromARGB(255, 199, 0, 189),
+                          color: Colors.black,
                         ),
                       ),
                       maxLines: 1,
