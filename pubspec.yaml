@@ -38,10 +38,9 @@ dependencies:
   enough_convert: ^1.6.0
   flutter_launcher_icons: ^0.9.3
   flutter_overlay_loader: ^2.0.0
-  flutter_native_splash: ^2.2.5
+  flutter_native_splash: ^2.2.6
   flutter_riverpod: ^2.0.0-dev.9
   freezed_annotation: ^2.1.0
-  google_fonts: ^3.0.1
   image: ^3.2.0
   image_gallery_saver: ^1.7.1
   image_picker: ^0.8.5+3
@@ -94,17 +93,73 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #   - family: Trajan Pro
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
+  fonts:
+    - family: EBGaramond
+      fonts:
+        - asset: assets/fonts/EB_Garamond/EBGaramond-Regular.ttf
+          style: normal
+        - asset: assets/fonts/EB_Garamond/EBGaramond-Italic.ttf
+          style: italic
+        - asset: assets/fonts/EB_Garamond/EBGaramond-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/EB_Garamond/EBGaramond-MediumItalic.ttf
+          weight: 500
+          style: italic
+        - asset: assets/fonts/EB_Garamond/EBGaramond-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/EB_Garamond/EBGaramond-SemiBoldItalic.ttf
+          weight: 600
+          style: italic
+        - asset: assets/fonts/EB_Garamond/EBGaramond-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/EB_Garamond/EBGaramond-BoldItalic.ttf
+          weight: 700
+          style: italic
+        - asset: assets/fonts/EB_Garamond/EBGaramond-ExtraBold.ttf
+          weight: 800
+        - asset: assets/fonts/EB_Garamond/EBGaramond-ExtraBoldItalic.ttf
+          weight: 800
+          style: italic
+    - family: Merienda
+      fonts:
+        - asset: assets/fonts/Merienda/Merienda-Regular.ttf
+          style: normal
+        - asset: assets/fonts/Merienda/Merienda-Bold.ttf
+          weight: 700
+    - family: Roboto
+      fonts:
+        - asset: assets/fonts/Roboto/Roboto-Thin.ttf
+          weight: 100
+        - asset: assets/fonts/Roboto/Roboto-ThinItalic.ttf
+          weight: 100
+          style: italic
+        - asset: assets/fonts/Roboto/Roboto-Light.ttf
+          weight: 300
+        - asset: assets/fonts/Roboto/Roboto-LightItalic.ttf
+          weight: 300
+          style: italic
+        - asset: assets/fonts/Roboto/Roboto-LightItalic.ttf
+          weight: 300
+          style: italic
+        - asset: assets/fonts/Roboto/Roboto-Regular.ttf
+          style: normal
+        - asset: assets/fonts/Roboto/Roboto-Italic.ttf
+          style: italic
+        - asset: assets/fonts/Roboto/Roboto-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Roboto/Roboto-MediumItalic.ttf
+          weight: 500
+          style: italic
+        - asset: assets/fonts/Roboto/Roboto-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Roboto/Roboto-BoldItalic.ttf
+          weight: 700
+          style: italic
+        - asset: assets/fonts/Roboto/Roboto-Black.ttf
+          weight: 900
+        - asset: assets/fonts/Roboto/Roboto-BlackItalic.ttf
+          weight: 900
+          style: italic
   #
   # For details regarding fonts from package dependencies,
-  # see https://flutter.dev/custom-fonts/#from-packages
+  # see https://flutter.dev/custom-assets/fonts/#from-packages

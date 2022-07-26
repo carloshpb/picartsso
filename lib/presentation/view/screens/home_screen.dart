@@ -2,8 +2,6 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../data/data_provider_module.dart';
@@ -39,10 +37,6 @@ class HomeScreen extends ConsumerWidget {
 
     var router = ref.watch(autoRouterProvider);
 
-    var backgroundColor = theme.backgroundColor;
-    var hex = '#${backgroundColor.value.toRadixString(16)}';
-    print("BACKGROUND COLOR HEX : $hex");
-
     return Scaffold(
       // appBar: AppBar(
       //   title: const Text("PicArtsso"),
@@ -57,9 +51,9 @@ class HomeScreen extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Flexible(
+                const Flexible(
                   child: AutoSizeText.rich(
-                    const TextSpan(
+                    TextSpan(
                       text: 'Pic',
                       children: [
                         TextSpan(
@@ -72,25 +66,23 @@ class HomeScreen extends ConsumerWidget {
                       ],
                     ),
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.merienda(
-                      textStyle: const TextStyle(
-                        color: Color.fromARGB(255, 228, 66, 17),
-                        fontSize: 30.0,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    style: TextStyle(
+                      color: Color.fromARGB(255, 228, 66, 17),
+                      fontSize: 30.0,
+                      fontFamily: 'Merienda',
+                      fontWeight: FontWeight.bold,
                     ),
                     maxLines: 1,
                   ),
                 ),
-                Flexible(
+                const Flexible(
                   child: AutoSizeText(
                     "Aplicativo criado para fazer Transferência de Estilo utilizando o TensorFlow Lite e seus modelos prontos de predição e transferência",
                     textAlign: TextAlign.center,
-                    style: GoogleFonts.ebGaramond(
-                      textStyle: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 30.0,
-                      ),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontFamily: 'EBGaramond',
+                      fontSize: 30.0,
                     ),
                     maxLines: 3,
                   ),
@@ -102,20 +94,26 @@ class HomeScreen extends ConsumerWidget {
                         return await showDialog(
                           context: context,
                           builder: (context) => AlertDialog(
-                            title: Text(
+                            title: const Text(
                               'Atenção',
-                              style: GoogleFonts.roboto(),
+                              style: TextStyle(
+                                fontFamily: 'Roboto',
+                              ),
                             ),
                             content: Text(
                               'Não foi possível abrir o endereço $_tensorFlowLiteUri',
-                              style: GoogleFonts.roboto(),
+                              style: const TextStyle(
+                                fontFamily: 'Roboto',
+                              ),
                             ),
                             actions: <Widget>[
                               TextButton(
                                 onPressed: () => router.pop(),
-                                child: Text(
+                                child: const Text(
                                   'Ok',
-                                  style: GoogleFonts.roboto(),
+                                  style: TextStyle(
+                                    fontFamily: 'Roboto',
+                                  ),
                                 ),
                               ),
                             ],
@@ -126,12 +124,11 @@ class HomeScreen extends ConsumerWidget {
                     child: AutoSizeText(
                       _tensorFlowLiteUri,
                       textAlign: TextAlign.center,
-                      style: GoogleFonts.roboto(
-                        textStyle: const TextStyle(
-                          color: Colors.blue,
-                          fontSize: 30.0,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      style: const TextStyle(
+                        color: Colors.blue,
+                        fontSize: 30.0,
+                        fontFamily: 'Roboto',
+                        fontWeight: FontWeight.bold,
                       ),
                       maxLines: 1,
                     ),
@@ -148,20 +145,26 @@ class HomeScreen extends ConsumerWidget {
                       await showDialog(
                         context: context,
                         builder: (context) => AlertDialog(
-                          title: Text(
+                          title: const Text(
                             'Atenção',
-                            style: GoogleFonts.roboto(),
+                            style: TextStyle(
+                              fontFamily: 'Roboto',
+                            ),
                           ),
                           content: Text(
                             result,
-                            style: GoogleFonts.roboto(),
+                            style: const TextStyle(
+                              fontFamily: 'Roboto',
+                            ),
                           ),
                           actions: <Widget>[
                             TextButton(
                               onPressed: () => router.pop(),
-                              child: Text(
+                              child: const Text(
                                 'Ok',
-                                style: GoogleFonts.roboto(),
+                                style: TextStyle(
+                                  fontFamily: 'Roboto',
+                                ),
                               ),
                             ),
                           ],
@@ -172,15 +175,14 @@ class HomeScreen extends ConsumerWidget {
                   style: ElevatedButton.styleFrom(
                     primary: const Color.fromARGB(255, 228, 66, 17),
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                  child: const Padding(
+                    padding: EdgeInsets.all(8.0),
                     child: AutoSizeText(
                       "Tirar Foto",
-                      style: GoogleFonts.ebGaramond(
-                        textStyle: const TextStyle(
-                          fontSize: 30.0,
-                          color: Colors.black,
-                        ),
+                      style: TextStyle(
+                        fontSize: 30.0,
+                        fontFamily: 'EBGaramond',
+                        color: Colors.black,
                       ),
                       maxLines: 1,
                     ),
@@ -218,15 +220,14 @@ class HomeScreen extends ConsumerWidget {
                   style: ElevatedButton.styleFrom(
                     primary: const Color.fromARGB(255, 228, 66, 17),
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
+                  child: const Padding(
+                    padding: EdgeInsets.all(8.0),
                     child: AutoSizeText(
                       "Escolher Foto da Galeria",
-                      style: GoogleFonts.ebGaramond(
-                        textStyle: const TextStyle(
-                          fontSize: 30.0,
-                          color: Colors.black,
-                        ),
+                      style: TextStyle(
+                        fontSize: 30.0,
+                        fontFamily: 'EBGaramond',
+                        color: Colors.black,
                       ),
                       maxLines: 1,
                     ),

@@ -15,6 +15,7 @@ class App extends ConsumerWidget {
     var router = ref.watch(autoRouterProvider);
     return MaterialApp.router(
       title: 'PicArtsso',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData.dark(),
       routerDelegate: router.delegate(initialRoutes: [HomeRoute()]),
       routeInformationParser: router.defaultRouteParser(),
