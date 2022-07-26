@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_overlay_loader/flutter_overlay_loader.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../../data/data_provider_module.dart' as data_provider_module;
 import '../../../data/router/app_router.dart';
@@ -24,12 +25,12 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
       transfer_style_view_model.provider,
       (_, state) {
         if (state.isLoading) {
-          print("MOSTRA LOADER OVERLAY");
+          //print("MOSTRA LOADER OVERLAY");
           //context.loaderOverlay.show();
           Loader.show(context,
               progressIndicator: const CircularProgressIndicator());
         } else {
-          print("ESCONDE LOADER OVERLAY");
+          //print("ESCONDE LOADER OVERLAY");
           //context.loaderOverlay.hide();
           Loader.hide();
         }
@@ -45,16 +46,28 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
         return await showDialog(
               context: context,
               builder: (context) => AlertDialog(
-                title: const Text('Você tem certeza?'),
-                content: const Text('Quer descartar a imagem modificada?'),
+                title: Text(
+                  'Você tem certeza?',
+                  style: GoogleFonts.roboto(),
+                ),
+                content: Text(
+                  'Quer descartar a imagem modificada?',
+                  style: GoogleFonts.roboto(),
+                ),
                 actions: <Widget>[
                   TextButton(
                     onPressed: () => route.pop(false), //<-- SEE HERE
-                    child: const Text('Não'),
+                    child: Text(
+                      'Não',
+                      style: GoogleFonts.roboto(),
+                    ),
                   ),
                   TextButton(
                     onPressed: () => route.pop(true), // <-- SEE HERE
-                    child: const Text('Sim'),
+                    child: Text(
+                      'Sim',
+                      style: GoogleFonts.roboto(),
+                    ),
                   ),
                 ],
               ),
@@ -63,7 +76,10 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Mostrar a foto'),
+          title: Text(
+            'Transferência de Estilo',
+            style: GoogleFonts.roboto(),
+          ),
           actions: [
             TextButton(
               onPressed: (ref
@@ -84,7 +100,10 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
                           .selectSpecificBinaryType('float16');
                     }
                   : null,
-              child: const Text("Float16"),
+              child: Text(
+                "Float16",
+                style: GoogleFonts.ebGaramond(),
+              ),
             ),
             TextButton(
               onPressed: (ref
@@ -105,7 +124,10 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
                           .selectSpecificBinaryType('int8');
                     }
                   : null,
-              child: const Text("Int8"),
+              child: Text(
+                "Int8",
+                style: GoogleFonts.ebGaramond(),
+              ),
             ),
             IconButton(
               icon: const Icon(
@@ -131,19 +153,31 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
                         return await showDialog(
                           context: context,
                           builder: (context) => AlertDialog(
-                            title: const Text('Atenção!'),
-                            content: Text(result),
+                            title: Text(
+                              'Atenção',
+                              style: GoogleFonts.roboto(),
+                            ),
+                            content: Text(
+                              result,
+                              style: GoogleFonts.roboto(),
+                            ),
                             actions: <Widget>[
                               TextButton(
                                 onPressed: () => route.pop(), //<-- SEE HERE
-                                child: const Text('Ok'),
+                                child: Text(
+                                  'Ok',
+                                  style: GoogleFonts.roboto(),
+                                ),
                               ),
                             ],
                           ),
                         );
                       } else {
-                        const snackBar = SnackBar(
-                          content: Text('Imagens transformadas salvas!'),
+                        var snackBar = SnackBar(
+                          content: Text(
+                            'Imagens transformadas salvas!',
+                            style: GoogleFonts.roboto(),
+                          ),
                         );
                         //! Special condition to check if widget is mounted to avoid unknown errors
                         //! Should be used before every .of(context) that is used inside an async method
@@ -245,12 +279,21 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
                                     return await showDialog(
                                       context: context,
                                       builder: (context) => AlertDialog(
-                                        title: const Text('Atenção!'),
-                                        content: Text(result),
+                                        title: Text(
+                                          'Atenção',
+                                          style: GoogleFonts.roboto(),
+                                        ),
+                                        content: Text(
+                                          result,
+                                          style: GoogleFonts.roboto(),
+                                        ),
                                         actions: <Widget>[
                                           TextButton(
                                             onPressed: () => route.pop(),
-                                            child: const Text('Ok'),
+                                            child: Text(
+                                              'Ok',
+                                              style: GoogleFonts.roboto(),
+                                            ),
                                           ),
                                         ],
                                       ),

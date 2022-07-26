@@ -2,6 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -51,25 +52,40 @@ class HomeScreen extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Flexible(
-                  child: AutoSizeText(
-                    "Bem Vindo ao PicArtsso!",
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.deepOrange,
-                      fontSize: 30.0,
-                      fontWeight: FontWeight.bold,
+                Flexible(
+                  child: AutoSizeText.rich(
+                    const TextSpan(
+                      text: 'Pic',
+                      children: [
+                        TextSpan(
+                          text: 'Art',
+                          style: TextStyle(
+                            color: Color.fromARGB(255, 199, 0, 189),
+                          ),
+                        ),
+                        TextSpan(text: 'sso'),
+                      ],
                     ),
-                    maxLines: 2,
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.merienda(
+                      textStyle: const TextStyle(
+                        color: Color.fromARGB(255, 228, 66, 17),
+                        fontSize: 30.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    maxLines: 1,
                   ),
                 ),
-                const Flexible(
+                Flexible(
                   child: AutoSizeText(
                     "Aplicativo criado para fazer Transferência de Estilo utilizando o TensorFlow Lite e seus modelos prontos de predição e transferência",
                     textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 30.0,
+                    style: GoogleFonts.ebGaramond(
+                      textStyle: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 30.0,
+                      ),
                     ),
                     maxLines: 3,
                   ),
@@ -81,13 +97,21 @@ class HomeScreen extends ConsumerWidget {
                         return await showDialog(
                           context: context,
                           builder: (context) => AlertDialog(
-                            title: const Text('Atenção!'),
+                            title: Text(
+                              'Atenção',
+                              style: GoogleFonts.roboto(),
+                            ),
                             content: Text(
-                                'Não foi possível abrir o endereço $_tensorFlowLiteUri'),
+                              'Não foi possível abrir o endereço $_tensorFlowLiteUri',
+                              style: GoogleFonts.roboto(),
+                            ),
                             actions: <Widget>[
                               TextButton(
                                 onPressed: () => router.pop(),
-                                child: const Text('Ok'),
+                                child: Text(
+                                  'Ok',
+                                  style: GoogleFonts.roboto(),
+                                ),
                               ),
                             ],
                           ),
@@ -97,10 +121,12 @@ class HomeScreen extends ConsumerWidget {
                     child: AutoSizeText(
                       _tensorFlowLiteUri,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Colors.blue,
-                        fontSize: 30.0,
-                        fontWeight: FontWeight.bold,
+                      style: GoogleFonts.roboto(
+                        textStyle: const TextStyle(
+                          color: Colors.blue,
+                          fontSize: 30.0,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       maxLines: 1,
                     ),
@@ -117,25 +143,39 @@ class HomeScreen extends ConsumerWidget {
                       await showDialog(
                         context: context,
                         builder: (context) => AlertDialog(
-                          title: const Text('Aviso !'),
-                          content: Text(result),
+                          title: Text(
+                            'Atenção',
+                            style: GoogleFonts.roboto(),
+                          ),
+                          content: Text(
+                            result,
+                            style: GoogleFonts.roboto(),
+                          ),
                           actions: <Widget>[
                             TextButton(
                               onPressed: () => router.pop(),
-                              child: const Text('Ok'),
+                              child: Text(
+                                'Ok',
+                                style: GoogleFonts.roboto(),
+                              ),
                             ),
                           ],
                         ),
                       );
                     }
                   },
-                  child: const Padding(
-                    padding: EdgeInsets.all(8.0),
+                  style: ElevatedButton.styleFrom(
+                    primary: const Color.fromARGB(255, 228, 66, 17),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
                     child: AutoSizeText(
                       "Tirar Foto",
-                      style: TextStyle(
-                        fontSize: 30.0,
-                        color: Colors.white,
+                      style: GoogleFonts.ebGaramond(
+                        textStyle: const TextStyle(
+                          fontSize: 30.0,
+                          color: Color.fromARGB(255, 199, 0, 189),
+                        ),
                       ),
                       maxLines: 1,
                     ),
@@ -170,13 +210,18 @@ class HomeScreen extends ConsumerWidget {
                       );
                     }
                   },
-                  child: const Padding(
-                    padding: EdgeInsets.all(8.0),
+                  style: ElevatedButton.styleFrom(
+                    primary: const Color.fromARGB(255, 228, 66, 17),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
                     child: AutoSizeText(
                       "Escolher Foto da Galeria",
-                      style: TextStyle(
-                        fontSize: 30.0,
-                        color: Colors.white,
+                      style: GoogleFonts.ebGaramond(
+                        textStyle: const TextStyle(
+                          fontSize: 30.0,
+                          color: Color.fromARGB(255, 199, 0, 189),
+                        ),
                       ),
                       maxLines: 1,
                     ),
