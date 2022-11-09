@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_overlay_loader/flutter_overlay_loader.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../data/data_provider_module.dart' as data_provider_module;
-import '../../../data/router/app_router.dart';
+import '../../../router/app_router.dart';
 import '../../view_model/transfer_style_view_model.dart'
     as transfer_style_view_model;
 
@@ -18,7 +17,7 @@ class TransferStyleScreen extends ConsumerStatefulWidget {
 class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
   @override
   Widget build(BuildContext context) {
-    var route = ref.watch(data_provider_module.autoRouterProvider);
+    var route = ref.watch(goRouterProvider);
 
     ref.listen<AsyncValue>(
       transfer_style_view_model.provider,
@@ -221,7 +220,7 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
                 flex: 3,
                 child: GestureDetector(
                   onTap: () {
-                    route.push(const FullSizePicRoute());
+                    route.go('/result');
                   },
                   child: Hero(
                     tag: 'image',

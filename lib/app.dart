@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'data/data_provider_module.dart';
-import 'data/router/app_router.dart';
-import 'presentation/view/widgets/animations/loading_overlay.dart';
+import 'router/app_router.dart';
 
 class App extends ConsumerWidget {
   const App({
@@ -12,13 +10,17 @@ class App extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var router = ref.watch(autoRouterProvider);
+    var router = ref.watch(goRouterProvider);
     return MaterialApp.router(
       title: 'PicArtsso',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData.dark(),
-      routerDelegate: router.delegate(initialRoutes: [HomeRoute()]),
-      routeInformationParser: router.defaultRouteParser(),
+      //theme: ThemeData.dark(),
+      theme: ThemeData(
+        colorSchemeSeed: const Color(0xFF636363),
+        useMaterial3: true,
+        brightness: Brightness.dark,
+      ),
+      routerConfig: router,
     );
   }
 }

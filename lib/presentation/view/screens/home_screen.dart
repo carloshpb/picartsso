@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../data/data_provider_module.dart';
-import '../../../data/router/app_router.dart';
 import '../../view_model/home_view_model.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -140,7 +139,7 @@ class HomeScreen extends ConsumerWidget {
                         .watch(homeViewModelProvider.notifier)
                         .takePictureWithCamera();
                     if (result == null) {
-                      await router.push(const TransferStyleRoute());
+                      await router.go('/pick');
                     } else {
                       await showDialog(
                         context: context,
@@ -200,7 +199,7 @@ class HomeScreen extends ConsumerWidget {
                         .watch(homeViewModelProvider.notifier)
                         .pickImageFromGallery();
                     if (result == null) {
-                      await router.push(const TransferStyleRoute());
+                      await router.go('/pick');
                     } else {
                       await showDialog(
                         context: context,

@@ -9,7 +9,7 @@ import 'repositories/arts_repository_impl.dart';
 import 'repositories/image_picker_repository_impl.dart';
 import 'repositories/store_data_repository_impl.dart';
 import 'repositories/transfer_style_repository_impl.dart';
-import 'router/app_router.dart';
+import '../router/app_router.dart';
 
 // Special provider with object (SharedPreferences) implemented at Main
 final sharedPreferencesProvider = Provider<SharedPreferences>((_) {
