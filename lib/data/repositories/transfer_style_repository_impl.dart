@@ -5,16 +5,6 @@ import 'package:tflite_flutter/tflite_flutter.dart';
 import '../../domain/repositories/transfer_style_repository.dart';
 
 class TransferStyleRepositoryImpl implements TransferStyleRepository {
-  final _predictionModelFileFloat16 =
-      'models/magenta_arbitrary-image-stylization-v1-256_fp16_prediction_1.tflite';
-  final _transformModelFileFloat16 =
-      'models/magenta_arbitrary-image-stylization-v1-256_fp16_transfer_1.tflite';
-
-  final _predictionModelFileInt8 =
-      'models/magenta_arbitrary-image-stylization-v1-256_int8_prediction_1.tflite';
-  final _transformModelFileInt8 =
-      'models/magenta_arbitrary-image-stylization-v1-256_int8_transfer_1.tflite';
-
   final Map<String, Uint8List> _transformedPictures = {};
 
   // A imagem do conteúdo deve ser (1, 384, 384, 3). Recortamos a imagem centralmente e a redimensionamos.
@@ -22,30 +12,6 @@ class TransferStyleRepositoryImpl implements TransferStyleRepository {
 
   // O tamanho da imagem do estilo deve ser (1, 256, 256, 3). Recortamos a imagem centralmente e a redimensionamos.
   static const int MODEL_PREDICTION_IMAGE_SIZE = 256;
-
-  // A classe Interpreter tem a função de carregar um modelo e conduzir a inferência do modelo.
-  // Inferência é o termo que descreve o ato de utilizar uma rede neural para
-  // fornecer insights após ela ter sido treinada. É como se alguém que
-  // estudou algum assunto (passou por treinamento) e se formou,
-  // estivesse indo trabalhar em um cenário da vida real (inferência).
-  late Interpreter interpreterPredictionFloat16;
-  late Interpreter interpreterTransformFloat16;
-  late Interpreter interpreterPredictionInt8;
-  late Interpreter interpreterTransformInt8;
-
-  // Função que carregará os modelos
-  @override
-  Future<void> loadModel() async {
-    // TODO Exception
-    interpreterPredictionFloat16 =
-        await Interpreter.fromAsset(_predictionModelFileFloat16);
-    interpreterTransformFloat16 =
-        await Interpreter.fromAsset(_transformModelFileFloat16);
-    interpreterPredictionInt8 =
-        await Interpreter.fromAsset(_predictionModelFileInt8);
-    interpreterTransformInt8 =
-        await Interpreter.fromAsset(_transformModelFileInt8);
-  }
 
   @override
   Future<Map<String, Uint8List>> transfer(

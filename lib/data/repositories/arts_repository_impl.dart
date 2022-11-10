@@ -3,12 +3,60 @@ import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 import 'package:enough_convert/enough_convert.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:picartsso/exceptions/app_exception.dart';
+import 'package:multiple_result/multiple_result.dart';
 
 import '../../domain/models/style_image.dart';
 import '../../domain/repositories/arts_repository.dart';
 import '../../domain/repositories/store_data_repository.dart';
+import '../datasources/arts_datasource.dart';
+import '../datasources/impl/arts_datasource_impl.dart';
+
+final artsRepository = Provider<ArtsRepository>(
+  (ref) => ArtsRepositoryImpl(
+    ref.watch(artsDataSource),
+  ),
+);
 
 class ArtsRepositoryImpl implements ArtsRepository {
+  final ArtsDataSource _artsDataSource;
+
+  ArtsRepositoryImpl(this._artsDataSource);
+
+  @override
+  Future<Result<AppException, void>> addCustomArt(StyleImage newCustomArt) {
+    // TODO: implement addCustomArt
+    throw UnimplementedError();
+  }
+
+  @override
+  // TODO: implement customArts
+  List<StyleImage> get customArts => throw UnimplementedError();
+
+  @override
+  // TODO: implement defaultArts
+  Result<AppException, List<StyleImage>> get defaultArts =>
+      throw UnimplementedError();
+
+  @override
+  Result<AppException, StyleImage> findArtByName(String artName) {
+    // TODO: implement findArtByName
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Result<AppException, void>> loadCustomArts() {
+    // TODO: implement loadCustomArts
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Result<AppException, void>> loadDefaultImages() {
+    // TODO: implement loadDefaultImages
+    throw UnimplementedError();
+  }
+
   // final _defaultArts = [
   //   const StyleImage('Ar, Ferro e Água', 'Robert Delaunay',
   //       _loadImagePath('assets/style_imgs/style0.jpg')),
@@ -55,82 +103,4 @@ class ArtsRepositoryImpl implements ArtsRepository {
   //       'assets/style_imgs/style25.jpg'),
   // ];
 
-  final _defaultArts = <StyleImage>[];
-  final _customArts = <StyleImage>[];
-
-  final StoreDataRepository _storeDataRepository;
-
-  ArtsRepositoryImpl(this._storeDataRepository);
-
-  @override
-  List<StyleImage> get defaultArts {
-    return [..._defaultArts];
-  }
-
-  @override
-  StyleImage findArtByName(String artName) {
-    return _defaultArts.firstWhere(
-      (defaultArt) => defaultArt.artName.contains(artName),
-      orElse: () => _customArts.firstWhere(
-        (customArt) => customArt.artName.contains(artName),
-        orElse: () => throw Exception('Not Found'),
-      ),
-    );
-  }
-
-  @override
-  List<StyleImage> get customArts {
-    return [..._customArts];
-  }
-
-  @override
-  void addCustomArt(StyleImage art) {
-    _customArts.add(art);
-  }
-
-  Future<Uint8List> _loadImagePath(String imagePath) async {
-    var styleImageByteData = await rootBundle.load(imagePath);
-    return styleImageByteData.buffer.asUint8List();
-  }
-
-  @override
-  Future<void> loadDefaultImages() async {
-    final manifestContent = await rootBundle.loadString("AssetManifest.json");
-    final Map<String, dynamic> manifestMap = json.decode(manifestContent);
-
-    final imagePaths = manifestMap.keys
-        .where((String key) => key.contains('assets/style_imgs/')) // 0 - 17
-        .where((String key) => key.contains('.jpg')) // 0 - 3
-        .toList();
-
-    imagePaths.sort();
-
-    for (var artPath in imagePaths) {
-      var pathDecoded = Uri.decodeComponent(artPath);
-      var cleanedPath = pathDecoded.replaceAll('assets/style_imgs/', '');
-      cleanedPath = cleanedPath.replaceAll('.jpg', '');
-      cleanedPath = cleanedPath.replaceAll('_', ' ');
-      var separatedNames = cleanedPath.split('--');
-      var image = await _loadImagePath(pathDecoded);
-      var newStyleImage = StyleImage(
-        artName: separatedNames[0],
-        authorName: separatedNames[1],
-        image: image,
-      );
-      _defaultArts.add(newStyleImage);
-    }
-  }
-
-  @override
-  Future<void> loadCustomArts() async {
-    try {
-      var result = await _storeDataRepository.readLocalCustomArts();
-      result.sort((a, b) => a.artName.compareTo(b.artName));
-      for (var customArt in result) {
-        _customArts.add(customArt);
-      }
-    } on Exception {
-      //DO NOTHING YET
-    }
-  }
 }

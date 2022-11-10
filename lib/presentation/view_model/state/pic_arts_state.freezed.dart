@@ -32,7 +32,8 @@ mixin _$PicArtsState {
 abstract class $PicArtsStateCopyWith<$Res> {
   factory $PicArtsStateCopyWith(
           PicArtsState value, $Res Function(PicArtsState) then) =
-      _$PicArtsStateCopyWithImpl<$Res>;
+      _$PicArtsStateCopyWithImpl<$Res, PicArtsState>;
+  @useResult
   $Res call(
       {List<StyleImage> arts,
       Uint8List lastPicture,
@@ -43,48 +44,51 @@ abstract class $PicArtsStateCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$PicArtsStateCopyWithImpl<$Res> implements $PicArtsStateCopyWith<$Res> {
+class _$PicArtsStateCopyWithImpl<$Res, $Val extends PicArtsState>
+    implements $PicArtsStateCopyWith<$Res> {
   _$PicArtsStateCopyWithImpl(this._value, this._then);
 
-  final PicArtsState _value;
   // ignore: unused_field
-  final $Res Function(PicArtsState) _then;
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? arts = freezed,
-    Object? lastPicture = freezed,
-    Object? displayPicture = freezed,
-    Object? imageDataType = freezed,
-    Object? isTransferedStyleToImage = freezed,
-    Object? isSaved = freezed,
+    Object? arts = null,
+    Object? lastPicture = null,
+    Object? displayPicture = null,
+    Object? imageDataType = null,
+    Object? isTransferedStyleToImage = null,
+    Object? isSaved = null,
   }) {
     return _then(_value.copyWith(
-      arts: arts == freezed
+      arts: null == arts
           ? _value.arts
           : arts // ignore: cast_nullable_to_non_nullable
               as List<StyleImage>,
-      lastPicture: lastPicture == freezed
+      lastPicture: null == lastPicture
           ? _value.lastPicture
           : lastPicture // ignore: cast_nullable_to_non_nullable
               as Uint8List,
-      displayPicture: displayPicture == freezed
+      displayPicture: null == displayPicture
           ? _value.displayPicture
           : displayPicture // ignore: cast_nullable_to_non_nullable
               as Uint8List,
-      imageDataType: imageDataType == freezed
+      imageDataType: null == imageDataType
           ? _value.imageDataType
           : imageDataType // ignore: cast_nullable_to_non_nullable
               as String,
-      isTransferedStyleToImage: isTransferedStyleToImage == freezed
+      isTransferedStyleToImage: null == isTransferedStyleToImage
           ? _value.isTransferedStyleToImage
           : isTransferedStyleToImage // ignore: cast_nullable_to_non_nullable
               as bool,
-      isSaved: isSaved == freezed
+      isSaved: null == isSaved
           ? _value.isSaved
           : isSaved // ignore: cast_nullable_to_non_nullable
               as bool,
-    ));
+    ) as $Val);
   }
 }
 
@@ -95,6 +99,7 @@ abstract class _$$_PicArtsStateCopyWith<$Res>
           _$_PicArtsState value, $Res Function(_$_PicArtsState) then) =
       __$$_PicArtsStateCopyWithImpl<$Res>;
   @override
+  @useResult
   $Res call(
       {List<StyleImage> arts,
       Uint8List lastPicture,
@@ -106,46 +111,44 @@ abstract class _$$_PicArtsStateCopyWith<$Res>
 
 /// @nodoc
 class __$$_PicArtsStateCopyWithImpl<$Res>
-    extends _$PicArtsStateCopyWithImpl<$Res>
+    extends _$PicArtsStateCopyWithImpl<$Res, _$_PicArtsState>
     implements _$$_PicArtsStateCopyWith<$Res> {
   __$$_PicArtsStateCopyWithImpl(
       _$_PicArtsState _value, $Res Function(_$_PicArtsState) _then)
-      : super(_value, (v) => _then(v as _$_PicArtsState));
+      : super(_value, _then);
 
-  @override
-  _$_PicArtsState get _value => super._value as _$_PicArtsState;
-
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? arts = freezed,
-    Object? lastPicture = freezed,
-    Object? displayPicture = freezed,
-    Object? imageDataType = freezed,
-    Object? isTransferedStyleToImage = freezed,
-    Object? isSaved = freezed,
+    Object? arts = null,
+    Object? lastPicture = null,
+    Object? displayPicture = null,
+    Object? imageDataType = null,
+    Object? isTransferedStyleToImage = null,
+    Object? isSaved = null,
   }) {
     return _then(_$_PicArtsState(
-      arts: arts == freezed
+      arts: null == arts
           ? _value._arts
           : arts // ignore: cast_nullable_to_non_nullable
               as List<StyleImage>,
-      lastPicture: lastPicture == freezed
+      lastPicture: null == lastPicture
           ? _value.lastPicture
           : lastPicture // ignore: cast_nullable_to_non_nullable
               as Uint8List,
-      displayPicture: displayPicture == freezed
+      displayPicture: null == displayPicture
           ? _value.displayPicture
           : displayPicture // ignore: cast_nullable_to_non_nullable
               as Uint8List,
-      imageDataType: imageDataType == freezed
+      imageDataType: null == imageDataType
           ? _value.imageDataType
           : imageDataType // ignore: cast_nullable_to_non_nullable
               as String,
-      isTransferedStyleToImage: isTransferedStyleToImage == freezed
+      isTransferedStyleToImage: null == isTransferedStyleToImage
           ? _value.isTransferedStyleToImage
           : isTransferedStyleToImage // ignore: cast_nullable_to_non_nullable
               as bool,
-      isSaved: isSaved == freezed
+      isSaved: null == isSaved
           ? _value.isSaved
           : isSaved // ignore: cast_nullable_to_non_nullable
               as bool,
@@ -198,11 +201,12 @@ class _$_PicArtsState implements _PicArtsState {
                 .equals(other.lastPicture, lastPicture) &&
             const DeepCollectionEquality()
                 .equals(other.displayPicture, displayPicture) &&
-            const DeepCollectionEquality()
-                .equals(other.imageDataType, imageDataType) &&
-            const DeepCollectionEquality().equals(
-                other.isTransferedStyleToImage, isTransferedStyleToImage) &&
-            const DeepCollectionEquality().equals(other.isSaved, isSaved));
+            (identical(other.imageDataType, imageDataType) ||
+                other.imageDataType == imageDataType) &&
+            (identical(
+                    other.isTransferedStyleToImage, isTransferedStyleToImage) ||
+                other.isTransferedStyleToImage == isTransferedStyleToImage) &&
+            (identical(other.isSaved, isSaved) || other.isSaved == isSaved));
   }
 
   @override
@@ -211,12 +215,13 @@ class _$_PicArtsState implements _PicArtsState {
       const DeepCollectionEquality().hash(_arts),
       const DeepCollectionEquality().hash(lastPicture),
       const DeepCollectionEquality().hash(displayPicture),
-      const DeepCollectionEquality().hash(imageDataType),
-      const DeepCollectionEquality().hash(isTransferedStyleToImage),
-      const DeepCollectionEquality().hash(isSaved));
+      imageDataType,
+      isTransferedStyleToImage,
+      isSaved);
 
   @JsonKey(ignore: true)
   @override
+  @pragma('vm:prefer-inline')
   _$$_PicArtsStateCopyWith<_$_PicArtsState> get copyWith =>
       __$$_PicArtsStateCopyWithImpl<_$_PicArtsState>(this, _$identity);
 }

@@ -6,7 +6,7 @@ import 'package:multiple_result/multiple_result.dart';
 import 'package:picartsso/domain/models/style_image.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../../exceptions/api_exception.dart';
+import '../../../exceptions/app_exception.dart';
 import '../arts_datasource.dart';
 
 final _defaultArts = StateProvider<List<StyleImage>>(
@@ -33,7 +33,7 @@ class ArtsDataSourceImpl implements ArtsDataSource {
   );
 
   @override
-  Future<Result<ApiException, void>> addCustomArt(
+  Future<Result<AppException, void>> addCustomArt(
       StyleImage newCustomArt) async {
     final oldCustomArtsList = _ref.read(_customArts);
     final newCustomArtsList = [...oldCustomArtsList, newCustomArt];
@@ -49,7 +49,7 @@ class ArtsDataSourceImpl implements ArtsDataSource {
       return const Success(null);
     } on Exception catch (e) {
       return Error(
-        ApiException(
+        AppException.general(
           "SharedPreferences not loaded: ${e.toString()}",
         ),
       );
@@ -60,15 +60,15 @@ class ArtsDataSourceImpl implements ArtsDataSource {
   List<StyleImage> get customArts => [..._ref.read(_customArts)];
 
   @override
-  Result<ApiException, List<StyleImage>> get defaultArts {
+  Result<AppException, List<StyleImage>> get defaultArts {
     final listDefaultArts = _ref.read(_defaultArts);
     return (listDefaultArts.isEmpty)
-        ? Error(ApiException("Default Arts list wasn't loaded."))
+        ? const Error(AppException.general("Default Arts list wasn't loaded."))
         : Success([...listDefaultArts]);
   }
 
   @override
-  Result<ApiException, StyleImage> findArtByName(String artName) {
+  Result<AppException, StyleImage> findArtByName(String artName) {
     return defaultArts.when(
       (error) => Error(error),
       (arts) {
@@ -81,20 +81,20 @@ class ArtsDataSourceImpl implements ArtsDataSource {
           );
           return Success(result);
         } on StateError {
-          return Error(ApiException("Art not found."));
+          return const Error(AppException.general("Art not found."));
         }
       },
     );
   }
 
   @override
-  Future<Result<ApiException, void>> loadCustomArts() async {
+  Future<Result<AppException, void>> loadCustomArts() async {
     final sharedPref = _ref.read(_sharedPreferences);
     try {
       var customArtsJson = sharedPref.value!.getStringList('customArts');
       if (customArtsJson == null || customArtsJson.isEmpty) {
-        return Error(
-            ApiException("Não há artes customizadas guardadas localmente."));
+        return const Error(AppException.general(
+            "Não há artes customizadas guardadas localmente."));
       }
       var customArtsStyleImages = customArtsJson
           .map((customArtJson) =>
@@ -105,7 +105,7 @@ class ArtsDataSourceImpl implements ArtsDataSource {
       return const Success(null);
     } on Exception catch (e) {
       return Error(
-        ApiException(
+        AppException.general(
           "SharedPreferences not loaded: ${e.toString()}",
         ),
       );
@@ -113,12 +113,13 @@ class ArtsDataSourceImpl implements ArtsDataSource {
   }
 
   @override
-  Future<Result<ApiException, void>> loadDefaultImages() async {
+  Future<Result<AppException, void>> loadDefaultImages() async {
     late String manifestContent;
     try {
       manifestContent = await rootBundle.loadString("AssetManifest.json");
     } on Exception {
-      return Error(ApiException("File AssetManifest.json not found."));
+      return const Error(
+          AppException.general("File AssetManifest.json not found."));
     }
 
     final Map<String, dynamic> manifestMap = json.decode(manifestContent);

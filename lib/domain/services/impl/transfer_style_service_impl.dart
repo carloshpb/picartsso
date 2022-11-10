@@ -11,58 +11,28 @@ final transferStyleService = Provider<TransferStyleService>(
 );
 
 class TransferStyleServiceImpl implements TransferStyleService {
-  final _predictionModelFileFloat16 =
-      'models/magenta_arbitrary-image-stylization-v1-256_fp16_prediction_1.tflite';
-  final _transformModelFileFloat16 =
-      'models/magenta_arbitrary-image-stylization-v1-256_fp16_transfer_1.tflite';
-
-  final _predictionModelFileInt8 =
-      'models/magenta_arbitrary-image-stylization-v1-256_int8_prediction_1.tflite';
-  final _transformModelFileInt8 =
-      'models/magenta_arbitrary-image-stylization-v1-256_int8_transfer_1.tflite';
-
-  final Map<String, Uint8List> _transformedPictures = {};
-
   // A imagem do conteúdo deve ser (1, 384, 384, 3). Recortamos a imagem centralmente e a redimensionamos.
   static const int MODEL_TRANSFER_IMAGE_SIZE = 384;
 
   // O tamanho da imagem do estilo deve ser (1, 256, 256, 3). Recortamos a imagem centralmente e a redimensionamos.
   static const int MODEL_PREDICTION_IMAGE_SIZE = 256;
 
-  // A classe Interpreter tem a função de carregar um modelo e conduzir a inferência do modelo.
-  // Inferência é o termo que descreve o ato de utilizar uma rede neural para
-  // fornecer insights após ela ter sido treinada. É como se alguém que
-  // estudou algum assunto (passou por treinamento) e se formou,
-  // estivesse indo trabalhar em um cenário da vida real (inferência).
-  late Interpreter interpreterPredictionFloat16;
-  late Interpreter interpreterTransformFloat16;
-  late Interpreter interpreterPredictionInt8;
-  late Interpreter interpreterTransformInt8;
-
   // Função que carregará os modelos
   @override
   Future<void> loadModel() async {
     // TODO Exception
-    interpreterPredictionFloat16 =
-        await Interpreter.fromAsset(_predictionModelFileFloat16);
-    interpreterTransformFloat16 =
-        await Interpreter.fromAsset(_transformModelFileFloat16);
-    interpreterPredictionInt8 =
-        await Interpreter.fromAsset(_predictionModelFileInt8);
-    interpreterTransformInt8 =
-        await Interpreter.fromAsset(_transformModelFileInt8);
   }
 
   @override
   Future<Map<String, Uint8List>> transferStyle(
       Uint8List originalPicture, Uint8List stylePicture) async {
-    var decodedOriginalImage = image_formatter.decodeImage(originalPicture);
+    var decodedOriginalImage = decodeImage(originalPicture);
 
     if (decodedOriginalImage == null) {
       return Future.error("Invalid origin image");
     }
 
-    var decodedStyleImage = image_formatter.decodeImage(stylePicture);
+    var decodedStyleImage = decodeImage(stylePicture);
     // style_image 256 256 3
 
     if (decodedStyleImage == null) {
@@ -70,10 +40,8 @@ class TransferStyleServiceImpl implements TransferStyleService {
     }
 
     //Resize images
-    var modelTransferImageFloat16 = image_formatter.copyResize(
-        decodedOriginalImage,
-        width: MODEL_TRANSFER_IMAGE_SIZE,
-        height: MODEL_TRANSFER_IMAGE_SIZE);
+    var modelTransferImageFloat16 = copyResize(decodedOriginalImage,
+        width: MODEL_TRANSFER_IMAGE_SIZE, height: MODEL_TRANSFER_IMAGE_SIZE);
 
     var modelTransferImageInt8 = modelTransferImageFloat16.clone();
 
@@ -86,8 +54,7 @@ class TransferStyleServiceImpl implements TransferStyleService {
     print(
         "Style Image Size : ${decodedStyleImage.height} ${decodedStyleImage.width} ${decodedStyleImage.xOffset} ${decodedStyleImage.yOffset}");
 
-    var modelPredictionImageFloat16 = image_formatter.copyResize(
-        decodedStyleImage,
+    var modelPredictionImageFloat16 = copyResize(decodedStyleImage,
         width: MODEL_PREDICTION_IMAGE_SIZE,
         height: MODEL_PREDICTION_IMAGE_SIZE);
 
@@ -101,7 +68,7 @@ class TransferStyleServiceImpl implements TransferStyleService {
         modelPredictionImageInt8, MODEL_PREDICTION_IMAGE_SIZE, 0, 255);
 
     // var modelPredictionInputImage =
-    //     imageFormatter.image_formatter.decodeImage(modelPredictionInput);
+    //     imageFormatter.decodeImage(modelPredictionInput);
     // print(
     //     "Prediction Image Size : ${modelPredictionInputImage?.height} ${modelPredictionInputImage?.width} ${modelPredictionInputImage?.xOffset} ${modelPredictionInputImage?.yOffset}");
 
@@ -195,7 +162,7 @@ class TransferStyleServiceImpl implements TransferStyleService {
         _convertArrayToImage(outputImageData, MODEL_TRANSFER_IMAGE_SIZE);
     var rotateOutputImageFloat16 = copyRotate(outputImage, 90);
     var flipOutputImage = flipHorizontal(rotateOutputImageFloat16);
-    var resultImage = image_formatter.copyResize(flipOutputImage,
+    var resultImage = copyResize(flipOutputImage,
         width: decodedOriginalImage.width, height: decodedOriginalImage.height);
     var encodedImage = Uint8List.fromList(encodeJpg(resultImage));
     return encodedImage;

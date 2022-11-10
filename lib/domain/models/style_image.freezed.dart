@@ -35,7 +35,8 @@ mixin _$StyleImage {
 abstract class $StyleImageCopyWith<$Res> {
   factory $StyleImageCopyWith(
           StyleImage value, $Res Function(StyleImage) then) =
-      _$StyleImageCopyWithImpl<$Res>;
+      _$StyleImageCopyWithImpl<$Res, StyleImage>;
+  @useResult
   $Res call(
       {String artName,
       String authorName,
@@ -43,33 +44,36 @@ abstract class $StyleImageCopyWith<$Res> {
 }
 
 /// @nodoc
-class _$StyleImageCopyWithImpl<$Res> implements $StyleImageCopyWith<$Res> {
+class _$StyleImageCopyWithImpl<$Res, $Val extends StyleImage>
+    implements $StyleImageCopyWith<$Res> {
   _$StyleImageCopyWithImpl(this._value, this._then);
 
-  final StyleImage _value;
   // ignore: unused_field
-  final $Res Function(StyleImage) _then;
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
 
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? artName = freezed,
-    Object? authorName = freezed,
-    Object? image = freezed,
+    Object? artName = null,
+    Object? authorName = null,
+    Object? image = null,
   }) {
     return _then(_value.copyWith(
-      artName: artName == freezed
+      artName: null == artName
           ? _value.artName
           : artName // ignore: cast_nullable_to_non_nullable
               as String,
-      authorName: authorName == freezed
+      authorName: null == authorName
           ? _value.authorName
           : authorName // ignore: cast_nullable_to_non_nullable
               as String,
-      image: image == freezed
+      image: null == image
           ? _value.image
           : image // ignore: cast_nullable_to_non_nullable
               as Uint8List,
-    ));
+    ) as $Val);
   }
 }
 
@@ -80,6 +84,7 @@ abstract class _$$_StyleImageCopyWith<$Res>
           _$_StyleImage value, $Res Function(_$_StyleImage) then) =
       __$$_StyleImageCopyWithImpl<$Res>;
   @override
+  @useResult
   $Res call(
       {String artName,
       String authorName,
@@ -87,31 +92,30 @@ abstract class _$$_StyleImageCopyWith<$Res>
 }
 
 /// @nodoc
-class __$$_StyleImageCopyWithImpl<$Res> extends _$StyleImageCopyWithImpl<$Res>
+class __$$_StyleImageCopyWithImpl<$Res>
+    extends _$StyleImageCopyWithImpl<$Res, _$_StyleImage>
     implements _$$_StyleImageCopyWith<$Res> {
   __$$_StyleImageCopyWithImpl(
       _$_StyleImage _value, $Res Function(_$_StyleImage) _then)
-      : super(_value, (v) => _then(v as _$_StyleImage));
+      : super(_value, _then);
 
-  @override
-  _$_StyleImage get _value => super._value as _$_StyleImage;
-
+  @pragma('vm:prefer-inline')
   @override
   $Res call({
-    Object? artName = freezed,
-    Object? authorName = freezed,
-    Object? image = freezed,
+    Object? artName = null,
+    Object? authorName = null,
+    Object? image = null,
   }) {
     return _then(_$_StyleImage(
-      artName: artName == freezed
+      artName: null == artName
           ? _value.artName
           : artName // ignore: cast_nullable_to_non_nullable
               as String,
-      authorName: authorName == freezed
+      authorName: null == authorName
           ? _value.authorName
           : authorName // ignore: cast_nullable_to_non_nullable
               as String,
-      image: image == freezed
+      image: null == image
           ? _value.image
           : image // ignore: cast_nullable_to_non_nullable
               as Uint8List,
@@ -158,22 +162,20 @@ class _$_StyleImage with DiagnosticableTreeMixin implements _StyleImage {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$_StyleImage &&
-            const DeepCollectionEquality().equals(other.artName, artName) &&
-            const DeepCollectionEquality()
-                .equals(other.authorName, authorName) &&
+            (identical(other.artName, artName) || other.artName == artName) &&
+            (identical(other.authorName, authorName) ||
+                other.authorName == authorName) &&
             const DeepCollectionEquality().equals(other.image, image));
   }
 
   @JsonKey(ignore: true)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      const DeepCollectionEquality().hash(artName),
-      const DeepCollectionEquality().hash(authorName),
+  int get hashCode => Object.hash(runtimeType, artName, authorName,
       const DeepCollectionEquality().hash(image));
 
   @JsonKey(ignore: true)
   @override
+  @pragma('vm:prefer-inline')
   _$$_StyleImageCopyWith<_$_StyleImage> get copyWith =>
       __$$_StyleImageCopyWithImpl<_$_StyleImage>(this, _$identity);
 

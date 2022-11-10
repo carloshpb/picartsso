@@ -1,10 +1,13 @@
+import 'package:multiple_result/multiple_result.dart';
+
+import '../../exceptions/app_exception.dart';
 import '../models/style_image.dart';
 
 abstract class ArtsRepository {
-  List<StyleImage> get defaultArts;
-  StyleImage findArtByName(String artName);
+  Result<AppException, List<StyleImage>> get defaultArts;
+  Result<AppException, StyleImage> findArtByName(String artName);
   List<StyleImage> get customArts;
-  Future<void> loadDefaultImages();
-  Future<void> loadCustomArts();
-  void addCustomArt(StyleImage art);
+  Future<Result<AppException, void>> loadDefaultImages();
+  Future<Result<AppException, void>> loadCustomArts();
+  Future<Result<AppException, void>> addCustomArt(StyleImage newCustomArt);
 }
