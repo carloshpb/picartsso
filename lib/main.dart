@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app.dart';
-import 'data/data_provider_module.dart';
 import 'presentation/view/screens/home_screen.dart';
 
 Future<void> main() async {

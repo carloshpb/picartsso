@@ -49,4 +49,13 @@ class PictureImageRepositoryImpl implements PictureImageRepository {
   Future<Result<AppException, void>> saveImageToGallery(StyleImage image) {
     return _pictureDataSource.saveImageToGallery(image.image);
   }
+
+  @override
+  Map<String, Uint8List> get transformedImages =>
+      _pictureDataSource.transformedImages;
+
+  @override
+  set transformedImages(Map<String, Uint8List> transformedImages) {
+    _pictureDataSource.transformedImages = transformedImages;
+  }
 }

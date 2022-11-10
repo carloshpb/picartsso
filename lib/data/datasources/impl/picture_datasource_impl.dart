@@ -13,6 +13,10 @@ final _chosenPic = StateProvider<Uint8List>(
   (_) => Uint8List(0),
 );
 
+final _transformedPic = StateProvider<Map<String, Uint8List>>(
+  (_) => <String, Uint8List>{},
+);
+
 final pictureDataSource = Provider<PictureDataSource>(
   (ref) => PictureDataSourceImpl(
     ref,
@@ -102,5 +106,13 @@ class PictureDataSourceImpl implements PictureDataSource {
       }
     }
     return Error(AppException.permission(permissionSource));
+  }
+
+  @override
+  Map<String, Uint8List> get transformedImages => _ref.read(_transformedPic);
+
+  @override
+  set transformedImages(Map<String, Uint8List> transformedImages) {
+    _ref.read(_transformedPic.notifier).state = transformedImages;
   }
 }

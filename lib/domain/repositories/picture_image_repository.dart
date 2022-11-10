@@ -14,4 +14,6 @@ abstract class PictureImageRepository {
   Uint8List get chosenPic;
   Future<Result<AppException, Uint8List>> pickImageFromSource(
       ImageSource imageSource);
+  Map<String, Uint8List> get transformedImages;
+  set transformedImages(Map<String, Uint8List> transformedImages);
 }

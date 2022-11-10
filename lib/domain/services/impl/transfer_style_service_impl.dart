@@ -1,16 +1,33 @@
 import 'dart:typed_data';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:multiple_result/multiple_result.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:image/image.dart' as image_formatter;
 
+import '../../../data/repositories/ai_models_repository_impl.dart';
+import '../../../data/repositories/picture_image_repository_impl.dart';
+import '../../../exceptions/app_exception.dart';
+import '../../repositories/ai_models_repository.dart';
+import '../../repositories/picture_image_repository.dart';
 import '../transfer_style_service.dart';
 
 final transferStyleService = Provider<TransferStyleService>(
-  (ref) => TransferStyleServiceImpl(),
+  (ref) => TransferStyleServiceImpl(
+    ref.watch(aiModelsRepository),
+    ref.watch(pictureImageRepository),
+  ),
 );
 
 class TransferStyleServiceImpl implements TransferStyleService {
+  final AiModelsRepository _aiModelsRepository;
+  final PictureImageRepository _pictureImageRepository;
+
+  TransferStyleServiceImpl(
+    this._aiModelsRepository,
+    this._pictureImageRepository,
+  );
+
   // A imagem do conteúdo deve ser (1, 384, 384, 3). Recortamos a imagem centralmente e a redimensionamos.
   static const int MODEL_TRANSFER_IMAGE_SIZE = 384;
 
@@ -19,20 +36,19 @@ class TransferStyleServiceImpl implements TransferStyleService {
 
   // Função que carregará os modelos
   @override
-  Future<void> loadModel() async {
-    // TODO Exception
-  }
+  Future<Result<AppException, void>> loadModel() =>
+      _aiModelsRepository.loadAiModels();
 
   @override
   Future<Map<String, Uint8List>> transferStyle(
       Uint8List originalPicture, Uint8List stylePicture) async {
-    var decodedOriginalImage = decodeImage(originalPicture);
+    var decodedOriginalImage = image_formatter.decodeImage(originalPicture);
 
     if (decodedOriginalImage == null) {
       return Future.error("Invalid origin image");
     }
 
-    var decodedStyleImage = decodeImage(stylePicture);
+    var decodedStyleImage = image_formatter.decodeImage(stylePicture);
     // style_image 256 256 3
 
     if (decodedStyleImage == null) {
