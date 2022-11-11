@@ -14,4 +14,5 @@ abstract class PictureImageService {
       Map<String, StyleImage> images);
   Future<Result<AppException, Uint8List>> pickImageFromSource(
       ImageSource imageSource);
+  Map<String, Uint8List> get transformedImages;
 }

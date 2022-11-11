@@ -40,7 +40,7 @@ class TransferStyleServiceImpl implements TransferStyleService {
       _aiModelsRepository.loadAiModels();
 
   @override
-  Future<Map<String, Uint8List>> transferStyle(
+  Future<Result<AppException, Map<String, Uint8List>>> transferStyle(
       Uint8List originalPicture, Uint8List stylePicture) async {
     var decodedOriginalImage = image_formatter.decodeImage(originalPicture);
 
@@ -56,8 +56,10 @@ class TransferStyleServiceImpl implements TransferStyleService {
     }
 
     //Resize images
-    var modelTransferImageFloat16 = copyResize(decodedOriginalImage,
-        width: MODEL_TRANSFER_IMAGE_SIZE, height: MODEL_TRANSFER_IMAGE_SIZE);
+    var modelTransferImageFloat16 = image_formatter.copyResize(
+        decodedOriginalImage,
+        width: MODEL_TRANSFER_IMAGE_SIZE,
+        height: MODEL_TRANSFER_IMAGE_SIZE);
 
     var modelTransferImageInt8 = modelTransferImageFloat16.clone();
 
@@ -70,7 +72,8 @@ class TransferStyleServiceImpl implements TransferStyleService {
     print(
         "Style Image Size : ${decodedStyleImage.height} ${decodedStyleImage.width} ${decodedStyleImage.xOffset} ${decodedStyleImage.yOffset}");
 
-    var modelPredictionImageFloat16 = copyResize(decodedStyleImage,
+    var modelPredictionImageFloat16 = image_formatter.copyResize(
+        decodedStyleImage,
         width: MODEL_PREDICTION_IMAGE_SIZE,
         height: MODEL_PREDICTION_IMAGE_SIZE);
 
@@ -112,12 +115,25 @@ class TransferStyleServiceImpl implements TransferStyleService {
     outputsForPredictionInt8[0] = styleBottleneckInt8;
 
     // style predict model Float 16
-    interpreterPredictionFloat16.runForMultipleInputs(
-        inputsForPredictionFloat16, outputsForPredictionFloat16);
+    // Check if interpreter has loaded the model
+    if (_aiModelsRepository.interpreterPredictionFloat16.isError()) {
+      return Error(
+          _aiModelsRepository.interpreterPredictionFloat16.getError()!);
+    }
+    _aiModelsRepository.interpreterPredictionFloat16
+        .getSuccess()!
+        .runForMultipleInputs(
+            inputsForPredictionFloat16, outputsForPredictionFloat16);
 
     // style predict model Int 8
-    interpreterPredictionInt8.runForMultipleInputs(
-        inputsForPredictionInt8, outputsForPredictionInt8);
+    // Check if interpreter has loaded the model
+    if (_aiModelsRepository.interpreterPredictionInt8.isError()) {
+      return Error(_aiModelsRepository.interpreterPredictionInt8.getError()!);
+    }
+    _aiModelsRepository.interpreterPredictionInt8
+        .getSuccess()!
+        .runForMultipleInputs(
+            inputsForPredictionInt8, outputsForPredictionInt8);
 
     // Now, to prepare for Transform
     // content_image + styleBottleneck
@@ -155,39 +171,59 @@ class TransferStyleServiceImpl implements TransferStyleService {
     outputsForStyleTransferFloat16[0] = outputImageDataFloat16;
     outputsForStyleTransferInt8[0] = outputImageDataInt8;
 
-    interpreterTransformFloat16.runForMultipleInputs(
-        inputsForStyleTransferFloat16, outputsForStyleTransferFloat16);
+    if (_aiModelsRepository.interpreterTransformFloat16.isError()) {
+      return Error(_aiModelsRepository.interpreterTransformFloat16.getError()!);
+    }
+    _aiModelsRepository.interpreterTransformFloat16
+        .getSuccess()!
+        .runForMultipleInputs(
+            inputsForStyleTransferFloat16, outputsForStyleTransferFloat16);
 
-    interpreterTransformInt8.runForMultipleInputs(
-        inputsForStyleTransferInt8, outputsForStyleTransferInt8);
+    if (_aiModelsRepository.interpreterTransformInt8.isError()) {
+      return Error(_aiModelsRepository.interpreterTransformInt8.getError()!);
+    }
+    _aiModelsRepository.interpreterTransformInt8
+        .getSuccess()!
+        .runForMultipleInputs(
+            inputsForStyleTransferInt8, outputsForStyleTransferInt8);
 
     // AQUI - Criar 2 endodedImage : Float16 e Int8 - com o código abaixo
 
-    _transformedPictures['float16'] =
+    final transformedPictures = <String, Uint8List>{};
+
+    transformedPictures['float16'] =
         encodeOutputImage(outputImageDataFloat16, decodedOriginalImage);
-    _transformedPictures['int8'] =
+    transformedPictures['int8'] =
         encodeOutputImage(outputImageDataInt8, decodedOriginalImage);
 
-    return _transformedPictures;
+    // Save locally
+    _pictureImageRepository.transformedImages = transformedPictures;
+
+    return Success(transformedPictures);
   }
 
   // HELPER
   Uint8List encodeOutputImage(List<List<List<List<double>>>> outputImageData,
-      Image decodedOriginalImage) {
+      image_formatter.Image decodedOriginalImage) {
     var outputImage =
         _convertArrayToImage(outputImageData, MODEL_TRANSFER_IMAGE_SIZE);
-    var rotateOutputImageFloat16 = copyRotate(outputImage, 90);
-    var flipOutputImage = flipHorizontal(rotateOutputImageFloat16);
-    var resultImage = copyResize(flipOutputImage,
+    var rotateOutputImageFloat16 = image_formatter.copyRotate(outputImage, 90);
+    var flipOutputImage =
+        image_formatter.flipHorizontal(rotateOutputImageFloat16);
+    var resultImage = image_formatter.copyResize(flipOutputImage,
         width: decodedOriginalImage.width, height: decodedOriginalImage.height);
-    var encodedImage = Uint8List.fromList(encodeJpg(resultImage));
+    var encodedImage =
+        Uint8List.fromList(image_formatter.encodeJpg(resultImage));
     return encodedImage;
   }
 
+  // BELLOW HELPERS ARE LOCAL BECAUSE THEY ARE ONLY GOING TO BE USED INSIDE THIS SERVICE
+
   // HELPER : Convert Array to Image
-  Image _convertArrayToImage(
+  image_formatter.Image _convertArrayToImage(
       List<List<List<List<double>>>> imageArray, int inputSize) {
-    Image image = Image.rgb(inputSize, inputSize);
+    image_formatter.Image image =
+        image_formatter.Image.rgb(inputSize, inputSize);
     for (var x = 0; x < imageArray[0].length; x++) {
       for (var y = 0; y < imageArray[0][0].length; y++) {
         var r = (imageArray[0][x][y][0] * 255).toInt();
@@ -201,7 +237,7 @@ class TransferStyleServiceImpl implements TransferStyleService {
 
   // HELPER : Convert Image to Uint8List
   Uint8List _imageToByteListUInt8(
-    Image image,
+    image_formatter.Image image,
     int inputSize,
     double mean,
     double std,
@@ -213,14 +249,11 @@ class TransferStyleServiceImpl implements TransferStyleService {
     for (var i = 0; i < inputSize; i++) {
       for (var j = 0; j < inputSize; j++) {
         var pixel = image.getPixel(j, i);
-        buffer[pixelIndex++] = (getRed(pixel) - mean) / std;
-        buffer[pixelIndex++] = (getGreen(pixel) - mean) / std;
-        buffer[pixelIndex++] = (getBlue(pixel) - mean) / std;
+        buffer[pixelIndex++] = (image_formatter.getRed(pixel) - mean) / std;
+        buffer[pixelIndex++] = (image_formatter.getGreen(pixel) - mean) / std;
+        buffer[pixelIndex++] = (image_formatter.getBlue(pixel) - mean) / std;
       }
     }
     return convertedBytes.buffer.asUint8List();
   }
-
-  @override
-  Map<String, Uint8List> get transformedImages => _transformedPictures;
 }

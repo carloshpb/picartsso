@@ -6,6 +6,6 @@ import '../../exceptions/app_exception.dart';
 
 abstract class TransferStyleService {
   Future<Result<AppException, void>> loadModel();
-  Future<Map<String, Uint8List>> transferStyle(
+  Future<Result<AppException, Map<String, Uint8List>>> transferStyle(
       Uint8List originalPicture, Uint8List stylePicture);
 }

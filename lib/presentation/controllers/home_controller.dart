@@ -2,28 +2,22 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../domain/domain_provider_module.dart' as domain_provider_module;
-
-import '../../domain/use_cases/get_chosen_pic_use_case.dart';
-import '../../domain/use_cases/load_initial_data_use_case.dart';
-import '../../domain/use_cases/pick_image_use_case.dart';
-
 final homeViewModelProvider =
-    StateNotifierProvider.autoDispose<HomeViewModel, AsyncValue<void>>(
-  (ref) => HomeViewModel(
+    StateNotifierProvider.autoDispose<HomeController, AsyncValue<void>>(
+  (ref) => HomeController(
     ref.watch(domain_provider_module.pickImageUseCase),
     ref.watch(domain_provider_module.loadInitialDataUseCase),
     ref.watch(domain_provider_module.getChosenPicUseCase),
   ),
 );
 
-class HomeViewModel extends StateNotifier<AsyncValue<void>> {
+class HomeController extends StateNotifier<AsyncValue<void>> {
   //final BootstrapAuthenticationUseCase _bootstrapAuthenticationUseCase;
   final PickImageUseCase _pickImageUseCase;
   final LoadInitialDataUseCase _loadInitialDataUseCase;
   final GetChosenPicUseCase _getChosenPicUseCase;
 
-  HomeViewModel(
+  HomeController(
     this._pickImageUseCase,
     this._loadInitialDataUseCase,
     this._getChosenPicUseCase,

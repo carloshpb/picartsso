@@ -13,9 +13,9 @@ import '../../domain/use_cases/save_images_gallery_use_case.dart';
 import '../../domain/use_cases/transfer_style_use_case.dart';
 import 'state/pic_arts_state.dart';
 
-final provider = StateNotifierProvider.autoDispose<TransferStyleViewModel,
+final provider = StateNotifierProvider.autoDispose<TransferStyleController,
     AsyncValue<PicArtsState>>(
-  (ref) => TransferStyleViewModel(
+  (ref) => TransferStyleController(
     ref.watch(domain_provider_module.getChosenPicUseCase),
     ref.watch(domain_provider_module.saveImagesGalleryUseCase),
     ref.watch(domain_provider_module.getTransformedImagesUseCase),
@@ -25,7 +25,7 @@ final provider = StateNotifierProvider.autoDispose<TransferStyleViewModel,
   ),
 );
 
-class TransferStyleViewModel extends StateNotifier<AsyncValue<PicArtsState>> {
+class TransferStyleController extends StateNotifier<AsyncValue<PicArtsState>> {
   final GetChosenPicUseCase _getChosenPicUseCase;
   final SaveImagesGalleryUseCase _saveImagesGalleryUseCase;
   final GetTransformedImagesUseCase _getTransformedImagesUseCase;
@@ -37,7 +37,7 @@ class TransferStyleViewModel extends StateNotifier<AsyncValue<PicArtsState>> {
   late Map<String, Uint8List> _transformedPics;
   late List<StyleImage> _arts;
 
-  TransferStyleViewModel(
+  TransferStyleController(
     this._getChosenPicUseCase,
     this._saveImagesGalleryUseCase,
     this._getTransformedImagesUseCase,

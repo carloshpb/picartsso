@@ -42,4 +42,8 @@ class PictureImageServiceImpl implements PictureImageService {
   @override
   Future<Result<AppException, void>> saveImageToGallery(StyleImage image) =>
       _pictureImageRepository.saveImageToGallery(image);
+
+  @override
+  Map<String, Uint8List> get transformedImages =>
+      _pictureImageRepository.transformedImages;
 }
