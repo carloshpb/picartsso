@@ -4,8 +4,9 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../data/data_provider_module.dart';
-import '../../view_model/home_view_model.dart';
+import '../../../domain/services/impl/art_service_impl.dart';
+import '../../../domain/services/impl/transfer_style_service_impl.dart';
+import '../../../router/app_router.dart';
 
 class HomeScreen extends ConsumerWidget {
   //final ImagePicker _picker = ImagePicker();
@@ -21,20 +22,19 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final _artService = ref.watch(artService);
+    final _transferStyleService = ref.watch(transferStyleService);
+
+    // TODO : Create chain of Futures to load every module and images, then at final of the chain to hide splash screen. If any errors was returned, show a dialog with its text and quit the app
+
+    _artService.loadCustomArts().then((result) {
+      return result.when((error) {}, (success) => null);
+    });
+
     final url = Uri.parse(_tensorFlowLiteUri);
     var theme = Theme.of(context);
-    ref.listen<AsyncValue>(
-      homeViewModelProvider,
-      (_, state) {
-        if (state.isLoading) {
-          // DO NOTHING
-        } else {
-          FlutterNativeSplash.remove();
-        }
-      },
-    );
 
-    var router = ref.watch(autoRouterProvider);
+    var router = ref.watch(goRouterProvider);
 
     return Scaffold(
       // appBar: AppBar(

@@ -12,13 +12,6 @@ class App extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final _artService = ref.watch(artService);
-    final _transferStyleService = ref.watch(transferStyleService);
-
-    // TODO : Create chain of Futures to load every module and images, then at final of the chain to hide splash screen. If any errors was returned, show a dialog with its text and quit the app
-
-    _artService.loadCustomArts().then((value) => null)
-
     var router = ref.watch(goRouterProvider);
     return MaterialApp.router(
       title: 'PicArtsso',
