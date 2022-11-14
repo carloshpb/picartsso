@@ -1,4 +1,3 @@
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -8,17 +7,15 @@ import '../../domain/services/impl/picture_image_service_impl.dart';
 import '../../domain/services/impl/transfer_style_service_impl.dart';
 import '../../domain/services/picture_image_service.dart';
 import '../../domain/services/transfer_style_service.dart';
+import '../../exceptions/app_exception.dart';
 
 final isInitialDataLoaded = StateProvider<bool>(
   (_) => false,
 );
 
-final homeViewModelProvider =
+final homeControllerProvider =
     StateNotifierProvider.autoDispose<HomeController, AsyncValue<void>>(
   (ref) => HomeController(
-    // ref.watch(domain_provider_module.pickImageUseCase),
-    // ref.watch(domain_provider_module.loadInitialDataUseCase),
-    // ref.watch(domain_provider_module.getChosenPicUseCase),
     ref.watch(artService),
     ref.watch(transferStyleService),
     ref.watch(pictureImageService),
@@ -27,21 +24,12 @@ final homeViewModelProvider =
 );
 
 class HomeController extends StateNotifier<AsyncValue<void>> {
-  //final BootstrapAuthenticationUseCase _bootstrapAuthenticationUseCase;
-
-  // final PickImageUseCase _pickImageUseCase;
-  // final LoadInitialDataUseCase _loadInitialDataUseCase;
-  // final GetChosenPicUseCase _getChosenPicUseCase;
-
   final ArtService _artService;
   final TransferStyleService _transferStyleService;
   final PictureImageService _pictureImageService;
   final Ref _ref;
 
   HomeController(
-    // this._pickImageUseCase,
-    // this._loadInitialDataUseCase,
-    // this._getChosenPicUseCase,
     this._artService,
     this._transferStyleService,
     this._pictureImageService,
@@ -80,38 +68,22 @@ class HomeController extends StateNotifier<AsyncValue<void>> {
             );
             return;
           }
-
           _ref.read(isInitialDataLoaded.notifier).state = true;
+          state = const AsyncValue.data(null);
         },
       );
     }
   }
 
-  Future<String?> pickImageFromGallery() async {
+  Future<AppException?> pickImageFromSource(ImageSource imageSource) async {
     final pickedImage =
-        await _pictureImageService.pickImageFromSource(ImageSource.gallery);
+        await _pictureImageService.pickImageFromSource(imageSource);
     return pickedImage.when(
-      (error) => error.when(
-        general: (message) => message,
-        // TODO : Treat denied permission situation
-        permission: (message) => message,
-      ),
+      (error) => error,
       (success) {
         _pictureImageService.chosenPic = success;
         return null;
       },
     );
-  }
-
-  Future<String?> takePictureWithCamera() async {
-    try {
-      await _pickImageUseCase.execute(ImageSource.camera);
-      // if (image == null) {
-      //   return "Não foi tirado nenhuma foto";
-      // }
-      return null;
-    } on PlatformException catch (e) {
-      return "Erro : $e";
-    }
   }
 }

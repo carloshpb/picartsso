@@ -1,12 +1,17 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../domain/services/impl/art_service_impl.dart';
 import '../../../domain/services/impl/transfer_style_service_impl.dart';
 import '../../../router/app_router.dart';
+import '../../controllers/home_controller.dart';
 
 class HomeScreen extends ConsumerWidget {
   //final ImagePicker _picker = ImagePicker();
@@ -15,26 +20,28 @@ class HomeScreen extends ConsumerWidget {
   final String _tensorFlowLiteUri =
       'https://www.tensorflow.org/lite/examples/style_transfer/overview';
 
-  HomeScreen({
+  const HomeScreen({
     Key? key,
     //required this.camera,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final _artService = ref.watch(artService);
-    final _transferStyleService = ref.watch(transferStyleService);
-
     // TODO : Create chain of Futures to load every module and images, then at final of the chain to hide splash screen. If any errors was returned, show a dialog with its text and quit the app
 
-    _artService.loadCustomArts().then((result) {
-      return result.when((error) {}, (success) => null);
-    });
+    ref.listen<AsyncValue>(
+      homeControllerProvider,
+      (_, state) {
+        if (!state.isLoading) {
+          FlutterNativeSplash.remove();
+        }
+      },
+    );
 
     final url = Uri.parse(_tensorFlowLiteUri);
     var theme = Theme.of(context);
 
-    var router = ref.watch(goRouterProvider);
+    final router = GoRouter.of(context);
 
     return Scaffold(
       // appBar: AppBar(
@@ -133,41 +140,83 @@ class HomeScreen extends ConsumerWidget {
                     ),
                   ),
                 ),
+                // Pick with Camera
                 ElevatedButton(
                   onPressed: () async {
                     var result = await ref
-                        .watch(homeViewModelProvider.notifier)
-                        .takePictureWithCamera();
+                        .watch(homeControllerProvider.notifier)
+                        .pickImageFromSource(ImageSource.camera);
                     if (result == null) {
-                      await router.go('/pick');
+                      router.go('/pick');
                     } else {
-                      await showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text(
-                            'Atenção',
-                            style: TextStyle(
-                              fontFamily: 'Roboto',
-                            ),
-                          ),
-                          content: Text(
-                            result,
-                            style: const TextStyle(
-                              fontFamily: 'Roboto',
-                            ),
-                          ),
-                          actions: <Widget>[
-                            TextButton(
-                              onPressed: () => router.pop(),
-                              child: const Text(
-                                'Ok',
+                      result.when(
+                        general: (String message) async {
+                          await showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text(
+                                'Atenção',
                                 style: TextStyle(
                                   fontFamily: 'Roboto',
                                 ),
                               ),
+                              content: Text(
+                                message,
+                                style: const TextStyle(
+                                  fontFamily: 'Roboto',
+                                ),
+                              ),
+                              actions: <Widget>[
+                                TextButton(
+                                  onPressed: () => SystemNavigator.pop(),
+                                  child: const Text(
+                                    'Ok',
+                                    style: TextStyle(
+                                      fontFamily: 'Roboto',
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          );
+                        },
+                        permission: (Permission permission) async {
+                          await showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text(
+                                'Atenção',
+                                style: TextStyle(
+                                  fontFamily: 'Roboto',
+                                ),
+                              ),
+                              content: const Text(
+                                "O aplicativo não tem permissão para acessar a câmera do celular. Clique no botão abaixo para ter permissão para acessar a câmera.",
+                                style: TextStyle(
+                                  fontFamily: 'Roboto',
+                                ),
+                              ),
+                              actions: <Widget>[
+                                TextButton(
+                                  onPressed: () async {
+                                    if (await Permission.camera
+                                        .request()
+                                        .isGranted) {
+                                      // TODO : Test this and if it doenst work, change to Navigator.pop(context)
+                                      router.pop();
+                                    }
+                                  },
+                                  child: const Text(
+                                    'Ok',
+                                    style: TextStyle(
+                                      fontFamily: 'Roboto',
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
                       );
                     }
                   },

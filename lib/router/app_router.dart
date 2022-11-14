@@ -18,7 +18,7 @@ final goRouterProvider = Provider<GoRouter>((_) {
       GoRoute(
         path: '/',
         builder: (BuildContext context, GoRouterState state) {
-          return HomeScreen();
+          return const HomeScreen();
         },
       ),
       GoRoute(

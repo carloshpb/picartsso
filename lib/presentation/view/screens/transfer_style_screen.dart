@@ -3,8 +3,6 @@ import 'package:flutter_overlay_loader/flutter_overlay_loader.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../router/app_router.dart';
-import '../../view_model/transfer_style_view_model.dart'
-    as transfer_style_view_model;
 
 class TransferStyleScreen extends ConsumerStatefulWidget {
   const TransferStyleScreen({Key? key}) : super(key: key);
