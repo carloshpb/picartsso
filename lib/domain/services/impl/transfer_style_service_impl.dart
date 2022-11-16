@@ -196,6 +196,20 @@ class TransferStyleServiceImpl implements TransferStyleService {
     transformedPictures['int8'] =
         encodeOutputImage(outputImageDataInt8, decodedOriginalImage);
 
+    if (transformedPictures['float16']!.isEmpty) {
+      return const Error(
+        AppException.general(
+            "Não foi possível fazer a transferencia de estilo para a imagem solicitada no formato binário FLOAT16. Tente novamente."),
+      );
+    }
+
+    if (transformedPictures['int8']!.isEmpty) {
+      return const Error(
+        AppException.general(
+            "Não foi possível fazer a transferencia de estilo para a imagem solicitada no formato binário INT8. Tente novamente."),
+      );
+    }
+
     // Save locally
     _pictureImageRepository.transformedImages = transformedPictures;
 

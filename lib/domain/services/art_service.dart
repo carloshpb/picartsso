@@ -10,6 +10,8 @@ abstract class ArtService {
   Result<AppException, List<StyleImage>> get defaultArts;
   List<StyleImage> get customArts;
 
+  Result<AppException, List<StyleImage>> get allArtsInOrder;
+
   Result<AppException, StyleImage> findArtByName(String artName);
 
   Future<Result<AppException, void>> loadDefaultImages();

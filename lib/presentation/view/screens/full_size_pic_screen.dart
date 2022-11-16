@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../data/data_provider_module.dart' as data_provider_module;
-import '../../view_model/transfer_style_view_model.dart'
-    as transfer_style_view_model;
+import '../../../router/app_router.dart';
+import '../../controllers/transfer_style_controller.dart';
 
 class FullSizePicScreen extends ConsumerWidget {
   const FullSizePicScreen({
@@ -12,14 +11,14 @@ class FullSizePicScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    var route = ref.watch(data_provider_module.autoRouterProvider);
+    var route = ref.watch(goRouterProvider);
 
     return SafeArea(
       child: Scaffold(
         //appBar: AppBar(),
         body: GestureDetector(
           onTap: () {
-            route.pop(context);
+            route.pop();
           },
           child: Hero(
             tag: 'image',
@@ -28,7 +27,7 @@ class FullSizePicScreen extends ConsumerWidget {
                 fit: BoxFit.fitHeight,
                 child: Image.memory(
                   ref
-                      .watch(transfer_style_view_model.provider)
+                      .watch(transferStyleControllerProvider)
                       .value!
                       .displayPicture,
                 ),

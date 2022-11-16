@@ -3,8 +3,6 @@ import 'dart:typed_data';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:picartsso/exceptions/app_exception.dart';
 
-import 'package:picartsso/domain/models/style_image.dart';
-
 import 'package:multiple_result/multiple_result.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -37,17 +35,17 @@ class PictureImageRepositoryImpl implements PictureImageRepository {
 
   @override
   Future<Result<AppException, void>> saveAllImagesToGallery(
-      Map<String, StyleImage> images) {
+      Map<String, Uint8List> images) {
     return _pictureDataSource.saveAllImagesToGallery(
       images.map(
-        (key, value) => MapEntry(key, value.image),
+        (key, img) => MapEntry(key, img),
       ),
     );
   }
 
   @override
-  Future<Result<AppException, void>> saveImageToGallery(StyleImage image) {
-    return _pictureDataSource.saveImageToGallery(image.image);
+  Future<Result<AppException, void>> saveImageToGallery(Uint8List image) {
+    return _pictureDataSource.saveImageToGallery(image);
   }
 
   @override

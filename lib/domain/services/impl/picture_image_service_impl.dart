@@ -5,7 +5,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:picartsso/exceptions/app_exception.dart';
 import 'package:multiple_result/multiple_result.dart';
 
-import '../../models/style_image.dart';
 import '../../repositories/picture_image_repository.dart';
 import '../picture_image_service.dart';
 import '../../../data/repositories/picture_image_repository_impl.dart';
@@ -36,11 +35,11 @@ class PictureImageServiceImpl implements PictureImageService {
 
   @override
   Future<Result<AppException, void>> saveAllImagesToGallery(
-          Map<String, StyleImage> images) =>
+          Map<String, Uint8List> images) =>
       _pictureImageRepository.saveAllImagesToGallery(images);
 
   @override
-  Future<Result<AppException, void>> saveImageToGallery(StyleImage image) =>
+  Future<Result<AppException, void>> saveImageToGallery(Uint8List image) =>
       _pictureImageRepository.saveImageToGallery(image);
 
   @override

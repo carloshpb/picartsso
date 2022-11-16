@@ -34,6 +34,14 @@ class ArtServiceImpl implements ArtService {
       _artsRepository.defaultArts;
 
   @override
+  Result<AppException, List<StyleImage>> get allArtsInOrder {
+    return defaultArts.when(
+      (error) => Error(error),
+      (success) => Success([...success, ...customArts]),
+    );
+  }
+
+  @override
   Result<AppException, StyleImage> findArtByName(String artName) =>
       _artsRepository.findArtByName(artName);
 

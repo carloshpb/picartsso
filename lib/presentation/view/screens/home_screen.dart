@@ -8,9 +8,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../../domain/services/impl/art_service_impl.dart';
-import '../../../domain/services/impl/transfer_style_service_impl.dart';
-import '../../../router/app_router.dart';
 import '../../controllers/home_controller.dart';
 
 class HomeScreen extends ConsumerWidget {
@@ -27,8 +24,7 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // TODO : Create chain of Futures to load every module and images, then at final of the chain to hide splash screen. If any errors was returned, show a dialog with its text and quit the app
-
+    // After loading initial stuffs with splash screen
     ref.listen<AsyncValue>(
       homeControllerProvider,
       (_, state) {
@@ -39,7 +35,7 @@ class HomeScreen extends ConsumerWidget {
     );
 
     final url = Uri.parse(_tensorFlowLiteUri);
-    var theme = Theme.of(context);
+    final theme = Theme.of(context);
 
     final router = GoRouter.of(context);
 
@@ -149,79 +145,57 @@ class HomeScreen extends ConsumerWidget {
                     if (result == null) {
                       router.go('/pick');
                     } else {
+                      late final void Function() alertButtonFunction;
+                      late final String alertMessage;
                       result.when(
                         general: (String message) async {
-                          await showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              title: const Text(
-                                'Atenção',
-                                style: TextStyle(
-                                  fontFamily: 'Roboto',
-                                ),
-                              ),
-                              content: Text(
-                                message,
-                                style: const TextStyle(
-                                  fontFamily: 'Roboto',
-                                ),
-                              ),
-                              actions: <Widget>[
-                                TextButton(
-                                  onPressed: () => SystemNavigator.pop(),
-                                  child: const Text(
-                                    'Ok',
-                                    style: TextStyle(
-                                      fontFamily: 'Roboto',
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
+                          alertButtonFunction =
+                              () async => await SystemNavigator.pop();
+                          alertMessage = message;
                         },
                         permission: (Permission permission) async {
-                          await showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              title: const Text(
-                                'Atenção',
-                                style: TextStyle(
-                                  fontFamily: 'Roboto',
-                                ),
-                              ),
-                              content: const Text(
-                                "O aplicativo não tem permissão para acessar a câmera do celular. Clique no botão abaixo para ter permissão para acessar a câmera.",
-                                style: TextStyle(
-                                  fontFamily: 'Roboto',
-                                ),
-                              ),
-                              actions: <Widget>[
-                                TextButton(
-                                  onPressed: () async {
-                                    if (await Permission.camera
-                                        .request()
-                                        .isGranted) {
-                                      // TODO : Test this and if it doenst work, change to Navigator.pop(context)
-                                      router.pop();
-                                    }
-                                  },
-                                  child: const Text(
-                                    'Ok',
-                                    style: TextStyle(
-                                      fontFamily: 'Roboto',
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
+                          alertMessage =
+                              "O aplicativo não tem permissão para acessar a câmera do celular. Clique no botão abaixo para ter permissão para acessar a câmera.";
+                          alertButtonFunction = () async {
+                            if (await permission.request().isGranted) {
+                              // TODO : Test this and if it doenst work, change to Navigator.pop(context)
+                              router.pop();
+                            }
+                          };
                         },
+                      );
+                      await showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text(
+                            'Atenção',
+                            style: TextStyle(
+                              fontFamily: 'Roboto',
+                            ),
+                          ),
+                          content: Text(
+                            alertMessage,
+                            style: const TextStyle(
+                              fontFamily: 'Roboto',
+                            ),
+                          ),
+                          actions: <Widget>[
+                            TextButton(
+                              onPressed: alertButtonFunction,
+                              child: const Text(
+                                'Ok',
+                                style: TextStyle(
+                                  fontFamily: 'Roboto',
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       );
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    primary: const Color.fromARGB(255, 228, 66, 17),
+                    backgroundColor: const Color.fromARGB(255, 228, 66, 17),
                   ),
                   child: const Padding(
                     padding: EdgeInsets.all(8.0),
@@ -245,20 +219,54 @@ class HomeScreen extends ConsumerWidget {
                 ElevatedButton(
                   onPressed: () async {
                     var result = await ref
-                        .watch(homeViewModelProvider.notifier)
-                        .pickImageFromGallery();
+                        .watch(homeControllerProvider.notifier)
+                        .pickImageFromSource(ImageSource.gallery);
                     if (result == null) {
-                      await router.go('/pick');
+                      router.go('/pick');
                     } else {
+                      late final void Function() alertButtonFunction;
+                      late final String alertMessage;
+                      result.when(
+                        general: (String message) async {
+                          alertButtonFunction =
+                              () async => await SystemNavigator.pop();
+                          alertMessage = message;
+                        },
+                        permission: (Permission permission) async {
+                          alertMessage =
+                              "O aplicativo não tem permissão para acessar a galeria de fotos do celular. Clique no botão abaixo para ter permissão para acessar a galeria.";
+                          alertButtonFunction = () async {
+                            if (await permission.request().isGranted) {
+                              // TODO : Test this and if it doenst work, change to Navigator.pop(context)
+                              router.pop();
+                            }
+                          };
+                        },
+                      );
                       await showDialog(
                         context: context,
                         builder: (context) => AlertDialog(
-                          title: const Text('Aviso !'),
-                          content: Text(result),
+                          title: const Text(
+                            'Atenção',
+                            style: TextStyle(
+                              fontFamily: 'Roboto',
+                            ),
+                          ),
+                          content: Text(
+                            alertMessage,
+                            style: const TextStyle(
+                              fontFamily: 'Roboto',
+                            ),
+                          ),
                           actions: <Widget>[
                             TextButton(
-                              onPressed: () => router.pop(),
-                              child: const Text('Ok'),
+                              onPressed: alertButtonFunction,
+                              child: const Text(
+                                'Ok',
+                                style: TextStyle(
+                                  fontFamily: 'Roboto',
+                                ),
+                              ),
                             ),
                           ],
                         ),

@@ -1,57 +1,60 @@
 import 'dart:typed_data';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:transparent_image/transparent_image.dart';
 
-import '../../domain/domain_provider_module.dart' as domain_provider_module;
-import '../../domain/models/style_image.dart';
-import '../../domain/use_cases/get_arts_use_case.dart';
-import '../../domain/use_cases/get_chosen_pic_use_case.dart';
-import '../../domain/use_cases/get_transformed_images_use_case.dart';
-import '../../domain/use_cases/pick_new_custom_art_use_case.dart';
-import '../../domain/use_cases/save_images_gallery_use_case.dart';
-import '../../domain/use_cases/transfer_style_use_case.dart';
+import '../../domain/services/art_service.dart';
+import '../../domain/services/impl/art_service_impl.dart';
+import '../../domain/services/impl/picture_image_service_impl.dart';
+import '../../domain/services/impl/transfer_style_service_impl.dart';
+import '../../domain/services/picture_image_service.dart';
+import '../../domain/services/transfer_style_service.dart';
 import 'state/pic_arts_state.dart';
 
-final provider = StateNotifierProvider.autoDispose<TransferStyleController,
-    AsyncValue<PicArtsState>>(
+final transferStyleControllerProvider = StateNotifierProvider.autoDispose<
+    TransferStyleController, AsyncValue<PicArtsState>>(
   (ref) => TransferStyleController(
-    ref.watch(domain_provider_module.getChosenPicUseCase),
-    ref.watch(domain_provider_module.saveImagesGalleryUseCase),
-    ref.watch(domain_provider_module.getTransformedImagesUseCase),
-    ref.watch(domain_provider_module.getArtsUseCase),
-    ref.watch(domain_provider_module.transferStyleUseCase),
-    ref.watch(domain_provider_module.pickNewCustomArtUseCase),
+    // ref.watch(domain_provider_module.getChosenPicUseCase),
+    // ref.watch(domain_provider_module.saveImagesGalleryUseCase),
+    // ref.watch(domain_provider_module.getTransformedImagesUseCase),
+    // ref.watch(domain_provider_module.getArtsUseCase),
+    // ref.watch(domain_provider_module.transferStyleUseCase),
+    // ref.watch(domain_provider_module.pickNewCustomArtUseCase),
+    ref.watch(artService),
+    ref.watch(pictureImageService),
+    ref.watch(transferStyleService),
   ),
 );
 
 class TransferStyleController extends StateNotifier<AsyncValue<PicArtsState>> {
-  final GetChosenPicUseCase _getChosenPicUseCase;
-  final SaveImagesGalleryUseCase _saveImagesGalleryUseCase;
-  final GetTransformedImagesUseCase _getTransformedImagesUseCase;
-  final GetArtsUseCase _getArtsUseCase;
-  final TransferStyleUseCase _transferStyleUseCase;
-  final PickNewCustomArtUseCase _pickNewCustomArtUseCase;
+  // final GetChosenPicUseCase _getChosenPicUseCase;
+  // final SaveImagesGalleryUseCase _saveImagesGalleryUseCase;
+  // final GetTransformedImagesUseCase _getTransformedImagesUseCase;
+  // final GetArtsUseCase _getArtsUseCase;
+  // final TransferStyleUseCase _transferStyleUseCase;
+  // final PickNewCustomArtUseCase _pickNewCustomArtUseCase;
 
-  late Uint8List _chosenPic;
-  late Map<String, Uint8List> _transformedPics;
-  late List<StyleImage> _arts;
+  final ArtService _artService;
+  final PictureImageService _pictureImageService;
+  final TransferStyleService _transferStyleService;
+
+  // late Uint8List _chosenPic;
+  // late Map<String, Uint8List> _transformedPics;
+  // late List<StyleImage> _arts;
 
   TransferStyleController(
-    this._getChosenPicUseCase,
-    this._saveImagesGalleryUseCase,
-    this._getTransformedImagesUseCase,
-    this._getArtsUseCase,
-    this._transferStyleUseCase,
-    this._pickNewCustomArtUseCase,
+    this._artService,
+    this._pictureImageService,
+    this._transferStyleService,
   ) : super(const AsyncValue.loading()) {
     _init();
   }
 
   void _init() {
     //state = const AsyncValue.loading();
-    _arts = _getArtsUseCase.execute();
-    _chosenPic = _getChosenPicUseCase.execute();
+    // _arts = _getArtsUseCase.execute();
+    // _chosenPic = _getChosenPicUseCase.execute();
 
     // state = await AsyncValue.guard<PicArtsState>(() async {
     //   return PicArtsState(
@@ -61,48 +64,65 @@ class TransferStyleController extends StateNotifier<AsyncValue<PicArtsState>> {
     //   );
     // });
 
-    state = AsyncValue.data(
-      PicArtsState(
-        arts: _arts,
-        lastPicture: kTransparentImage,
-        displayPicture: _chosenPic,
-        imageDataType: 'float16',
-        isTransferedStyleToImage: false,
-        isSaved: false,
-      ),
+    _artService.allArtsInOrder.when(
+      (error) {
+        state = AsyncValue.error(
+          error,
+          StackTrace.current,
+        );
+      },
+      (successArtsList) {
+        state = AsyncValue.data(
+          PicArtsState(
+            arts: successArtsList,
+            lastPicture: kTransparentImage,
+            displayPicture: _pictureImageService.chosenPic,
+            imageDataType: 'float16',
+            isTransferedStyleToImage: false,
+            isSaved: false,
+          ),
+        );
+      },
     );
   }
 
   Future<String?> saveImageInGallery() async {
     var oldStateValue = state.value!;
     state = const AsyncValue.loading();
-    try {
-      var transformedImagesMap = _getTransformedImagesUseCase.execute();
-      if (transformedImagesMap.containsKey('float16') &&
-          transformedImagesMap.containsKey('int8') &&
-          transformedImagesMap['float16'] != null &&
-          transformedImagesMap['float16']!.isNotEmpty &&
-          transformedImagesMap['int8'] != null &&
-          transformedImagesMap['int8']!.isNotEmpty) {
-        await _saveImagesGalleryUseCase.execute(transformedImagesMap);
-        state = AsyncValue.data(
-          PicArtsState(
-            arts: oldStateValue.arts,
-            lastPicture: oldStateValue.lastPicture,
-            displayPicture: oldStateValue.displayPicture,
-            imageDataType: oldStateValue.imageDataType,
-            isTransferedStyleToImage: oldStateValue.isTransferedStyleToImage,
-            isSaved: true,
-          ),
-        );
-        return null;
-      } else {
-        state = AsyncValue.data(oldStateValue);
-        return 'Não há nenhuma foto / imagem transformada para salvar.';
-      }
-    } on Exception catch (e) {
+
+    var transformedImagesMap = _pictureImageService.transformedImages;
+    if (transformedImagesMap.containsKey('float16') &&
+        transformedImagesMap.containsKey('int8') &&
+        transformedImagesMap['float16'] != null &&
+        transformedImagesMap['float16']!.isNotEmpty &&
+        transformedImagesMap['int8'] != null &&
+        transformedImagesMap['int8']!.isNotEmpty) {
+      var saveImagesResult = await _pictureImageService
+          .saveAllImagesToGallery(transformedImagesMap);
+      saveImagesResult.when(
+        (error) {
+          state = AsyncValue.error(
+            error,
+            StackTrace.current,
+          );
+        },
+        (success) {
+          state = AsyncValue.data(
+            PicArtsState(
+              arts: oldStateValue.arts,
+              lastPicture: oldStateValue.lastPicture,
+              displayPicture: oldStateValue.displayPicture,
+              imageDataType: oldStateValue.imageDataType,
+              isTransferedStyleToImage: oldStateValue.isTransferedStyleToImage,
+              isSaved: true,
+            ),
+          );
+        },
+      );
+      return null;
+    } else {
       state = AsyncValue.data(oldStateValue);
-      return e.toString();
+      return 'Não há nenhuma foto / imagem transformada para salvar.';
     }
   }
 
@@ -142,7 +162,7 @@ class TransferStyleController extends StateNotifier<AsyncValue<PicArtsState>> {
         PicArtsState(
           arts: oldState.arts,
           lastPicture: oldState.displayPicture,
-          displayPicture: _transformedPics[type]!,
+          displayPicture: _pictureImageService.transformedImages[type]!,
           imageDataType: type,
           isTransferedStyleToImage: oldState.isTransferedStyleToImage,
           isSaved: oldState.isSaved,
@@ -163,56 +183,72 @@ class TransferStyleController extends StateNotifier<AsyncValue<PicArtsState>> {
     // Put here to show Loader Overlay working - Screen freezes when TF is executed
     await Future.delayed(const Duration(milliseconds: 300));
 
-    try {
-      _transformedPics =
-          await _transferStyleUseCase.execute(_chosenPic, styleArt);
+    var transformedPicsResult = await _transferStyleService.transferStyle(
+      oldStateValue.lastPicture,
+      styleArt,
+    );
 
-      if (_transformedPics.containsKey('float16') &&
-          _transformedPics.containsKey('int8') &&
-          _transformedPics['float16'] != null &&
-          _transformedPics['float16']!.isNotEmpty &&
-          _transformedPics['int8'] != null &&
-          _transformedPics['int8']!.isNotEmpty) {
+    transformedPicsResult.when(
+      (error) {
+        state = AsyncValue.error(
+          error,
+          StackTrace.current,
+        );
+      },
+      (successTransformedPic) {
         state = AsyncValue.data(
           PicArtsState(
             arts: oldStateValue.arts,
             lastPicture: oldStateValue.displayPicture,
-            displayPicture: _transformedPics[oldStateValue.imageDataType]!,
+            displayPicture: successTransformedPic[oldStateValue.imageDataType]!,
             imageDataType: oldStateValue.imageDataType,
             isTransferedStyleToImage: true,
             isSaved: false,
           ),
         );
-        return null;
-      } else {
-        state = AsyncValue.data(oldStateValue);
-        return "Não ocorreu a transferência de estilo da imagem. Tente novamente.";
-      }
-    } on Exception catch (e) {
-      state = AsyncValue.data(oldStateValue);
-      return e.toString();
-    }
+      },
+    );
+
+    return null;
   }
 
-  Future<void> pickNewCustomArt() async {
+  Future<void> addNewCustomArt() async {
     var oldStateValue = state.value!;
     state = const AsyncValue.loading();
-    try {
-      var newArtsList = await _pickNewCustomArtUseCase.execute();
-      state = AsyncValue.data(
-        PicArtsState(
-          arts: newArtsList,
-          lastPicture: oldStateValue.lastPicture,
-          displayPicture: oldStateValue.displayPicture,
-          imageDataType: oldStateValue.imageDataType,
-          isTransferedStyleToImage: oldStateValue.isTransferedStyleToImage,
-          isSaved: oldStateValue.isSaved,
-        ),
-      );
-    } on Exception {
-      state = AsyncValue.data(oldStateValue);
-    }
 
-    //selectSpecificBinaryType(oldStateValue!);
+    var pickNewCustomArtResult =
+        await _artService.pickNewCustomArt(ImageSource.gallery);
+
+    pickNewCustomArtResult.when(
+      (error) {
+        state = AsyncValue.error(
+          error,
+          StackTrace.current,
+        );
+      },
+      (gottenCustomArt) {
+        _artService.allArtsInOrder.when(
+          (error) {
+            state = AsyncValue.error(
+              error,
+              StackTrace.current,
+            );
+          },
+          (successNewArtsList) {
+            state = AsyncValue.data(
+              PicArtsState(
+                arts: successNewArtsList,
+                lastPicture: oldStateValue.lastPicture,
+                displayPicture: oldStateValue.displayPicture,
+                imageDataType: oldStateValue.imageDataType,
+                isTransferedStyleToImage:
+                    oldStateValue.isTransferedStyleToImage,
+                isSaved: oldStateValue.isSaved,
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 }
