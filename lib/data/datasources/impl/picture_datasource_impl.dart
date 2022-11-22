@@ -40,11 +40,11 @@ class PictureDataSourceImpl implements PictureDataSource {
 
   /// If it exists a chosen picture, it'll return a valid Uint8List. Otherwise, it'll return Uint8List(0)
   @override
-  Uint8List get chosenPic => _ref.watch(_chosenPic);
+  Uint8List get chosenPic => _ref.read(_chosenPic);
 
   @override
   set chosenPic(Uint8List image) {
-    _ref.watch(_chosenPic.notifier).state = image;
+    _ref.read(_chosenPic.notifier).state = image;
   }
 
   @override
@@ -139,10 +139,10 @@ class PictureDataSourceImpl implements PictureDataSource {
   }
 
   @override
-  Map<String, Uint8List> get transformedImages => _ref.watch(_transformedPic);
+  Map<String, Uint8List> get transformedImages => _ref.read(_transformedPic);
 
   @override
   set transformedImages(Map<String, Uint8List> transformedImages) {
-    _ref.watch(_transformedPic.notifier).state = transformedImages;
+    _ref.read(_transformedPic.notifier).state = transformedImages;
   }
 }

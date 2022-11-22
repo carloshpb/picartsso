@@ -24,20 +24,56 @@ class HomeScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final url = Uri.parse(_tensorFlowLiteUri);
+    final theme = Theme.of(context);
+    final router = GoRouter.of(context);
+    final navigatorForDialogs = Navigator.of(context);
+
+    final homeController = ref.watch(homeControllerProvider.notifier);
+
     // After loading initial stuffs with splash screen
     ref.listen<AsyncValue>(
       homeControllerProvider,
-      (_, state) {
-        if (!state.isLoading) {
+      (_, state) async {
+        if (state.hasError) {
+          await showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text(
+                'Erro',
+                style: TextStyle(
+                  fontFamily: 'Roboto',
+                ),
+              ),
+              content: Text(
+                "${state.error.toString()} -- ${state.asError!.stackTrace}",
+                style: const TextStyle(
+                  fontFamily: 'Roboto',
+                ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    // TODO : Tratar erro
+                    // temporary splash remove
+                    FlutterNativeSplash.remove();
+                    navigatorForDialogs.pop();
+                  },
+                  child: const Text(
+                    'Ok',
+                    style: TextStyle(
+                      fontFamily: 'Roboto',
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        } else if (!state.isLoading) {
           FlutterNativeSplash.remove();
         }
       },
     );
-
-    final url = Uri.parse(_tensorFlowLiteUri);
-    final theme = Theme.of(context);
-
-    final router = GoRouter.of(context);
 
     return Scaffold(
       // appBar: AppBar(
@@ -110,7 +146,7 @@ class HomeScreen extends ConsumerWidget {
                             ),
                             actions: <Widget>[
                               TextButton(
-                                onPressed: () => router.pop(),
+                                onPressed: () => navigatorForDialogs.pop(),
                                 child: const Text(
                                   'Ok',
                                   style: TextStyle(
@@ -139,8 +175,7 @@ class HomeScreen extends ConsumerWidget {
                 // Pick with Camera
                 ElevatedButton(
                   onPressed: () async {
-                    var result = await ref
-                        .watch(homeControllerProvider.notifier)
+                    var result = await homeController
                         .pickImageFromSource(ImageSource.camera);
                     if (result == null) {
                       router.go('/pick');
@@ -158,8 +193,7 @@ class HomeScreen extends ConsumerWidget {
                               "O aplicativo não tem permissão para acessar a câmera do celular. Clique no botão abaixo para ter permissão para acessar a câmera.";
                           alertButtonFunction = () async {
                             if (await permission.request().isGranted) {
-                              // TODO : Test this and if it doenst work, change to Navigator.pop(context)
-                              router.pop();
+                              navigatorForDialogs.pop();
                             }
                           };
                         },
@@ -218,8 +252,7 @@ class HomeScreen extends ConsumerWidget {
                 ),
                 ElevatedButton(
                   onPressed: () async {
-                    var result = await ref
-                        .watch(homeControllerProvider.notifier)
+                    var result = await homeController
                         .pickImageFromSource(ImageSource.gallery);
                     if (result == null) {
                       router.go('/pick');
@@ -237,8 +270,7 @@ class HomeScreen extends ConsumerWidget {
                               "O aplicativo não tem permissão para acessar a galeria de fotos do celular. Clique no botão abaixo para ter permissão para acessar a galeria.";
                           alertButtonFunction = () async {
                             if (await permission.request().isGranted) {
-                              // TODO : Test this and if it doenst work, change to Navigator.pop(context)
-                              router.pop();
+                              navigatorForDialogs.pop();
                             }
                           };
                         },

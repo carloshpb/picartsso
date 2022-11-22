@@ -35,13 +35,13 @@ class ArtsDataSourceImpl implements ArtsDataSource {
   @override
   Future<Result<AppException, void>> addCustomArt(
       StyleImage newCustomArt) async {
-    final oldCustomArtsList = _ref.watch(_customArts);
+    final oldCustomArtsList = _ref.read(_customArts);
     final newCustomArtsList = [...oldCustomArtsList, newCustomArt];
-    _ref.watch(_customArts.notifier).state = newCustomArtsList;
+    _ref.read(_customArts.notifier).state = newCustomArtsList;
 
-    final sharedPref = _ref.watch(_sharedPreferences);
+    final sharedPref = await _ref.read(_sharedPreferences.future);
     try {
-      await sharedPref.value!.setStringList(
+      await sharedPref.setStringList(
           'customArts',
           newCustomArtsList
               .map((customArt) => json.encode(customArt.toJson()))
@@ -57,11 +57,11 @@ class ArtsDataSourceImpl implements ArtsDataSource {
   }
 
   @override
-  List<StyleImage> get customArts => [..._ref.watch(_customArts)];
+  List<StyleImage> get customArts => [..._ref.read(_customArts)];
 
   @override
   Result<AppException, List<StyleImage>> get defaultArts {
-    final listDefaultArts = _ref.watch(_defaultArts);
+    final listDefaultArts = _ref.read(_defaultArts);
     return (listDefaultArts.isEmpty)
         ? const Error(AppException.general("Default Arts list wasn't loaded."))
         : Success([...listDefaultArts]);
@@ -89,19 +89,19 @@ class ArtsDataSourceImpl implements ArtsDataSource {
 
   @override
   Future<Result<AppException, void>> loadCustomArts() async {
-    final sharedPref = _ref.watch(_sharedPreferences);
+    final sharedPref = await _ref.read(_sharedPreferences.future);
     try {
-      var customArtsJson = sharedPref.value!.getStringList('customArts');
-      if (customArtsJson == null || customArtsJson.isEmpty) {
-        return const Error(AppException.general(
-            "Não há artes customizadas guardadas localmente."));
-      }
-      var customArtsStyleImages = customArtsJson
-          .map((customArtJson) =>
-              StyleImage.fromJson(json.decode(customArtJson)))
-          .toList();
+      var customArtsJson = sharedPref.getStringList('customArts');
 
-      _ref.watch(_customArts.notifier).state = customArtsStyleImages;
+      var customArtsStyleImages =
+          (customArtsJson != null && customArtsJson.isNotEmpty)
+              ? customArtsJson
+                  .map((customArtJson) =>
+                      StyleImage.fromJson(json.decode(customArtJson)))
+                  .toList()
+              : <StyleImage>[];
+
+      _ref.read(_customArts.notifier).state = customArtsStyleImages;
       return const Success(null);
     } on Exception catch (e) {
       return Error(
@@ -149,7 +149,7 @@ class ArtsDataSourceImpl implements ArtsDataSource {
       defaultArts.add(newStyleImage);
     }
 
-    _ref.watch(_defaultArts.notifier).state = defaultArts;
+    _ref.read(_defaultArts.notifier).state = defaultArts;
 
     return const Success(null);
   }

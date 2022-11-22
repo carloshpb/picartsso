@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_overlay_loader/flutter_overlay_loader.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../exceptions/app_exception.dart';
 import '../../../router/app_router.dart';
 import '../../controllers/transfer_style_controller.dart';
 
@@ -16,31 +17,68 @@ class TransferStyleScreen extends ConsumerStatefulWidget {
 class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
   @override
   Widget build(BuildContext context) {
-    var route = ref.watch(goRouterProvider);
+    var router = ref.watch(goRouterProvider);
+    final navigatorForDialogs = Navigator.of(context);
+
+    final currentState = ref.watch(transferStyleControllerProvider);
+    final transferStyleController =
+        ref.watch(transferStyleControllerProvider.notifier);
 
     ref.listen<AsyncValue>(
       transferStyleControllerProvider,
-      (_, state) {
+      (_, state) async {
         if (state.isLoading) {
           //print("MOSTRA LOADER OVERLAY");
           //context.loaderOverlay.show();
-          Loader.show(context,
-              progressIndicator: const CircularProgressIndicator());
+          //Loader.show(context,progressIndicator: const CircularProgressIndicator());
+        } else if (state.hasError) {
+          await showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text(
+                'Erro',
+                style: TextStyle(
+                  fontFamily: 'Roboto',
+                ),
+              ),
+              content: Text(
+                state.error.toString(),
+                style: const TextStyle(
+                  fontFamily: 'Roboto',
+                ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    // TODO : Tratar erro
+                    Loader.hide();
+                    navigatorForDialogs.pop();
+                  },
+                  child: const Text(
+                    'Ok',
+                    style: TextStyle(
+                      fontFamily: 'Roboto',
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
         } else {
           //print("ESCONDE LOADER OVERLAY");
           //context.loaderOverlay.hide();
-          Loader.hide();
+
+          //Loader.hide();
         }
       },
     );
 
     return WillPopScope(
       onWillPop: () async {
-        if (ref.watch(transferStyleControllerProvider).hasValue &&
-            ref.watch(transferStyleControllerProvider).value!.isSaved) {
+        if (currentState.hasValue && currentState.value!.isSaved) {
           return true;
         }
-        bool wantToDiscar = true;
+        bool wantToDiscard = true;
         await showDialog(
           context: context,
           builder: (context) => AlertDialog(
@@ -59,8 +97,8 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
             actions: <Widget>[
               TextButton(
                 onPressed: () {
-                  wantToDiscar = false;
-                  route.pop();
+                  wantToDiscard = false;
+                  navigatorForDialogs.pop();
                 }, //<-- SEE HERE
                 child: const Text(
                   'Não',
@@ -71,8 +109,8 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
               ),
               TextButton(
                 onPressed: () {
-                  wantToDiscar = true;
-                  route.pop();
+                  wantToDiscard = true;
+                  navigatorForDialogs.pop();
                 },
                 child: const Text(
                   'Sim',
@@ -84,7 +122,7 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
             ],
           ),
         );
-        return wantToDiscar;
+        return wantToDiscard;
       },
       child: Scaffold(
         appBar: AppBar(
@@ -98,19 +136,12 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
           ),
           actions: [
             TextButton(
-              onPressed: (ref.watch(transferStyleControllerProvider).hasValue &&
-                      ref
-                          .watch(transferStyleControllerProvider)
-                          .value!
-                          .isTransferedStyleToImage &&
-                      ref
-                              .watch(transferStyleControllerProvider)
-                              .value!
-                              .imageDataType !=
-                          'float16')
+              onPressed: (!currentState.hasError &&
+                      currentState.hasValue &&
+                      currentState.value!.isTransferedStyleToImage &&
+                      currentState.value!.imageDataType != 'float16')
                   ? () {
-                      ref
-                          .watch(transferStyleControllerProvider.notifier)
+                      transferStyleController
                           .selectSpecificBinaryType('float16');
                     }
                   : null,
@@ -122,20 +153,11 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
               ),
             ),
             TextButton(
-              onPressed: (ref.watch(transferStyleControllerProvider).hasValue &&
-                      ref
-                          .watch(transferStyleControllerProvider)
-                          .value!
-                          .isTransferedStyleToImage &&
-                      ref
-                              .watch(transferStyleControllerProvider)
-                              .value!
-                              .imageDataType !=
-                          'int8')
+              onPressed: (currentState.hasValue &&
+                      currentState.value!.isTransferedStyleToImage &&
+                      currentState.value!.imageDataType != 'int8')
                   ? () {
-                      ref
-                          .watch(transferStyleControllerProvider.notifier)
-                          .selectSpecificBinaryType('int8');
+                      transferStyleController.selectSpecificBinaryType('int8');
                     }
                   : null,
               child: const Text(
@@ -150,19 +172,12 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
                 Icons.save_outlined,
               ),
               tooltip: 'Salvar imagem',
-              onPressed: (ref.watch(transferStyleControllerProvider).hasValue &&
-                      ref
-                          .watch(transferStyleControllerProvider)
-                          .value!
-                          .isTransferedStyleToImage &&
-                      !ref
-                          .watch(transferStyleControllerProvider)
-                          .value!
-                          .isSaved)
+              onPressed: (currentState.hasValue &&
+                      currentState.value!.isTransferedStyleToImage &&
+                      !currentState.value!.isSaved)
                   ? () async {
-                      var result = await ref
-                          .watch(transferStyleControllerProvider.notifier)
-                          .saveImageInGallery();
+                      var result =
+                          await transferStyleController.saveImageInGallery();
                       if (result != null) {
                         return await showDialog(
                           context: context,
@@ -181,7 +196,8 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
                             ),
                             actions: <Widget>[
                               TextButton(
-                                onPressed: () => route.pop(), //<-- SEE HERE
+                                onPressed: () =>
+                                    navigatorForDialogs.pop(), //<-- SEE HERE
                                 child: const Text(
                                   'Ok',
                                   style: TextStyle(
@@ -202,7 +218,7 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
                           ),
                         );
                         //! Special condition to check if widget is mounted to avoid unknown errors
-                        //! Should be used before every .of(context) that is used inside an async method
+                        //! Should be used before every .of(context) that is used inside an async method in a State
                         if (!mounted) return;
                         ScaffoldMessenger.of(context).showSnackBar(snackBar);
                       }
@@ -220,7 +236,7 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
                 flex: 3,
                 child: GestureDetector(
                   onTap: () {
-                    route.go('/result');
+                    router.go('/result');
                   },
                   child: Hero(
                     tag: 'image',
@@ -258,11 +274,25 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
                         Positioned.fill(
                           child: FittedBox(
                             fit: BoxFit.fitHeight,
-                            child: Image.memory(
-                              ref
-                                  .watch(transferStyleControllerProvider)
-                                  .value!
-                                  .displayPicture,
+                            child: currentState.when(
+                              data: (data) => Image.memory(
+                                data.displayPicture,
+                              ),
+                              error: (error, stackTrace) => (currentState
+                                      .hasValue)
+                                  ? Image.memory(
+                                      // AsyncValue.loading maintain old state, so we can get it yet to keep the image from previous state
+                                      currentState.value!.displayPicture,
+                                    )
+                                  : const Align(
+                                      alignment: Alignment.center,
+                                      child: Text("ERROR - NO PREVIOUS IMAGE"),
+                                    ),
+                              loading: () => (currentState.hasValue)
+                                  ? Image.memory(
+                                      currentState.value!.displayPicture,
+                                    )
+                                  : const SizedBox.shrink(),
                             ),
                           ),
                         ),
@@ -273,30 +303,19 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
               ),
               Expanded(
                 flex: 1,
-                child: (ref.watch(transferStyleControllerProvider).hasValue)
+                child: (currentState.hasValue)
                     ? ListView.separated(
                         scrollDirection: Axis.horizontal,
                         padding: const EdgeInsets.all(10.0),
                         shrinkWrap: true,
                         itemBuilder: (ctx, index) => (index !=
-                                ref
-                                    .watch(transferStyleControllerProvider)
-                                    .value!
-                                    .arts
-                                    .length)
+                                currentState.value!.arts.length)
                             ? GestureDetector(
                                 onTap: () async {
-                                  var result = await ref
-                                      .watch(transferStyleControllerProvider
-                                          .notifier)
+                                  var result = await transferStyleController
                                       .transferStyle(
-                                        ref
-                                            .watch(
-                                                transferStyleControllerProvider)
-                                            .value!
-                                            .arts[index]
-                                            .image,
-                                      );
+                                    currentState.value!.arts[index].image,
+                                  );
                                   if (result != null) {
                                     return await showDialog(
                                       context: context,
@@ -315,7 +334,8 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
                                         ),
                                         actions: <Widget>[
                                           TextButton(
-                                            onPressed: () => route.pop(),
+                                            onPressed: () =>
+                                                navigatorForDialogs.pop(),
                                             child: const Text(
                                               'Ok',
                                               style: TextStyle(
@@ -362,12 +382,10 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
                                         Positioned.fill(
                                           child: FittedBox(
                                             fit: BoxFit.fill,
-                                            child: Image.memory(ref
-                                                .watch(
-                                                    transferStyleControllerProvider)
-                                                .value!
-                                                .arts[index]
-                                                .image),
+                                            child: Image.memory(
+                                              currentState
+                                                  .value!.arts[index].image,
+                                            ),
                                           ),
                                         ),
                                       ],
@@ -376,10 +394,7 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
                                 ),
                               )
                             : GestureDetector(
-                                onTap: ref
-                                    .watch(transferStyleControllerProvider
-                                        .notifier)
-                                    .addNewCustomArt,
+                                onTap: transferStyleController.addNewCustomArt,
                                 child: Container(
                                   height: 100.0,
                                   width: 100.0,
@@ -404,12 +419,7 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
                         ),
                         // itemCount:
                         //     StyleImageConstants.listStyleImages.length,
-                        itemCount: ref
-                                .watch(transferStyleControllerProvider)
-                                .value!
-                                .arts
-                                .length +
-                            1,
+                        itemCount: currentState.value!.arts.length + 1,
                       )
                     : const SizedBox.shrink(),
               ),

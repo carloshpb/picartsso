@@ -39,7 +39,7 @@ class HomeController extends StateNotifier<AsyncValue<void>> {
   }
 
   Future<void> _loadInitialData() async {
-    final isLoaded = _ref.watch(isInitialDataLoaded);
+    final isLoaded = _ref.read(isInitialDataLoaded);
     if (!isLoaded) {
       state = await AsyncValue.guard<void>(
         () async {
@@ -68,7 +68,7 @@ class HomeController extends StateNotifier<AsyncValue<void>> {
             );
             return;
           }
-          _ref.watch(isInitialDataLoaded.notifier).state = true;
+          _ref.read(isInitialDataLoaded.notifier).state = true;
           state = const AsyncValue.data(null);
         },
       );
