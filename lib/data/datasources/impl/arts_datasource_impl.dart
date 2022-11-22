@@ -93,15 +93,14 @@ class ArtsDataSourceImpl implements ArtsDataSource {
     try {
       var customArtsJson = sharedPref.getStringList('customArts');
 
-      var customArtsStyleImages =
-          (customArtsJson != null && customArtsJson.isNotEmpty)
-              ? customArtsJson
-                  .map((customArtJson) =>
-                      StyleImage.fromJson(json.decode(customArtJson)))
-                  .toList()
-              : <StyleImage>[];
+      if (customArtsJson != null && customArtsJson.isNotEmpty) {
+        var customArtsStyleImages = customArtsJson
+            .map((customArtJson) =>
+                StyleImage.fromJson(json.decode(customArtJson)))
+            .toList();
+        _ref.read(_customArts.notifier).state = customArtsStyleImages;
+      }
 
-      _ref.read(_customArts.notifier).state = customArtsStyleImages;
       return const Success(null);
     } on Exception catch (e) {
       return Error(
