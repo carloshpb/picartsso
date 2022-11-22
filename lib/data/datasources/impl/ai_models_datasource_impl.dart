@@ -48,7 +48,7 @@ class AiModelsDataSourceImpl implements AiModelsDataSource {
 
   @override
   Result<AppException, Interpreter> get interpreterPredictionFloat16 {
-    var interpreter = _ref.read(_interpreterPredictionFloat16);
+    var interpreter = _ref.watch(_interpreterPredictionFloat16);
     return (interpreter == null)
         ? const Error(AppException.general(
             "O modelo de transferencia não foi carregado."))
@@ -57,7 +57,7 @@ class AiModelsDataSourceImpl implements AiModelsDataSource {
 
   @override
   Result<AppException, Interpreter> get interpreterPredictionInt8 {
-    var interpreter = _ref.read(_interpreterPredictionInt8);
+    var interpreter = _ref.watch(_interpreterPredictionInt8);
     return (interpreter == null)
         ? const Error(AppException.general(
             "O modelo de transferencia não foi carregado."))
@@ -66,7 +66,7 @@ class AiModelsDataSourceImpl implements AiModelsDataSource {
 
   @override
   Result<AppException, Interpreter> get interpreterTransformFloat16 {
-    var interpreter = _ref.read(_interpreterTransformFloat16);
+    var interpreter = _ref.watch(_interpreterTransformFloat16);
     return (interpreter == null)
         ? const Error(AppException.general(
             "O modelo de transferencia não foi carregado."))
@@ -75,7 +75,7 @@ class AiModelsDataSourceImpl implements AiModelsDataSource {
 
   @override
   Result<AppException, Interpreter> get interpreterTransformInt8 {
-    var interpreter = _ref.read(_interpreterTransformFloat16);
+    var interpreter = _ref.watch(_interpreterTransformFloat16);
     return (interpreter == null)
         ? const Error(AppException.general(
             "O modelo de transferencia não foi carregado."))
@@ -94,13 +94,13 @@ class AiModelsDataSourceImpl implements AiModelsDataSource {
       var interpreterTransformInt8 =
           await Interpreter.fromAsset(_transformModelFileInt8);
 
-      _ref.read(_interpreterPredictionFloat16.notifier).state =
+      _ref.watch(_interpreterPredictionFloat16.notifier).state =
           interpreterPredictionFloat16;
-      _ref.read(_interpreterTransformFloat16.notifier).state =
+      _ref.watch(_interpreterTransformFloat16.notifier).state =
           interpreterTransformFloat16;
-      _ref.read(_interpreterPredictionInt8.notifier).state =
+      _ref.watch(_interpreterPredictionInt8.notifier).state =
           interpreterPredictionInt8;
-      _ref.read(_interpreterTransformInt8.notifier).state =
+      _ref.watch(_interpreterTransformInt8.notifier).state =
           interpreterTransformInt8;
       return const Success(null);
     } on Exception catch (e) {

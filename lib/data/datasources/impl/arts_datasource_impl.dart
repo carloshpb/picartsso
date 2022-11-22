@@ -35,11 +35,11 @@ class ArtsDataSourceImpl implements ArtsDataSource {
   @override
   Future<Result<AppException, void>> addCustomArt(
       StyleImage newCustomArt) async {
-    final oldCustomArtsList = _ref.read(_customArts);
+    final oldCustomArtsList = _ref.watch(_customArts);
     final newCustomArtsList = [...oldCustomArtsList, newCustomArt];
-    _ref.read(_customArts.notifier).state = newCustomArtsList;
+    _ref.watch(_customArts.notifier).state = newCustomArtsList;
 
-    final sharedPref = _ref.read(_sharedPreferences);
+    final sharedPref = _ref.watch(_sharedPreferences);
     try {
       await sharedPref.value!.setStringList(
           'customArts',
@@ -57,11 +57,11 @@ class ArtsDataSourceImpl implements ArtsDataSource {
   }
 
   @override
-  List<StyleImage> get customArts => [..._ref.read(_customArts)];
+  List<StyleImage> get customArts => [..._ref.watch(_customArts)];
 
   @override
   Result<AppException, List<StyleImage>> get defaultArts {
-    final listDefaultArts = _ref.read(_defaultArts);
+    final listDefaultArts = _ref.watch(_defaultArts);
     return (listDefaultArts.isEmpty)
         ? const Error(AppException.general("Default Arts list wasn't loaded."))
         : Success([...listDefaultArts]);
@@ -89,7 +89,7 @@ class ArtsDataSourceImpl implements ArtsDataSource {
 
   @override
   Future<Result<AppException, void>> loadCustomArts() async {
-    final sharedPref = _ref.read(_sharedPreferences);
+    final sharedPref = _ref.watch(_sharedPreferences);
     try {
       var customArtsJson = sharedPref.value!.getStringList('customArts');
       if (customArtsJson == null || customArtsJson.isEmpty) {
@@ -101,7 +101,7 @@ class ArtsDataSourceImpl implements ArtsDataSource {
               StyleImage.fromJson(json.decode(customArtJson)))
           .toList();
 
-      _ref.read(_customArts.notifier).state = customArtsStyleImages;
+      _ref.watch(_customArts.notifier).state = customArtsStyleImages;
       return const Success(null);
     } on Exception catch (e) {
       return Error(
@@ -149,7 +149,7 @@ class ArtsDataSourceImpl implements ArtsDataSource {
       defaultArts.add(newStyleImage);
     }
 
-    _ref.read(_defaultArts.notifier).state = defaultArts;
+    _ref.watch(_defaultArts.notifier).state = defaultArts;
 
     return const Success(null);
   }

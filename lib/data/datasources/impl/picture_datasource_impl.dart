@@ -1,5 +1,7 @@
+import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:image_picker/image_picker.dart';
@@ -21,30 +23,35 @@ final pictureDataSource = Provider<PictureDataSource>(
   (ref) => PictureDataSourceImpl(
     ref,
     ImagePicker(),
+    DeviceInfoPlugin(),
   ),
 );
 
 class PictureDataSourceImpl implements PictureDataSource {
   final Ref _ref;
   final ImagePicker _imagePicker;
+  final DeviceInfoPlugin _deviceInfoPlugin;
 
   PictureDataSourceImpl(
     this._ref,
     this._imagePicker,
+    this._deviceInfoPlugin,
   );
 
   /// If it exists a chosen picture, it'll return a valid Uint8List. Otherwise, it'll return Uint8List(0)
   @override
-  Uint8List get chosenPic => _ref.read(_chosenPic);
+  Uint8List get chosenPic => _ref.watch(_chosenPic);
 
   @override
   set chosenPic(Uint8List image) {
-    _ref.read(_chosenPic.notifier).state = image;
+    _ref.watch(_chosenPic.notifier).state = image;
   }
 
   @override
   Future<Result<AppException, void>> saveAllImagesToGallery(
       Map<String, Uint8List> images) async {
+    var status = await Permission.photos.status;
+    print("PERMISSION GALLERY STATUS: $status");
     if (await Permission.photos.request().isGranted) {
       if (images.containsKey('float16') && images['float16'] != null) {
         await ImageGallerySaver.saveImage(
@@ -72,7 +79,14 @@ class PictureDataSourceImpl implements PictureDataSource {
   @override
   Future<Result<AppException, void>> saveImageToGallery(
       Uint8List imageBytes) async {
-    if (await Permission.photos.request().isGranted) {
+    late final Permission permissionSource;
+    final androidInfo = await _deviceInfoPlugin.androidInfo;
+    if (Platform.isAndroid && androidInfo.version.sdkInt <= 32) {
+      permissionSource = Permission.storage;
+    } else {
+      permissionSource = Permission.photos;
+    }
+    if (await permissionSource.request().isGranted) {
       await ImageGallerySaver.saveImage(
         imageBytes,
         name: "transformedImage${DateTime.now().toIso8601String()}",
@@ -86,8 +100,14 @@ class PictureDataSourceImpl implements PictureDataSource {
   Future<Result<AppException, Uint8List>> pickImageFromSource(
       ImageSource imageSource) async {
     final Permission permissionSource;
+    final androidInfo = await _deviceInfoPlugin.androidInfo;
     switch (imageSource) {
       case ImageSource.gallery:
+        // Temporary FIX for bug in permission_handler of DENIED status
+        if (Platform.isAndroid && androidInfo.version.sdkInt <= 32) {
+          permissionSource = Permission.storage;
+          break;
+        }
         permissionSource = Permission.photos;
         break;
       case ImageSource.camera:
@@ -96,6 +116,16 @@ class PictureDataSourceImpl implements PictureDataSource {
       default:
         return const Error(AppException.general("Unknown image source."));
     }
+    // Temporary FIX for bug in permission_handler of DENIED status
+    // if (Platform.isAndroid) {
+    //   final androidInfo = await _deviceInfoPlugin.androidInfo;
+    //   if (androidInfo.version.sdkInt <= 32) {
+    //     /// use [Permissions.storage.status]
+    //     permissionSource = Permission.storage;
+    //   }
+    // }
+    var status = await Permission.photos.status;
+    print("PERMISSION $permissionSource STATUS: ${permissionSource.status}");
     if (await permissionSource.request().isGranted) {
       var image = await _imagePicker.pickImage(source: imageSource);
       if (image != null) {
@@ -109,10 +139,10 @@ class PictureDataSourceImpl implements PictureDataSource {
   }
 
   @override
-  Map<String, Uint8List> get transformedImages => _ref.read(_transformedPic);
+  Map<String, Uint8List> get transformedImages => _ref.watch(_transformedPic);
 
   @override
   set transformedImages(Map<String, Uint8List> transformedImages) {
-    _ref.read(_transformedPic.notifier).state = transformedImages;
+    _ref.watch(_transformedPic.notifier).state = transformedImages;
   }
 }
