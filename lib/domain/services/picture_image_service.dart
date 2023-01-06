@@ -8,10 +8,10 @@ import '../../exceptions/app_exception.dart';
 abstract class PictureImageService {
   set chosenPic(Uint8List image);
   Uint8List get chosenPic;
-  Future<Result<AppException, void>> saveImageToGallery(Uint8List image);
-  Future<Result<AppException, void>> saveAllImagesToGallery(
+  Future<Result<void, AppException>> saveImageToGallery(Uint8List image);
+  Future<Result<void, AppException>> saveAllImagesToGallery(
       Map<String, Uint8List> images);
-  Future<Result<AppException, Uint8List>> pickImageFromSource(
+  Future<Result<Uint8List, AppException>> pickImageFromSource(
       ImageSource imageSource);
   Map<String, Uint8List> get transformedImages;
 }

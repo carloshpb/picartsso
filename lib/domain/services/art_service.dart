@@ -7,16 +7,16 @@ import '../../exceptions/app_exception.dart';
 import '../models/style_image.dart';
 
 abstract class ArtService {
-  Result<AppException, List<StyleImage>> get defaultArts;
+  Result<List<StyleImage>, AppException> get defaultArts;
   List<StyleImage> get customArts;
 
-  Result<AppException, List<StyleImage>> get allArtsInOrder;
+  Result<List<StyleImage>, AppException> get allArtsInOrder;
 
-  Result<AppException, StyleImage> findArtByName(String artName);
+  Result<StyleImage, AppException> findArtByName(String artName);
 
-  Future<Result<AppException, void>> loadDefaultImages();
-  Future<Result<AppException, void>> loadCustomArts();
+  Future<Result<void, AppException>> loadDefaultImages();
+  Future<Result<void, AppException>> loadCustomArts();
 
-  Future<Result<AppException, StyleImage>> pickNewCustomArt(
+  Future<Result<StyleImage, AppException>> pickNewCustomArt(
       ImageSource imageSource);
 }
