@@ -48,7 +48,7 @@ class PictureDataSourceImpl implements PictureDataSource {
   }
 
   @override
-  Future<Result<AppException, void>> saveAllImagesToGallery(
+  Future<Result<void, AppException>> saveAllImagesToGallery(
       Map<String, Uint8List> images) async {
     var status = await Permission.photos.status;
     print("PERMISSION GALLERY STATUS: $status");
@@ -77,7 +77,7 @@ class PictureDataSourceImpl implements PictureDataSource {
   }
 
   @override
-  Future<Result<AppException, void>> saveImageToGallery(
+  Future<Result<void, AppException>> saveImageToGallery(
       Uint8List imageBytes) async {
     late final Permission permissionSource;
     final androidInfo = await _deviceInfoPlugin.androidInfo;
@@ -97,7 +97,7 @@ class PictureDataSourceImpl implements PictureDataSource {
   }
 
   @override
-  Future<Result<AppException, Uint8List>> pickImageFromSource(
+  Future<Result<Uint8List, AppException>> pickImageFromSource(
       ImageSource imageSource) async {
     final Permission permissionSource;
     final androidInfo = await _deviceInfoPlugin.androidInfo;
@@ -124,7 +124,8 @@ class PictureDataSourceImpl implements PictureDataSource {
     //     permissionSource = Permission.storage;
     //   }
     // }
-    var status = await Permission.photos.status;
+
+    //var status = await Permission.photos.status;
     print("PERMISSION $permissionSource STATUS: ${permissionSource.status}");
     if (await permissionSource.request().isGranted) {
       var image = await _imagePicker.pickImage(source: imageSource);

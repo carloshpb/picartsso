@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:tflite_flutter/src/interpreter.dart';
 
 import 'package:picartsso/exceptions/app_exception.dart';
 
 import 'package:multiple_result/multiple_result.dart';
+import 'package:tflite_flutter_plugin_2/tflite_flutter_plugin_2.dart';
 
 import '../../domain/repositories/ai_models_repository.dart';
 import '../datasources/ai_models_datasource.dart';
@@ -19,22 +19,22 @@ class AiModelsRepositoryImpl implements AiModelsRepository {
   AiModelsRepositoryImpl(this._aiModelsDataSource);
 
   @override
-  Result<AppException, Interpreter> get interpreterPredictionFloat16 =>
+  Result<Interpreter, AppException> get interpreterPredictionFloat16 =>
       _aiModelsDataSource.interpreterPredictionFloat16;
 
   @override
-  Result<AppException, Interpreter> get interpreterPredictionInt8 =>
+  Result<Interpreter, AppException> get interpreterPredictionInt8 =>
       _aiModelsDataSource.interpreterPredictionInt8;
 
   @override
-  Result<AppException, Interpreter> get interpreterTransformFloat16 =>
+  Result<Interpreter, AppException> get interpreterTransformFloat16 =>
       _aiModelsDataSource.interpreterTransformFloat16;
 
   @override
-  Result<AppException, Interpreter> get interpreterTransformInt8 =>
+  Result<Interpreter, AppException> get interpreterTransformInt8 =>
       _aiModelsDataSource.interpreterTransformInt8;
 
   @override
-  Future<Result<AppException, void>> loadAiModels() =>
+  Future<Result<void, AppException>> loadAiModels() =>
       _aiModelsDataSource.loadAiModels();
 }

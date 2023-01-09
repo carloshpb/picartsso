@@ -30,35 +30,34 @@ class ArtServiceImpl implements ArtService {
   List<StyleImage> get customArts => _artsRepository.customArts;
 
   @override
-  Result<AppException, List<StyleImage>> get defaultArts =>
+  Result<List<StyleImage>, AppException> get defaultArts =>
       _artsRepository.defaultArts;
 
   @override
-  Result<AppException, List<StyleImage>> get allArtsInOrder {
+  Result<List<StyleImage>, AppException> get allArtsInOrder {
     return defaultArts.when(
-      (error) => Error(error),
       (success) => Success([...success, ...customArts]),
+      (error) => Error(error),
     );
   }
 
   @override
-  Result<AppException, StyleImage> findArtByName(String artName) =>
+  Result<StyleImage, AppException> findArtByName(String artName) =>
       _artsRepository.findArtByName(artName);
 
   @override
-  Future<Result<AppException, void>> loadCustomArts() =>
+  Future<Result<void, AppException>> loadCustomArts() =>
       _artsRepository.loadCustomArts();
   @override
-  Future<Result<AppException, void>> loadDefaultImages() =>
+  Future<Result<void, AppException>> loadDefaultImages() =>
       _artsRepository.loadDefaultImages();
 
   @override
-  Future<Result<AppException, StyleImage>> pickNewCustomArt(
+  Future<Result<StyleImage, AppException>> pickNewCustomArt(
       ImageSource imageSource) async {
     var newCustomArt =
         await _pictureImageRepository.pickImageFromSource(imageSource);
     return newCustomArt.when(
-      (error) => Error(error),
       (success) async {
         var styleImage = StyleImage(
           artName: 'CustomArt${_artsRepository.customArts.length}',
@@ -68,10 +67,11 @@ class ArtServiceImpl implements ArtService {
         var resultSaveCustomArt =
             await _artsRepository.addCustomArt(styleImage);
         return resultSaveCustomArt.when(
-          (error) => Error(error),
           (success) => Success(styleImage),
+          (error) => Error(error),
         );
       },
+      (error) => Error(error),
     );
   }
 }

@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'domain/services/impl/art_service_impl.dart';
-import 'domain/services/impl/transfer_style_service_impl.dart';
 import 'router/app_router.dart';
 
 class App extends ConsumerWidget {

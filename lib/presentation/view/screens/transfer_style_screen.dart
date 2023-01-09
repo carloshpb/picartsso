@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_overlay_loader/flutter_overlay_loader.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../exceptions/app_exception.dart';
 import '../../../router/app_router.dart';
 import '../../controllers/transfer_style_controller.dart';
 

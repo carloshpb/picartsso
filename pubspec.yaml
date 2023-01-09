@@ -101,6 +101,7 @@ flutter:
     - assets/style_imgs/
     - assets/models/
     - assets/logo/
+    - assets/background/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
@@ -140,6 +141,10 @@ flutter:
         - asset: assets/fonts/EB_Garamond/EBGaramond-ExtraBoldItalic.ttf
           weight: 800
           style: italic
+    - family: Jonathan
+      fonts:
+        - asset: assets/fonts/Jonathan/Jonathan.ttf
+          style: normal
     - family: Merienda
       fonts:
         - asset: assets/fonts/Merienda/Merienda-Regular.ttf

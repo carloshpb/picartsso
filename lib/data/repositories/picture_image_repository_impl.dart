@@ -28,13 +28,13 @@ class PictureImageRepositoryImpl implements PictureImageRepository {
   set chosenPic(Uint8List image) => _pictureDataSource.chosenPic = image;
 
   @override
-  Future<Result<AppException, Uint8List>> pickImageFromSource(
+  Future<Result<Uint8List, AppException>> pickImageFromSource(
       ImageSource imageSource) {
     return _pictureDataSource.pickImageFromSource(imageSource);
   }
 
   @override
-  Future<Result<AppException, void>> saveAllImagesToGallery(
+  Future<Result<void, AppException>> saveAllImagesToGallery(
       Map<String, Uint8List> images) {
     return _pictureDataSource.saveAllImagesToGallery(
       images.map(
@@ -44,7 +44,7 @@ class PictureImageRepositoryImpl implements PictureImageRepository {
   }
 
   @override
-  Future<Result<AppException, void>> saveImageToGallery(Uint8List image) {
+  Future<Result<void, AppException>> saveImageToGallery(Uint8List image) {
     return _pictureDataSource.saveImageToGallery(image);
   }
 

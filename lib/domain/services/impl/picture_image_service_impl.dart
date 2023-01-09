@@ -29,17 +29,17 @@ class PictureImageServiceImpl implements PictureImageService {
   Uint8List get chosenPic => _pictureImageRepository.chosenPic;
 
   @override
-  Future<Result<AppException, Uint8List>> pickImageFromSource(
+  Future<Result<Uint8List, AppException>> pickImageFromSource(
           ImageSource imageSource) =>
       _pictureImageRepository.pickImageFromSource(imageSource);
 
   @override
-  Future<Result<AppException, void>> saveAllImagesToGallery(
+  Future<Result<void, AppException>> saveAllImagesToGallery(
           Map<String, Uint8List> images) =>
       _pictureImageRepository.saveAllImagesToGallery(images);
 
   @override
-  Future<Result<AppException, void>> saveImageToGallery(Uint8List image) =>
+  Future<Result<void, AppException>> saveImageToGallery(Uint8List image) =>
       _pictureImageRepository.saveImageToGallery(image);
 
   @override

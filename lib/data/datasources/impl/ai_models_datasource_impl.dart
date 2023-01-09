@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:multiple_result/multiple_result.dart';
 import 'package:picartsso/exceptions/app_exception.dart';
-import 'package:tflite_flutter/tflite_flutter.dart';
+import 'package:tflite_flutter_plugin_2/tflite_flutter_plugin_2.dart';
 
 import '../ai_models_datasource.dart';
 
@@ -47,7 +47,7 @@ class AiModelsDataSourceImpl implements AiModelsDataSource {
   // estivesse indo trabalhar em um cenário da vida real (inferência).
 
   @override
-  Result<AppException, Interpreter> get interpreterPredictionFloat16 {
+  Result<Interpreter, AppException> get interpreterPredictionFloat16 {
     var interpreter = _ref.read(_interpreterPredictionFloat16);
     return (interpreter == null)
         ? const Error(AppException.general(
@@ -56,7 +56,7 @@ class AiModelsDataSourceImpl implements AiModelsDataSource {
   }
 
   @override
-  Result<AppException, Interpreter> get interpreterPredictionInt8 {
+  Result<Interpreter, AppException> get interpreterPredictionInt8 {
     var interpreter = _ref.read(_interpreterPredictionInt8);
     return (interpreter == null)
         ? const Error(AppException.general(
@@ -65,7 +65,7 @@ class AiModelsDataSourceImpl implements AiModelsDataSource {
   }
 
   @override
-  Result<AppException, Interpreter> get interpreterTransformFloat16 {
+  Result<Interpreter, AppException> get interpreterTransformFloat16 {
     var interpreter = _ref.read(_interpreterTransformFloat16);
     return (interpreter == null)
         ? const Error(AppException.general(
@@ -74,7 +74,7 @@ class AiModelsDataSourceImpl implements AiModelsDataSource {
   }
 
   @override
-  Result<AppException, Interpreter> get interpreterTransformInt8 {
+  Result<Interpreter, AppException> get interpreterTransformInt8 {
     var interpreter = _ref.read(_interpreterTransformFloat16);
     return (interpreter == null)
         ? const Error(AppException.general(
@@ -83,7 +83,7 @@ class AiModelsDataSourceImpl implements AiModelsDataSource {
   }
 
   @override
-  Future<Result<AppException, void>> loadAiModels() async {
+  Future<Result<void, AppException>> loadAiModels() async {
     try {
       var interpreterPredictionFloat16 =
           await Interpreter.fromAsset(_predictionModelFileFloat16);

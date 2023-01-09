@@ -65,12 +65,6 @@ class TransferStyleController extends StateNotifier<AsyncValue<PicArtsState>> {
     // });
 
     _artService.allArtsInOrder.when(
-      (error) {
-        state = AsyncValue.error(
-          error,
-          StackTrace.current,
-        );
-      },
       (successArtsList) {
         state = AsyncValue.data(
           PicArtsState(
@@ -81,6 +75,12 @@ class TransferStyleController extends StateNotifier<AsyncValue<PicArtsState>> {
             isTransferedStyleToImage: false,
             isSaved: false,
           ),
+        );
+      },
+      (error) {
+        state = AsyncValue.error(
+          error,
+          StackTrace.current,
         );
       },
     );
@@ -100,12 +100,6 @@ class TransferStyleController extends StateNotifier<AsyncValue<PicArtsState>> {
       var saveImagesResult = await _pictureImageService
           .saveAllImagesToGallery(transformedImagesMap);
       saveImagesResult.when(
-        (error) {
-          state = AsyncValue.error(
-            error,
-            StackTrace.current,
-          );
-        },
         (success) {
           state = AsyncValue.data(
             PicArtsState(
@@ -116,6 +110,12 @@ class TransferStyleController extends StateNotifier<AsyncValue<PicArtsState>> {
               isTransferedStyleToImage: oldStateValue.isTransferedStyleToImage,
               isSaved: true,
             ),
+          );
+        },
+        (error) {
+          state = AsyncValue.error(
+            error,
+            StackTrace.current,
           );
         },
       );
@@ -189,12 +189,6 @@ class TransferStyleController extends StateNotifier<AsyncValue<PicArtsState>> {
     );
 
     transformedPicsResult.when(
-      (error) {
-        state = AsyncValue.error(
-          error,
-          StackTrace.current,
-        );
-      },
       (successTransformedPic) {
         state = AsyncValue.data(
           PicArtsState(
@@ -205,6 +199,12 @@ class TransferStyleController extends StateNotifier<AsyncValue<PicArtsState>> {
             isTransferedStyleToImage: true,
             isSaved: false,
           ),
+        );
+      },
+      (error) {
+        state = AsyncValue.error(
+          error,
+          StackTrace.current,
         );
       },
     );
@@ -228,12 +228,6 @@ class TransferStyleController extends StateNotifier<AsyncValue<PicArtsState>> {
       },
       (gottenCustomArt) {
         _artService.allArtsInOrder.when(
-          (error) {
-            state = AsyncValue.error(
-              error,
-              StackTrace.current,
-            );
-          },
           (successNewArtsList) {
             state = AsyncValue.data(
               PicArtsState(
@@ -245,6 +239,12 @@ class TransferStyleController extends StateNotifier<AsyncValue<PicArtsState>> {
                     oldStateValue.isTransferedStyleToImage,
                 isSaved: oldStateValue.isSaved,
               ),
+            );
+          },
+          (error) {
+            state = AsyncValue.error(
+              error,
+              StackTrace.current,
             );
           },
         );

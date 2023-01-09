@@ -33,7 +33,7 @@ class ArtsDataSourceImpl implements ArtsDataSource {
   );
 
   @override
-  Future<Result<AppException, void>> addCustomArt(
+  Future<Result<void, AppException>> addCustomArt(
       StyleImage newCustomArt) async {
     final oldCustomArtsList = _ref.read(_customArts);
     final newCustomArtsList = [...oldCustomArtsList, newCustomArt];
@@ -60,7 +60,7 @@ class ArtsDataSourceImpl implements ArtsDataSource {
   List<StyleImage> get customArts => [..._ref.read(_customArts)];
 
   @override
-  Result<AppException, List<StyleImage>> get defaultArts {
+  Result<List<StyleImage>, AppException> get defaultArts {
     final listDefaultArts = _ref.read(_defaultArts);
     return (listDefaultArts.isEmpty)
         ? const Error(AppException.general("Default Arts list wasn't loaded."))
@@ -68,9 +68,8 @@ class ArtsDataSourceImpl implements ArtsDataSource {
   }
 
   @override
-  Result<AppException, StyleImage> findArtByName(String artName) {
+  Result<StyleImage, AppException> findArtByName(String artName) {
     return defaultArts.when(
-      (error) => Error(error),
       (arts) {
         try {
           var result = arts.firstWhere(
@@ -84,11 +83,12 @@ class ArtsDataSourceImpl implements ArtsDataSource {
           return const Error(AppException.general("Art not found."));
         }
       },
+      (error) => Error(error),
     );
   }
 
   @override
-  Future<Result<AppException, void>> loadCustomArts() async {
+  Future<Result<void, AppException>> loadCustomArts() async {
     final sharedPref = await _ref.read(_sharedPreferences.future);
     try {
       var customArtsJson = sharedPref.getStringList('customArts');
@@ -112,7 +112,7 @@ class ArtsDataSourceImpl implements ArtsDataSource {
   }
 
   @override
-  Future<Result<AppException, void>> loadDefaultImages() async {
+  Future<Result<void, AppException>> loadDefaultImages() async {
     late String manifestContent;
     try {
       manifestContent = await rootBundle.loadString("AssetManifest.json");

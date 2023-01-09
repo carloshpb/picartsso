@@ -19,25 +19,25 @@ class ArtsRepositoryImpl implements ArtsRepository {
   ArtsRepositoryImpl(this._artsDataSource);
 
   @override
-  Future<Result<AppException, void>> addCustomArt(StyleImage newCustomArt) =>
+  Future<Result<void, AppException>> addCustomArt(StyleImage newCustomArt) =>
       _artsDataSource.addCustomArt(newCustomArt);
 
   @override
   List<StyleImage> get customArts => _artsDataSource.customArts;
 
   @override
-  Result<AppException, List<StyleImage>> get defaultArts =>
+  Result<List<StyleImage>, AppException> get defaultArts =>
       _artsDataSource.defaultArts;
 
   @override
-  Result<AppException, StyleImage> findArtByName(String artName) =>
+  Result<StyleImage, AppException> findArtByName(String artName) =>
       _artsDataSource.findArtByName(artName);
 
   @override
-  Future<Result<AppException, void>> loadCustomArts() =>
+  Future<Result<void, AppException>> loadCustomArts() =>
       _artsDataSource.loadCustomArts();
 
   @override
-  Future<Result<AppException, void>> loadDefaultImages() =>
+  Future<Result<void, AppException>> loadDefaultImages() =>
       _artsDataSource.loadDefaultImages();
 }

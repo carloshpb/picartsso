@@ -2,7 +2,6 @@ import 'dart:typed_data';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:multiple_result/multiple_result.dart';
-import 'package:tflite_flutter/tflite_flutter.dart';
 import 'package:image/image.dart' as image_formatter;
 
 import '../../../data/repositories/ai_models_repository_impl.dart';
@@ -29,18 +28,18 @@ class TransferStyleServiceImpl implements TransferStyleService {
   );
 
   // A imagem do conteúdo deve ser (1, 384, 384, 3). Recortamos a imagem centralmente e a redimensionamos.
-  static const int MODEL_TRANSFER_IMAGE_SIZE = 384;
+  static const int modelTransferImageSize = 384;
 
   // O tamanho da imagem do estilo deve ser (1, 256, 256, 3). Recortamos a imagem centralmente e a redimensionamos.
-  static const int MODEL_PREDICTION_IMAGE_SIZE = 256;
+  static const int modelPredictionImageSize = 256;
 
   // Função que carregará os modelos
   @override
-  Future<Result<AppException, void>> loadModel() =>
+  Future<Result<void, AppException>> loadModel() =>
       _aiModelsRepository.loadAiModels();
 
   @override
-  Future<Result<AppException, Map<String, Uint8List>>> transferStyle(
+  Future<Result<Map<String, Uint8List>, AppException>> transferStyle(
       Uint8List originalPicture, Uint8List stylePicture) async {
     var decodedOriginalImage = image_formatter.decodeImage(originalPicture);
 
@@ -58,33 +57,33 @@ class TransferStyleServiceImpl implements TransferStyleService {
     //Resize images
     var modelTransferImageFloat16 = image_formatter.copyResize(
         decodedOriginalImage,
-        width: MODEL_TRANSFER_IMAGE_SIZE,
-        height: MODEL_TRANSFER_IMAGE_SIZE);
+        width: modelTransferImageSize,
+        height: modelTransferImageSize);
 
     var modelTransferImageInt8 = modelTransferImageFloat16.clone();
 
     var modelTransferInputFloat16 = _imageToByteListUInt8(
-        modelTransferImageFloat16, MODEL_TRANSFER_IMAGE_SIZE, 0, 255);
+        modelTransferImageFloat16, modelTransferImageSize, 0, 255);
 
     var modelTransferInputInt8 = _imageToByteListUInt8(
-        modelTransferImageInt8, MODEL_TRANSFER_IMAGE_SIZE, 0, 255);
+        modelTransferImageInt8, modelTransferImageSize, 0, 255);
 
     print(
         "Style Image Size : ${decodedStyleImage.height} ${decodedStyleImage.width} ${decodedStyleImage.xOffset} ${decodedStyleImage.yOffset}");
 
     var modelPredictionImageFloat16 = image_formatter.copyResize(
         decodedStyleImage,
-        width: MODEL_PREDICTION_IMAGE_SIZE,
-        height: MODEL_PREDICTION_IMAGE_SIZE);
+        width: modelPredictionImageSize,
+        height: modelPredictionImageSize);
 
     var modelPredictionImageInt8 = modelPredictionImageFloat16.clone();
 
     // content_image 384 384 3
     var modelPredictionInputFloat16 = _imageToByteListUInt8(
-        modelPredictionImageFloat16, MODEL_PREDICTION_IMAGE_SIZE, 0, 255);
+        modelPredictionImageFloat16, modelPredictionImageSize, 0, 255);
 
     var modelPredictionInputInt8 = _imageToByteListUInt8(
-        modelPredictionImageInt8, MODEL_PREDICTION_IMAGE_SIZE, 0, 255);
+        modelPredictionImageInt8, modelPredictionImageSize, 0, 255);
 
     // var modelPredictionInputImage =
     //     imageFormatter.decodeImage(modelPredictionInput);
@@ -118,20 +117,21 @@ class TransferStyleServiceImpl implements TransferStyleService {
     // Check if interpreter has loaded the model
     if (_aiModelsRepository.interpreterPredictionFloat16.isError()) {
       return Error(
-          _aiModelsRepository.interpreterPredictionFloat16.getError()!);
+          _aiModelsRepository.interpreterPredictionFloat16.tryGetError()!);
     }
     _aiModelsRepository.interpreterPredictionFloat16
-        .getSuccess()!
+        .tryGetSuccess()!
         .runForMultipleInputs(
             inputsForPredictionFloat16, outputsForPredictionFloat16);
 
     // style predict model Int 8
     // Check if interpreter has loaded the model
     if (_aiModelsRepository.interpreterPredictionInt8.isError()) {
-      return Error(_aiModelsRepository.interpreterPredictionInt8.getError()!);
+      return Error(
+          _aiModelsRepository.interpreterPredictionInt8.tryGetError()!);
     }
     _aiModelsRepository.interpreterPredictionInt8
-        .getSuccess()!
+        .tryGetSuccess()!
         .runForMultipleInputs(
             inputsForPredictionInt8, outputsForPredictionInt8);
 
@@ -152,18 +152,18 @@ class TransferStyleServiceImpl implements TransferStyleService {
     // stylized_image 1 384 384 3
     var outputImageDataFloat16 = [
       List.generate(
-        MODEL_TRANSFER_IMAGE_SIZE,
+        modelTransferImageSize,
         (index) => List.generate(
-          MODEL_TRANSFER_IMAGE_SIZE,
+          modelTransferImageSize,
           (index) => List.generate(3, (index) => 0.0),
         ),
       ),
     ];
     var outputImageDataInt8 = [
       List.generate(
-        MODEL_TRANSFER_IMAGE_SIZE,
+        modelTransferImageSize,
         (index) => List.generate(
-          MODEL_TRANSFER_IMAGE_SIZE,
+          modelTransferImageSize,
           (index) => List.generate(3, (index) => 0.0),
         ),
       ),
@@ -172,18 +172,19 @@ class TransferStyleServiceImpl implements TransferStyleService {
     outputsForStyleTransferInt8[0] = outputImageDataInt8;
 
     if (_aiModelsRepository.interpreterTransformFloat16.isError()) {
-      return Error(_aiModelsRepository.interpreterTransformFloat16.getError()!);
+      return Error(
+          _aiModelsRepository.interpreterTransformFloat16.tryGetError()!);
     }
     _aiModelsRepository.interpreterTransformFloat16
-        .getSuccess()!
+        .tryGetSuccess()!
         .runForMultipleInputs(
             inputsForStyleTransferFloat16, outputsForStyleTransferFloat16);
 
     if (_aiModelsRepository.interpreterTransformInt8.isError()) {
-      return Error(_aiModelsRepository.interpreterTransformInt8.getError()!);
+      return Error(_aiModelsRepository.interpreterTransformInt8.tryGetError()!);
     }
     _aiModelsRepository.interpreterTransformInt8
-        .getSuccess()!
+        .tryGetSuccess()!
         .runForMultipleInputs(
             inputsForStyleTransferInt8, outputsForStyleTransferInt8);
 
@@ -220,7 +221,7 @@ class TransferStyleServiceImpl implements TransferStyleService {
   Uint8List encodeOutputImage(List<List<List<List<double>>>> outputImageData,
       image_formatter.Image decodedOriginalImage) {
     var outputImage =
-        _convertArrayToImage(outputImageData, MODEL_TRANSFER_IMAGE_SIZE);
+        _convertArrayToImage(outputImageData, modelTransferImageSize);
     var rotateOutputImageFloat16 = image_formatter.copyRotate(outputImage, 90);
     var flipOutputImage =
         image_formatter.flipHorizontal(rotateOutputImageFloat16);

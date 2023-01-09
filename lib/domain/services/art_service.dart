@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:image_picker/image_picker.dart';
 import 'package:multiple_result/multiple_result.dart';
 

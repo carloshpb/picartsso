@@ -46,7 +46,7 @@ class HomeController extends StateNotifier<AsyncValue<void>> {
           final loadDefaultImages = await _artService.loadDefaultImages();
           if (loadDefaultImages.isError()) {
             state = AsyncValue.error(
-              loadDefaultImages.getError()!,
+              loadDefaultImages.tryGetError()!,
               StackTrace.current,
             );
             return;
@@ -54,7 +54,7 @@ class HomeController extends StateNotifier<AsyncValue<void>> {
           final loadCustomArts = await _artService.loadCustomArts();
           if (loadCustomArts.isError()) {
             state = AsyncValue.error(
-              loadCustomArts.getError()!,
+              loadCustomArts.tryGetError()!,
               StackTrace.current,
             );
             return;
@@ -63,7 +63,7 @@ class HomeController extends StateNotifier<AsyncValue<void>> {
           final loadAIModels = await _transferStyleService.loadModel();
           if (loadAIModels.isError()) {
             state = AsyncValue.error(
-              loadAIModels.getError()!,
+              loadAIModels.tryGetError()!,
               StackTrace.current,
             );
             return;
@@ -79,11 +79,11 @@ class HomeController extends StateNotifier<AsyncValue<void>> {
     final pickedImage =
         await _pictureImageService.pickImageFromSource(imageSource);
     return pickedImage.when(
-      (error) => error,
       (success) {
         _pictureImageService.chosenPic = success;
         return null;
       },
+      (error) => error,
     );
   }
 }
