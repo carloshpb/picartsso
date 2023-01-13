@@ -29,7 +29,12 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
         if (state.isLoading) {
           //print("MOSTRA LOADER OVERLAY");
           //context.loaderOverlay.show();
-          //Loader.show(context,progressIndicator: const CircularProgressIndicator());
+          if (!Loader.isShown) {
+            Loader.show(
+              context,
+              progressIndicator: const CircularProgressIndicator.adaptive(),
+            );
+          }
         } else if (state.hasError) {
           await showDialog(
             context: context,
@@ -66,8 +71,7 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
         } else {
           //print("ESCONDE LOADER OVERLAY");
           //context.loaderOverlay.hide();
-
-          //Loader.hide();
+          Loader.hide();
         }
       },
     );
@@ -125,14 +129,18 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const FittedBox(
-            child: Text(
-              'Transferência de Estilo',
-              style: TextStyle(
-                fontFamily: 'Roboto',
-              ),
-            ),
-          ),
+          backgroundColor: const Color.fromRGBO(25, 27, 29, 1),
+          elevation: 0.0,
+          surfaceTintColor: Colors.transparent,
+          scrolledUnderElevation: 0.0,
+          // title: const FittedBox(
+          //   child: Text(
+          //     'Transferência de Estilo',
+          //     style: TextStyle(
+          //       fontFamily: 'Roboto',
+          //     ),
+          //   ),
+          // ),
           actions: [
             TextButton(
               onPressed: (!currentState.hasError &&
@@ -232,72 +240,117 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
           child: Column(
             children: [
               Expanded(
-                flex: 3,
-                child: GestureDetector(
-                  onTap: () {
-                    router.go('/result');
-                  },
-                  child: Hero(
-                    tag: 'image',
-                    // child: FadeInImage(
-                    //   placeholder: MemoryImage(
-                    //     ref
-                    //         .watch(display_picture_view_model
-                    //             .displayPictureViewModelProvider)
-                    //         .value!
-                    //         .lastPicture,
-                    //   ),
-                    //   image: MemoryImage(
-                    //     ref
-                    //         .watch(display_picture_view_model
-                    //             .displayPictureViewModelProvider)
-                    //         .value!
-                    //         .displayPicture,
-                    //   ),
-                    // ),
-                    // child: Image.memory(
-                    //   ref
-                    //       .watch(transfer_style_view_model.provider)
-                    //       .value!
-                    //       .displayPicture,
-                    //   gaplessPlayback: false,
-                    // ),
-                    child: Stack(
+                flex: 4,
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return Stack(
                       children: [
-                        const Positioned.fill(
-                          child: Align(
-                            alignment: Alignment.center,
-                            child: CircularProgressIndicator(),
+                        GestureDetector(
+                          onTap: () {
+                            router.push('/result');
+                          },
+                          child: Hero(
+                            tag: 'image',
+                            // child: FadeInImage(
+                            //   placeholder: MemoryImage(
+                            //     ref
+                            //         .watch(display_picture_view_model
+                            //             .displayPictureViewModelProvider)
+                            //         .value!
+                            //         .lastPicture,
+                            //   ),
+                            //   image: MemoryImage(
+                            //     ref
+                            //         .watch(display_picture_view_model
+                            //             .displayPictureViewModelProvider)
+                            //         .value!
+                            //         .displayPicture,
+                            //   ),
+                            // ),
+                            // child: Image.memory(
+                            //   ref
+                            //       .watch(transfer_style_view_model.provider)
+                            //       .value!
+                            //       .displayPicture,
+                            //   gaplessPlayback: false,
+                            // ),
+                            child: Stack(
+                              children: [
+                                const Positioned.fill(
+                                  child: Align(
+                                    alignment: Alignment.center,
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                ),
+                                Positioned.fill(
+                                  child: FittedBox(
+                                    fit: BoxFit.fitHeight,
+                                    child: currentState.when(
+                                      data: (data) => Image.memory(
+                                        data.displayPicture,
+                                      ),
+                                      error: (error, stackTrace) =>
+                                          (currentState.hasValue)
+                                              ? Image.memory(
+                                                  // AsyncValue.loading maintain old state, so we can get it yet to keep the image from previous state
+                                                  currentState
+                                                      .value!.displayPicture,
+                                                )
+                                              : const Align(
+                                                  alignment: Alignment.center,
+                                                  child: Text(
+                                                      "ERROR - NO PREVIOUS IMAGE"),
+                                                ),
+                                      loading: () => (currentState.hasValue)
+                                          ? Image.memory(
+                                              currentState
+                                                  .value!.displayPicture,
+                                            )
+                                          : const SizedBox.shrink(),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
-                        Positioned.fill(
-                          child: FittedBox(
-                            fit: BoxFit.fitHeight,
-                            child: currentState.when(
-                              data: (data) => Image.memory(
-                                data.displayPicture,
+                        Align(
+                          alignment: Alignment.topCenter,
+                          child: Container(
+                            height: constraints.maxHeight * 0.06,
+                            width: constraints.maxWidth,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: const Alignment(0.0, -1),
+                                end: const Alignment(0.0, 0.2),
+                                colors: <Color>[
+                                  const Color.fromRGBO(25, 27, 29, 1),
+                                  Colors.black12.withOpacity(0.0)
+                                ],
                               ),
-                              error: (error, stackTrace) => (currentState
-                                      .hasValue)
-                                  ? Image.memory(
-                                      // AsyncValue.loading maintain old state, so we can get it yet to keep the image from previous state
-                                      currentState.value!.displayPicture,
-                                    )
-                                  : const Align(
-                                      alignment: Alignment.center,
-                                      child: Text("ERROR - NO PREVIOUS IMAGE"),
-                                    ),
-                              loading: () => (currentState.hasValue)
-                                  ? Image.memory(
-                                      currentState.value!.displayPicture,
-                                    )
-                                  : const SizedBox.shrink(),
+                            ),
+                          ),
+                        ),
+                        Align(
+                          alignment: Alignment.bottomCenter,
+                          child: Container(
+                            height: constraints.maxHeight * 0.06,
+                            width: constraints.maxWidth,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: const Alignment(0.0, 0.8),
+                                end: const Alignment(0.0, -1),
+                                colors: <Color>[
+                                  const Color.fromRGBO(25, 27, 29, 1),
+                                  Colors.black12.withOpacity(0.0)
+                                ],
+                              ),
                             ),
                           ),
                         ),
                       ],
-                    ),
-                  ),
+                    );
+                  },
                 ),
               ),
               Expanded(
@@ -351,9 +404,9 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
                                   height: 100.0,
                                   width: 100.0,
                                   decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: Colors.red.shade400,
-                                    ),
+                                    // border: Border.all(
+                                    //   color: Colors.red.shade400,
+                                    // ),
                                     shape: BoxShape.rectangle,
                                     borderRadius: BorderRadius.circular(8.0),
                                     // image: DecorationImage(
@@ -398,17 +451,17 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
                                   height: 100.0,
                                   width: 100.0,
                                   alignment: Alignment.center,
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: Colors.red.shade800,
-                                    ),
+                                  decoration: const BoxDecoration(
+                                    // border: Border.all(
+                                    //   color: Colors.red.shade800,
+                                    // ),
                                     shape: BoxShape.rectangle,
-                                    borderRadius: const BorderRadius.all(
-                                        Radius.circular(8.0)),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(8.0)),
                                   ),
-                                  child: Icon(
+                                  child: const Icon(
                                     Icons.add_a_photo,
-                                    color: Colors.red.shade800,
+                                    color: Colors.white,
                                   ),
                                 ),
                               ),

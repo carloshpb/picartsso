@@ -2,10 +2,12 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:flutter_overlay_loader/flutter_overlay_loader.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:picartsso/exceptions/app_exception.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../controllers/home_controller.dart';
@@ -29,37 +31,82 @@ class HomeScreen extends ConsumerWidget {
     final router = GoRouter.of(context);
     // final navigatorForDialogs = Navigator.of(context);
 
+    // final homeState = ref.watch(homeControllerProvider);
     final homeController = ref.watch(homeControllerProvider.notifier);
 
-    // After loading initial stuffs with splash screen
+    // Listener do deal with Error and Loading
     ref.listen<AsyncValue>(
       homeControllerProvider,
       (_, state) async {
         if (state.hasError) {
+          if (Loader.isShown) {
+            Loader.hide();
+          }
+
+          var isAppException = state.error is AppException;
+          String title = (isAppException)
+              ? (state.error as AppException).maybeWhen(
+                  general: (message) => "Erro!",
+                  orElse: () => "Atenção!",
+                )
+              : "Erro!";
+
+          String body = (isAppException)
+              ? (state.error as AppException).message()
+              : "${state.error.toString()} -- ${state.asError!.stackTrace}";
+
           await showDialog(
             context: context,
             builder: (context) => AlertDialog(
-              title: const Text(
-                'Erro',
-                style: TextStyle(
+              title: Text(
+                title,
+                style: const TextStyle(
                   fontFamily: 'Roboto',
                 ),
               ),
               content: Text(
-                "${state.error.toString()} -- ${state.asError!.stackTrace}",
+                body,
                 style: const TextStyle(
                   fontFamily: 'Roboto',
                 ),
               ),
               actions: <Widget>[
+                if (state.error is PermissionFailure)
+                  TextButton(
+                    onPressed: () async {
+                      await openAppSettings();
+                      router.pop();
+                    },
+                    child: const Text(
+                      'Mudar permissão',
+                      style: TextStyle(
+                        fontFamily: 'Roboto',
+                      ),
+                    ),
+                  ),
                 TextButton(
-                  onPressed: () {
-                    // TODO : Tratar erro
-                    // temporary splash remove
-                    FlutterNativeSplash.remove();
-                    //navigatorForDialogs.pop();
-                    context.pop();
-                  },
+                  onPressed: (isAppException)
+                      ? (state.error as AppException).maybeWhen(
+                          general: (message) {
+                            return () {
+                              // TODO : Tratar erro
+                              // temporary splash remove
+                              FlutterNativeSplash.remove();
+                              //navigatorForDialogs.pop();
+                              router.pop();
+                            };
+                          },
+                          orElse: () {
+                            return () => router.pop();
+                          },
+                        )
+                      : () {
+                          // TODO : Tratar erro
+                          // temporary splash remove
+                          FlutterNativeSplash.remove();
+                          //navigatorForDialogs.pop();
+                          router.pop();
+                        },
                   child: const Text(
                     'Ok',
                     style: TextStyle(
@@ -70,7 +117,13 @@ class HomeScreen extends ConsumerWidget {
               ],
             ),
           );
-        } else if (!state.isLoading) {
+        } else if (state.isLoading) {
+          Loader.show(
+            context,
+            progressIndicator: const CircularProgressIndicator.adaptive(),
+          );
+        } else {
+          Loader.hide();
           FlutterNativeSplash.remove();
         }
       },
@@ -88,26 +141,41 @@ class HomeScreen extends ConsumerWidget {
             onPressed: () async => await showDialog(
               context: context,
               builder: (context) => AlertDialog(
-                title: const Text(
-                  "PicArtsso",
-                  style: TextStyle(
-                    fontFamily: "Jonathan",
-                  ),
-                ),
-                content: Column(
-                  children: [
-                    const AutoSizeText(
-                      "Aplicativo criado para fazer Transferência de Estilo utilizando o TensorFlow Lite e seus modelos prontos de predição e transferência",
+                title: SizedBox(
+                  height: mediaQuery.size.height * 0.1,
+                  width: mediaQuery.size.width * 0.9,
+                  child: const FittedBox(
+                    fit: BoxFit.contain,
+                    child: Text(
+                      "PicArtsso",
                       textAlign: TextAlign.center,
                       style: TextStyle(
-                        color: Colors.white,
-                        fontFamily: 'EBGaramond',
-                        fontSize: 30.0,
+                        fontFamily: "Jonathan",
+                        fontSize: 100.0,
                       ),
-                      maxLines: 3,
+                      maxLines: 1,
                     ),
-                    Flexible(
-                      child: InkWell(
+                  ),
+                ),
+                content: SizedBox(
+                  width: mediaQuery.size.width * 0.9,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const AutoSizeText(
+                        "Aplicativo criado para fazer Transferência de Estilo utilizando o TensorFlow Lite e seus modelos prontos de predição e transferência",
+                        textAlign: TextAlign.start,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontFamily: 'EBGaramond',
+                          fontSize: 40.0,
+                        ),
+                        maxLines: 4,
+                      ),
+                      const SizedBox(
+                        height: 30.0,
+                      ),
+                      InkWell(
                         onTap: () async {
                           if (!await launchUrl(url)) {
                             return await showDialog(
@@ -140,10 +208,10 @@ class HomeScreen extends ConsumerWidget {
                             );
                           }
                         },
-                        child: AutoSizeText(
-                          _tensorFlowLiteUri,
+                        child: const AutoSizeText(
+                          "Website do TensorFlow Lite",
                           textAlign: TextAlign.center,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.blue,
                             fontSize: 30.0,
                             fontFamily: 'Roboto',
@@ -152,8 +220,8 @@ class HomeScreen extends ConsumerWidget {
                           maxLines: 1,
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
                 actions: <Widget>[
                   TextButton(
@@ -285,58 +353,70 @@ class HomeScreen extends ConsumerWidget {
                           ),
                         ),
                         onPressed: () async {
-                          var result = await homeController
+                          // Loader.show(
+                          //   context,
+                          //   progressIndicator:
+                          //       const CircularProgressIndicator.adaptive(),
+                          // );
+                          await homeController
                               .pickImageFromSource(ImageSource.camera);
-                          if (result == null) {
-                            router.go('/pick');
-                          } else {
-                            late final void Function() alertButtonFunction;
-                            late final String alertMessage;
-                            result.when(
-                              general: (String message) async {
-                                alertButtonFunction =
-                                    () async => await SystemNavigator.pop();
-                                alertMessage = message;
-                              },
-                              permission: (Permission permission) async {
-                                alertMessage =
-                                    "O aplicativo não tem permissão para acessar a câmera do celular. Clique no botão abaixo para ter permissão para acessar a câmera.";
-                                alertButtonFunction = () async {
-                                  if (await permission.request().isGranted) {
-                                    router.pop();
-                                  }
-                                };
-                              },
-                            );
-                            await showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: const Text(
-                                  'Atenção',
-                                  style: TextStyle(
-                                    fontFamily: 'Roboto',
-                                  ),
-                                ),
-                                content: Text(
-                                  alertMessage,
-                                  style: const TextStyle(
-                                    fontFamily: 'Roboto',
-                                  ),
-                                ),
-                                actions: <Widget>[
-                                  TextButton(
-                                    onPressed: alertButtonFunction,
-                                    child: const Text(
-                                      'Ok',
-                                      style: TextStyle(
-                                        fontFamily: 'Roboto',
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
+
+                          if (Loader.isShown) {
+                            Loader.hide();
                           }
+
+                          ref.read(homeControllerProvider).maybeWhen(
+                                error: (error, stackTrace) => null,
+                                orElse: () => router.push('/pick'),
+                              );
+
+                          // if (!homeState.hasError && homeState.) {
+                          //   router.push('/pick');
+                          // }
+                          // Loader.hide();
+                          // if (result == null) {
+                          //   router.push('/pick');
+                          // } else {
+                          //   late final void Function() alertButtonFunction;
+                          //   late final String alertMessage;
+                          //   result.maybeWhen(
+                          //     noPic: () {
+                          //       return;
+                          //     },
+                          //     orElse: () async {
+                          //       alertMessage = result.message();
+                          //       alertButtonFunction = () => router.pop();
+                          //     },
+                          //   );
+                          //   await showDialog(
+                          //     context: context,
+                          //     builder: (context) => AlertDialog(
+                          //       title: const Text(
+                          //         'Atenção',
+                          //         style: TextStyle(
+                          //           fontFamily: 'Roboto',
+                          //         ),
+                          //       ),
+                          //       content: Text(
+                          //         alertMessage,
+                          //         style: const TextStyle(
+                          //           fontFamily: 'Roboto',
+                          //         ),
+                          //       ),
+                          //       actions: <Widget>[
+                          //         TextButton(
+                          //           onPressed: alertButtonFunction,
+                          //           child: const Text(
+                          //             'Ok',
+                          //             style: TextStyle(
+                          //               fontFamily: 'Roboto',
+                          //             ),
+                          //           ),
+                          //         ),
+                          //       ],
+                          //     ),
+                          //   );
+                          // }
                         },
                         // style: ElevatedButton.styleFrom(
                         //   backgroundColor: const Color.fromARGB(255, 228, 66, 17),
@@ -384,58 +464,74 @@ class HomeScreen extends ConsumerWidget {
                           ),
                         ),
                         onPressed: () async {
-                          var result = await homeController
+                          // Loader.show(
+                          //   context,
+                          //   progressIndicator:
+                          //       const CircularProgressIndicator.adaptive(),
+                          // );
+                          await homeController
                               .pickImageFromSource(ImageSource.gallery);
-                          if (result == null) {
-                            router.go('/pick');
-                          } else {
-                            late final void Function() alertButtonFunction;
-                            late final String alertMessage;
-                            result.when(
-                              general: (String message) async {
-                                alertButtonFunction =
-                                    () async => await SystemNavigator.pop();
-                                alertMessage = message;
-                              },
-                              permission: (Permission permission) async {
-                                alertMessage =
-                                    "O aplicativo não tem permissão para acessar a galeria de fotos do celular. Clique no botão abaixo para ter permissão para acessar a galeria.";
-                                alertButtonFunction = () async {
-                                  if (await permission.request().isGranted) {
-                                    router.pop();
-                                  }
-                                };
-                              },
-                            );
-                            await showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: const Text(
-                                  'Atenção',
-                                  style: TextStyle(
-                                    fontFamily: 'Roboto',
-                                  ),
-                                ),
-                                content: Text(
-                                  alertMessage,
-                                  style: const TextStyle(
-                                    fontFamily: 'Roboto',
-                                  ),
-                                ),
-                                actions: <Widget>[
-                                  TextButton(
-                                    onPressed: alertButtonFunction,
-                                    child: const Text(
-                                      'Ok',
-                                      style: TextStyle(
-                                        fontFamily: 'Roboto',
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
+                          // Loader.hide();
+
+                          if (Loader.isShown) {
+                            Loader.hide();
                           }
+
+                          ref.read(homeControllerProvider).maybeWhen(
+                                error: (error, stackTrace) => null,
+                                orElse: () => router.push('/pick'),
+                              );
+
+                          // if (result == null) {
+                          //   router.push('/pick');
+                          // } else {
+                          //   late final void Function() alertButtonFunction;
+                          //   late final String alertMessage;
+                          //   result.when(
+                          //     general: (String message) async {
+                          //       alertButtonFunction = () {
+                          //         return;
+                          //       };
+                          //       alertMessage = message;
+                          //     },
+                          //     noPic: () {
+                          //       return;
+                          //     },
+                          //     permission: (_) async {
+                          //       alertMessage =
+                          //           "O aplicativo não tem permissão para acessar a galeria. Tente novamente e conceda permissão para acessar, caso queira.";
+                          //       alertButtonFunction = () => router.pop();
+                          //     },
+                          //   );
+                          //   await showDialog(
+                          //     context: context,
+                          //     builder: (context) => AlertDialog(
+                          //       title: const Text(
+                          //         'Atenção',
+                          //         style: TextStyle(
+                          //           fontFamily: 'Roboto',
+                          //         ),
+                          //       ),
+                          //       content: Text(
+                          //         alertMessage,
+                          //         style: const TextStyle(
+                          //           fontFamily: 'Roboto',
+                          //         ),
+                          //       ),
+                          //       actions: <Widget>[
+                          //         TextButton(
+                          //           onPressed: alertButtonFunction,
+                          //           child: const Text(
+                          //             'Ok',
+                          //             style: TextStyle(
+                          //               fontFamily: 'Roboto',
+                          //             ),
+                          //           ),
+                          //         ),
+                          //       ],
+                          //     ),
+                          //   );
+                          // }
                         },
                         // style: ElevatedButton.styleFrom(
                         //   primary: const Color.fromARGB(255, 228, 66, 17),

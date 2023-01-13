@@ -7,7 +7,6 @@ import '../../domain/services/impl/picture_image_service_impl.dart';
 import '../../domain/services/impl/transfer_style_service_impl.dart';
 import '../../domain/services/picture_image_service.dart';
 import '../../domain/services/transfer_style_service.dart';
-import '../../exceptions/app_exception.dart';
 
 final isInitialDataLoaded = StateProvider<bool>(
   (_) => false,
@@ -75,15 +74,20 @@ class HomeController extends StateNotifier<AsyncValue<void>> {
     }
   }
 
-  Future<AppException?> pickImageFromSource(ImageSource imageSource) async {
+  Future<void> pickImageFromSource(ImageSource imageSource) async {
+    state = const AsyncValue.loading();
     final pickedImage =
         await _pictureImageService.pickImageFromSource(imageSource);
-    return pickedImage.when(
+    pickedImage.when(
       (success) {
         _pictureImageService.chosenPic = success;
-        return null;
       },
-      (error) => error,
+      (error) => state = AsyncValue.error(
+        error,
+        StackTrace.current,
+      ),
     );
+
+    return;
   }
 }

@@ -20,18 +20,30 @@ final goRouterProvider = Provider<GoRouter>((_) {
         builder: (BuildContext context, GoRouterState state) {
           return const HomeScreen();
         },
-      ),
-      GoRoute(
-        path: '/pick',
-        builder: (BuildContext context, GoRouterState state) {
-          return const TransferStyleScreen();
-        },
-      ),
-      GoRoute(
-        path: '/result',
-        builder: (BuildContext context, GoRouterState state) {
-          return const FullSizePicScreen();
-        },
+        routes: [
+          ShellRoute(
+            pageBuilder: (context, state, child) => MaterialPage(
+              child: HeroControllerScope(
+                controller: MaterialApp.createMaterialHeroController(),
+                child: child,
+              ),
+            ),
+            routes: [
+              GoRoute(
+                path: 'result',
+                builder: (BuildContext context, GoRouterState state) {
+                  return const FullSizePicScreen();
+                },
+              ),
+              GoRoute(
+                path: 'pick',
+                builder: (BuildContext context, GoRouterState state) {
+                  return const TransferStyleScreen();
+                },
+              ),
+            ],
+          ),
+        ],
       ),
     ],
   );

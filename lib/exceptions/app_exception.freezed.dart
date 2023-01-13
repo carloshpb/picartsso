@@ -1,7 +1,7 @@
 // coverage:ignore-file
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint
-// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target
+// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
 
 part of 'app_exception.dart';
 
@@ -19,18 +19,21 @@ mixin _$AppException {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(String message) general,
+    required TResult Function() noPic,
     required TResult Function(Permission permission) permission,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String message)? general,
+    TResult? Function()? noPic,
     TResult? Function(Permission permission)? permission,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String message)? general,
+    TResult Function()? noPic,
     TResult Function(Permission permission)? permission,
     required TResult orElse(),
   }) =>
@@ -38,18 +41,21 @@ mixin _$AppException {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(AppGeneralException value) general,
+    required TResult Function(NoPictureException value) noPic,
     required TResult Function(PermissionFailure value) permission,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(AppGeneralException value)? general,
+    TResult? Function(NoPictureException value)? noPic,
     TResult? Function(PermissionFailure value)? permission,
   }) =>
       throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(AppGeneralException value)? general,
+    TResult Function(NoPictureException value)? noPic,
     TResult Function(PermissionFailure value)? permission,
     required TResult orElse(),
   }) =>
@@ -140,6 +146,7 @@ class _$AppGeneralException implements AppGeneralException {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(String message) general,
+    required TResult Function() noPic,
     required TResult Function(Permission permission) permission,
   }) {
     return general(message);
@@ -149,6 +156,7 @@ class _$AppGeneralException implements AppGeneralException {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String message)? general,
+    TResult? Function()? noPic,
     TResult? Function(Permission permission)? permission,
   }) {
     return general?.call(message);
@@ -158,6 +166,7 @@ class _$AppGeneralException implements AppGeneralException {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String message)? general,
+    TResult Function()? noPic,
     TResult Function(Permission permission)? permission,
     required TResult orElse(),
   }) {
@@ -171,6 +180,7 @@ class _$AppGeneralException implements AppGeneralException {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(AppGeneralException value) general,
+    required TResult Function(NoPictureException value) noPic,
     required TResult Function(PermissionFailure value) permission,
   }) {
     return general(this);
@@ -180,6 +190,7 @@ class _$AppGeneralException implements AppGeneralException {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(AppGeneralException value)? general,
+    TResult? Function(NoPictureException value)? noPic,
     TResult? Function(PermissionFailure value)? permission,
   }) {
     return general?.call(this);
@@ -189,6 +200,7 @@ class _$AppGeneralException implements AppGeneralException {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(AppGeneralException value)? general,
+    TResult Function(NoPictureException value)? noPic,
     TResult Function(PermissionFailure value)? permission,
     required TResult orElse(),
   }) {
@@ -207,6 +219,114 @@ abstract class AppGeneralException implements AppException {
   @JsonKey(ignore: true)
   _$$AppGeneralExceptionCopyWith<_$AppGeneralException> get copyWith =>
       throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class _$$NoPictureExceptionCopyWith<$Res> {
+  factory _$$NoPictureExceptionCopyWith(_$NoPictureException value,
+          $Res Function(_$NoPictureException) then) =
+      __$$NoPictureExceptionCopyWithImpl<$Res>;
+}
+
+/// @nodoc
+class __$$NoPictureExceptionCopyWithImpl<$Res>
+    extends _$AppExceptionCopyWithImpl<$Res, _$NoPictureException>
+    implements _$$NoPictureExceptionCopyWith<$Res> {
+  __$$NoPictureExceptionCopyWithImpl(
+      _$NoPictureException _value, $Res Function(_$NoPictureException) _then)
+      : super(_value, _then);
+}
+
+/// @nodoc
+
+class _$NoPictureException implements NoPictureException {
+  const _$NoPictureException();
+
+  @override
+  String toString() {
+    return 'AppException.noPic()';
+  }
+
+  @override
+  bool operator ==(dynamic other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType && other is _$NoPictureException);
+  }
+
+  @override
+  int get hashCode => runtimeType.hashCode;
+
+  @override
+  @optionalTypeArgs
+  TResult when<TResult extends Object?>({
+    required TResult Function(String message) general,
+    required TResult Function() noPic,
+    required TResult Function(Permission permission) permission,
+  }) {
+    return noPic();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? whenOrNull<TResult extends Object?>({
+    TResult? Function(String message)? general,
+    TResult? Function()? noPic,
+    TResult? Function(Permission permission)? permission,
+  }) {
+    return noPic?.call();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeWhen<TResult extends Object?>({
+    TResult Function(String message)? general,
+    TResult Function()? noPic,
+    TResult Function(Permission permission)? permission,
+    required TResult orElse(),
+  }) {
+    if (noPic != null) {
+      return noPic();
+    }
+    return orElse();
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult map<TResult extends Object?>({
+    required TResult Function(AppGeneralException value) general,
+    required TResult Function(NoPictureException value) noPic,
+    required TResult Function(PermissionFailure value) permission,
+  }) {
+    return noPic(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult? mapOrNull<TResult extends Object?>({
+    TResult? Function(AppGeneralException value)? general,
+    TResult? Function(NoPictureException value)? noPic,
+    TResult? Function(PermissionFailure value)? permission,
+  }) {
+    return noPic?.call(this);
+  }
+
+  @override
+  @optionalTypeArgs
+  TResult maybeMap<TResult extends Object?>({
+    TResult Function(AppGeneralException value)? general,
+    TResult Function(NoPictureException value)? noPic,
+    TResult Function(PermissionFailure value)? permission,
+    required TResult orElse(),
+  }) {
+    if (noPic != null) {
+      return noPic(this);
+    }
+    return orElse();
+  }
+}
+
+abstract class NoPictureException implements AppException {
+  const factory NoPictureException() = _$NoPictureException;
 }
 
 /// @nodoc
@@ -275,6 +395,7 @@ class _$PermissionFailure implements PermissionFailure {
   @optionalTypeArgs
   TResult when<TResult extends Object?>({
     required TResult Function(String message) general,
+    required TResult Function() noPic,
     required TResult Function(Permission permission) permission,
   }) {
     return permission(this.permission);
@@ -284,6 +405,7 @@ class _$PermissionFailure implements PermissionFailure {
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
     TResult? Function(String message)? general,
+    TResult? Function()? noPic,
     TResult? Function(Permission permission)? permission,
   }) {
     return permission?.call(this.permission);
@@ -293,6 +415,7 @@ class _$PermissionFailure implements PermissionFailure {
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
     TResult Function(String message)? general,
+    TResult Function()? noPic,
     TResult Function(Permission permission)? permission,
     required TResult orElse(),
   }) {
@@ -306,6 +429,7 @@ class _$PermissionFailure implements PermissionFailure {
   @optionalTypeArgs
   TResult map<TResult extends Object?>({
     required TResult Function(AppGeneralException value) general,
+    required TResult Function(NoPictureException value) noPic,
     required TResult Function(PermissionFailure value) permission,
   }) {
     return permission(this);
@@ -315,6 +439,7 @@ class _$PermissionFailure implements PermissionFailure {
   @optionalTypeArgs
   TResult? mapOrNull<TResult extends Object?>({
     TResult? Function(AppGeneralException value)? general,
+    TResult? Function(NoPictureException value)? noPic,
     TResult? Function(PermissionFailure value)? permission,
   }) {
     return permission?.call(this);
@@ -324,6 +449,7 @@ class _$PermissionFailure implements PermissionFailure {
   @optionalTypeArgs
   TResult maybeMap<TResult extends Object?>({
     TResult Function(AppGeneralException value)? general,
+    TResult Function(NoPictureException value)? noPic,
     TResult Function(PermissionFailure value)? permission,
     required TResult orElse(),
   }) {

@@ -52,7 +52,8 @@ class PictureDataSourceImpl implements PictureDataSource {
       Map<String, Uint8List> images) async {
     var status = await Permission.photos.status;
     print("PERMISSION GALLERY STATUS: $status");
-    if (await Permission.photos.request().isGranted) {
+    var currentStatus = await Permission.photos.request();
+    if (currentStatus.isGranted) {
       if (images.containsKey('float16') && images['float16'] != null) {
         await ImageGallerySaver.saveImage(
           images['float16']!,
@@ -126,14 +127,16 @@ class PictureDataSourceImpl implements PictureDataSource {
     // }
 
     //var status = await Permission.photos.status;
-    print("PERMISSION $permissionSource STATUS: ${permissionSource.status}");
+    print(
+        "PERMISSION $permissionSource STATUS: ${await permissionSource.status}");
     if (await permissionSource.request().isGranted) {
       var image = await _imagePicker.pickImage(source: imageSource);
       if (image != null) {
         return Success(await image.readAsBytes());
       } else {
         return const Error(
-            AppException.general("Não foi escolhido nenhuma imagem."));
+          AppException.noPic(),
+        );
       }
     }
     return Error(AppException.permission(permissionSource));
