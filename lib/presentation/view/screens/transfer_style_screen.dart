@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../router/app_router.dart';
 import '../../controllers/transfer_style_controller.dart';
+import 'full_size_pic_screen.dart';
 
 class TransferStyleScreen extends ConsumerStatefulWidget {
   const TransferStyleScreen({Key? key}) : super(key: key);
@@ -245,109 +246,107 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
                   builder: (context, constraints) {
                     return Stack(
                       children: [
-                        GestureDetector(
-                          onTap: () {
-                            router.push('/result');
-                          },
+                        Positioned(
+                          top: constraints.maxHeight / 2,
+                          left: constraints.maxWidth / 2,
+                          child: const Align(
+                            alignment: Alignment.center,
+                            child: CircularProgressIndicator(),
+                          ),
+                        ),
+                        Positioned.fill(
                           child: Hero(
                             tag: 'image',
-                            // child: FadeInImage(
-                            //   placeholder: MemoryImage(
-                            //     ref
-                            //         .watch(display_picture_view_model
-                            //             .displayPictureViewModelProvider)
-                            //         .value!
-                            //         .lastPicture,
-                            //   ),
-                            //   image: MemoryImage(
-                            //     ref
-                            //         .watch(display_picture_view_model
-                            //             .displayPictureViewModelProvider)
-                            //         .value!
-                            //         .displayPicture,
-                            //   ),
-                            // ),
-                            // child: Image.memory(
-                            //   ref
-                            //       .watch(transfer_style_view_model.provider)
-                            //       .value!
-                            //       .displayPicture,
-                            //   gaplessPlayback: false,
-                            // ),
-                            child: Stack(
-                              children: [
-                                const Positioned.fill(
-                                  child: Align(
-                                    alignment: Alignment.center,
-                                    child: CircularProgressIndicator(),
-                                  ),
-                                ),
-                                Positioned.fill(
-                                  child: FittedBox(
-                                    fit: BoxFit.fitHeight,
-                                    child: currentState.when(
-                                      data: (data) => Image.memory(
-                                        data.displayPicture,
+                            child: Material(
+                              color: Colors.transparent,
+                              child: LayoutBuilder(
+                                  builder: (context, heroConstraints) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute<void>(
+                                        builder: (BuildContext context) {
+                                          return const FullSizePicScreen();
+                                        },
                                       ),
-                                      error: (error, stackTrace) =>
-                                          (currentState.hasValue)
-                                              ? Image.memory(
-                                                  // AsyncValue.loading maintain old state, so we can get it yet to keep the image from previous state
-                                                  currentState
-                                                      .value!.displayPicture,
-                                                )
-                                              : const Align(
-                                                  alignment: Alignment.center,
-                                                  child: Text(
-                                                      "ERROR - NO PREVIOUS IMAGE"),
-                                                ),
-                                      loading: () => (currentState.hasValue)
-                                          ? Image.memory(
-                                              currentState
-                                                  .value!.displayPicture,
-                                            )
-                                          : const SizedBox.shrink(),
+                                    );
+                                  },
+                                  child: Center(
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                      child: SizedBox(
+                                        height: heroConstraints.maxHeight,
+                                        width: heroConstraints.maxWidth,
+                                        child: FittedBox(
+                                          fit: BoxFit.contain,
+                                          child: currentState.when(
+                                            data: (data) => Image.memory(
+                                              data.displayPicture,
+                                            ),
+                                            error: (error, stackTrace) =>
+                                                (currentState.hasValue)
+                                                    ? Image.memory(
+                                                        // AsyncValue.loading maintain old state, so we can get it yet to keep the image from previous state
+                                                        currentState.value!
+                                                            .displayPicture,
+                                                      )
+                                                    : const Align(
+                                                        alignment:
+                                                            Alignment.center,
+                                                        child: Text(
+                                                            "ERROR - NO PREVIOUS IMAGE"),
+                                                      ),
+                                            loading: () =>
+                                                (currentState.hasValue)
+                                                    ? Image.memory(
+                                                        currentState.value!
+                                                            .displayPicture,
+                                                      )
+                                                    : const SizedBox.shrink(),
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ],
+                                );
+                              }),
                             ),
                           ),
                         ),
-                        Align(
-                          alignment: Alignment.topCenter,
-                          child: Container(
-                            height: constraints.maxHeight * 0.06,
-                            width: constraints.maxWidth,
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: const Alignment(0.0, -1),
-                                end: const Alignment(0.0, 0.2),
-                                colors: <Color>[
-                                  const Color.fromRGBO(25, 27, 29, 1),
-                                  Colors.black12.withOpacity(0.0)
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        Align(
-                          alignment: Alignment.bottomCenter,
-                          child: Container(
-                            height: constraints.maxHeight * 0.06,
-                            width: constraints.maxWidth,
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: const Alignment(0.0, 0.8),
-                                end: const Alignment(0.0, -1),
-                                colors: <Color>[
-                                  const Color.fromRGBO(25, 27, 29, 1),
-                                  Colors.black12.withOpacity(0.0)
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
+                        // Align(
+                        //   alignment: Alignment.topCenter,
+                        //   child: Container(
+                        //     height: constraints.maxHeight * 0.06,
+                        //     width: constraints.maxWidth,
+                        //     decoration: BoxDecoration(
+                        //       gradient: LinearGradient(
+                        //         begin: const Alignment(0.0, -1),
+                        //         end: const Alignment(0.0, 0.2),
+                        //         colors: <Color>[
+                        //           const Color.fromRGBO(25, 27, 29, 1),
+                        //           Colors.black12.withOpacity(0.0)
+                        //         ],
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
+                        // Align(
+                        //   alignment: Alignment.bottomCenter,
+                        //   child: Container(
+                        //     height: constraints.maxHeight * 0.06,
+                        //     width: constraints.maxWidth,
+                        //     decoration: BoxDecoration(
+                        //       gradient: LinearGradient(
+                        //         begin: const Alignment(0.0, 0.8),
+                        //         end: const Alignment(0.0, -1),
+                        //         colors: <Color>[
+                        //           const Color.fromRGBO(25, 27, 29, 1),
+                        //           Colors.black12.withOpacity(0.0)
+                        //         ],
+                        //       ),
+                        //     ),
+                        //   ),
+                        // ),
                       ],
                     );
                   },
