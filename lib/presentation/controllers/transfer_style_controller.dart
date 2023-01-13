@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:picartsso/exceptions/app_exception.dart';
 import 'package:transparent_image/transparent_image.dart';
 
 import '../../domain/services/art_service.dart';
@@ -86,7 +87,7 @@ class TransferStyleController extends StateNotifier<AsyncValue<PicArtsState>> {
     );
   }
 
-  Future<String?> saveImageInGallery() async {
+  Future<void> saveImageInGallery() async {
     var oldStateValue = state.value!;
     state = const AsyncValue.loading();
 
@@ -119,10 +120,14 @@ class TransferStyleController extends StateNotifier<AsyncValue<PicArtsState>> {
           );
         },
       );
-      return null;
     } else {
-      state = AsyncValue.data(oldStateValue);
-      return 'Não há nenhuma foto / imagem transformada para salvar.';
+      state = AsyncError(
+        const AppException.general(
+            'Não há nenhuma foto / imagem transformada para salvar.'),
+        StackTrace.current,
+      );
+      // state = AsyncValue.data(oldStateValue);
+      // return 'Não há nenhuma foto / imagem transformada para salvar.';
     }
   }
 
@@ -176,7 +181,7 @@ class TransferStyleController extends StateNotifier<AsyncValue<PicArtsState>> {
   //   return list;
   // }
 
-  Future<String?> transferStyle(Uint8List styleArt) async {
+  Future<void> transferStyle(Uint8List styleArt) async {
     var oldStateValue = state.value!;
     state = const AsyncValue.loading();
 
@@ -208,8 +213,6 @@ class TransferStyleController extends StateNotifier<AsyncValue<PicArtsState>> {
         );
       },
     );
-
-    return null;
   }
 
   Future<void> addNewCustomArt() async {
@@ -220,12 +223,6 @@ class TransferStyleController extends StateNotifier<AsyncValue<PicArtsState>> {
         await _artService.pickNewCustomArt(ImageSource.gallery);
 
     pickNewCustomArtResult.when(
-      (error) {
-        state = AsyncValue.error(
-          error,
-          StackTrace.current,
-        );
-      },
       (gottenCustomArt) {
         _artService.allArtsInOrder.when(
           (successNewArtsList) {
@@ -247,6 +244,12 @@ class TransferStyleController extends StateNotifier<AsyncValue<PicArtsState>> {
               StackTrace.current,
             );
           },
+        );
+      },
+      (error) {
+        state = AsyncValue.error(
+          error,
+          StackTrace.current,
         );
       },
     );

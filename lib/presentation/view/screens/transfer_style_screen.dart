@@ -4,7 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../router/app_router.dart';
 import '../../controllers/transfer_style_controller.dart';
-import 'full_size_pic_screen.dart';
+import '../widgets/animations/hero_picture.dart';
+//import 'full_size_pic_screen.dart';
 
 class TransferStyleScreen extends ConsumerStatefulWidget {
   const TransferStyleScreen({Key? key}) : super(key: key);
@@ -18,7 +19,7 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
   @override
   Widget build(BuildContext context) {
     var router = ref.watch(goRouterProvider);
-    final navigatorForDialogs = Navigator.of(context);
+    //final navigatorForDialogs = Navigator.of(context);
 
     final currentState = ref.watch(transferStyleControllerProvider);
     final transferStyleController =
@@ -27,7 +28,7 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
     ref.listen<AsyncValue>(
       transferStyleControllerProvider,
       (_, state) async {
-        if (state.isLoading) {
+        if (state.isLoading || state.isReloading) {
           //print("MOSTRA LOADER OVERLAY");
           //context.loaderOverlay.show();
           if (!Loader.isShown) {
@@ -37,6 +38,9 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
             );
           }
         } else if (state.hasError) {
+          if (Loader.isShown) {
+            Loader.hide();
+          }
           await showDialog(
             context: context,
             builder: (context) => AlertDialog(
@@ -57,7 +61,7 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
                   onPressed: () {
                     // TODO : Tratar erro
                     Loader.hide();
-                    navigatorForDialogs.pop();
+                    router.pop();
                   },
                   child: const Text(
                     'Ok',
@@ -102,7 +106,7 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
               TextButton(
                 onPressed: () {
                   wantToDiscard = false;
-                  navigatorForDialogs.pop();
+                  router.pop();
                 }, //<-- SEE HERE
                 child: const Text(
                   'Não',
@@ -114,7 +118,7 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
               TextButton(
                 onPressed: () {
                   wantToDiscard = true;
-                  navigatorForDialogs.pop();
+                  router.pop();
                 },
                 child: const Text(
                   'Sim',
@@ -184,39 +188,11 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
                       currentState.value!.isTransferedStyleToImage &&
                       !currentState.value!.isSaved)
                   ? () async {
-                      var result =
-                          await transferStyleController.saveImageInGallery();
-                      if (result != null) {
-                        return await showDialog(
-                          context: context,
-                          builder: (context) => AlertDialog(
-                            title: const Text(
-                              'Atenção',
-                              style: TextStyle(
-                                fontFamily: 'Roboto',
-                              ),
-                            ),
-                            content: Text(
-                              result,
-                              style: const TextStyle(
-                                fontFamily: 'Roboto',
-                              ),
-                            ),
-                            actions: <Widget>[
-                              TextButton(
-                                onPressed: () =>
-                                    navigatorForDialogs.pop(), //<-- SEE HERE
-                                child: const Text(
-                                  'Ok',
-                                  style: TextStyle(
-                                    fontFamily: 'Roboto',
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      } else {
+                      await transferStyleController.saveImageInGallery();
+
+                      final state = ref.read(transferStyleControllerProvider);
+
+                      if (state.hasValue && state.value!.isSaved) {
                         var snackBar = const SnackBar(
                           content: Text(
                             'Imagens transformadas salvas!',
@@ -230,6 +206,50 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
                         if (!mounted) return;
                         ScaffoldMessenger.of(context).showSnackBar(snackBar);
                       }
+                      // if (result != null) {
+                      //   return await showDialog(
+                      //     context: context,
+                      //     builder: (context) => AlertDialog(
+                      //       title: const Text(
+                      //         'Atenção',
+                      //         style: TextStyle(
+                      //           fontFamily: 'Roboto',
+                      //         ),
+                      //       ),
+                      //       content: Text(
+                      //         result,
+                      //         style: const TextStyle(
+                      //           fontFamily: 'Roboto',
+                      //         ),
+                      //       ),
+                      //       actions: <Widget>[
+                      //         TextButton(
+                      //           onPressed: () =>
+                      //               navigatorForDialogs.pop(), //<-- SEE HERE
+                      //           child: const Text(
+                      //             'Ok',
+                      //             style: TextStyle(
+                      //               fontFamily: 'Roboto',
+                      //             ),
+                      //           ),
+                      //         ),
+                      //       ],
+                      //     ),
+                      //   );
+                      // } else {
+                      //   var snackBar = const SnackBar(
+                      //     content: Text(
+                      //       'Imagens transformadas salvas!',
+                      //       style: TextStyle(
+                      //         fontFamily: 'Roboto',
+                      //       ),
+                      //     ),
+                      //   );
+                      //   //! Special condition to check if widget is mounted to avoid unknown errors
+                      //   //! Should be used before every .of(context) that is used inside an async method in a State
+                      //   if (!mounted) return;
+                      //   ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      // }
                     }
                   : null,
             ),
@@ -244,111 +264,126 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
                 flex: 4,
                 child: LayoutBuilder(
                   builder: (context, constraints) {
-                    return Stack(
-                      children: [
-                        Positioned(
-                          top: constraints.maxHeight / 2,
-                          left: constraints.maxWidth / 2,
-                          child: const Align(
-                            alignment: Alignment.center,
-                            child: CircularProgressIndicator(),
-                          ),
-                        ),
-                        Positioned.fill(
-                          child: Hero(
-                            tag: 'image',
-                            child: Material(
-                              color: Colors.transparent,
-                              child: LayoutBuilder(
-                                  builder: (context, heroConstraints) {
-                                return GestureDetector(
-                                  onTap: () {
-                                    Navigator.of(context).push(
-                                      MaterialPageRoute<void>(
-                                        builder: (BuildContext context) {
-                                          return const FullSizePicScreen();
+                    return (currentState.hasValue)
+                        ? HeroPicture(
+                            onTap: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute<void>(
+                                  builder: (BuildContext innerContext) {
+                                    return Scaffold(
+                                      body: HeroPicture(
+                                        onTap: () {
+                                          Navigator.of(innerContext).pop();
                                         },
+                                        picture:
+                                            currentState.value!.displayPicture,
                                       ),
                                     );
                                   },
-                                  child: Center(
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                      child: SizedBox(
-                                        height: heroConstraints.maxHeight,
-                                        width: heroConstraints.maxWidth,
-                                        child: FittedBox(
-                                          fit: BoxFit.contain,
-                                          child: currentState.when(
-                                            data: (data) => Image.memory(
-                                              data.displayPicture,
-                                            ),
-                                            error: (error, stackTrace) =>
-                                                (currentState.hasValue)
-                                                    ? Image.memory(
-                                                        // AsyncValue.loading maintain old state, so we can get it yet to keep the image from previous state
-                                                        currentState.value!
-                                                            .displayPicture,
-                                                      )
-                                                    : const Align(
-                                                        alignment:
-                                                            Alignment.center,
-                                                        child: Text(
-                                                            "ERROR - NO PREVIOUS IMAGE"),
-                                                      ),
-                                            loading: () =>
-                                                (currentState.hasValue)
-                                                    ? Image.memory(
-                                                        currentState.value!
-                                                            .displayPicture,
-                                                      )
-                                                    : const SizedBox.shrink(),
-                                          ),
-                                        ),
-                                      ),
+                                ),
+                              );
+                            },
+                            picture: currentState.value!.displayPicture,
+                          )
+                        : (!currentState.isReloading && currentState.hasError)
+                            ? SizedBox(
+                                height: constraints.maxHeight,
+                                width: constraints.maxWidth,
+                                child: const FittedBox(
+                                  child: Text(
+                                    "ERROR - NO PREVIOUS IMAGE",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontFamily: 'Poppins',
                                     ),
                                   ),
-                                );
-                              }),
-                            ),
-                          ),
-                        ),
-                        // Align(
-                        //   alignment: Alignment.topCenter,
-                        //   child: Container(
-                        //     height: constraints.maxHeight * 0.06,
-                        //     width: constraints.maxWidth,
-                        //     decoration: BoxDecoration(
-                        //       gradient: LinearGradient(
-                        //         begin: const Alignment(0.0, -1),
-                        //         end: const Alignment(0.0, 0.2),
-                        //         colors: <Color>[
-                        //           const Color.fromRGBO(25, 27, 29, 1),
-                        //           Colors.black12.withOpacity(0.0)
-                        //         ],
-                        //       ),
-                        //     ),
-                        //   ),
-                        // ),
-                        // Align(
-                        //   alignment: Alignment.bottomCenter,
-                        //   child: Container(
-                        //     height: constraints.maxHeight * 0.06,
-                        //     width: constraints.maxWidth,
-                        //     decoration: BoxDecoration(
-                        //       gradient: LinearGradient(
-                        //         begin: const Alignment(0.0, 0.8),
-                        //         end: const Alignment(0.0, -1),
-                        //         colors: <Color>[
-                        //           const Color.fromRGBO(25, 27, 29, 1),
-                        //           Colors.black12.withOpacity(0.0)
-                        //         ],
-                        //       ),
-                        //     ),
-                        //   ),
-                        // ),
-                      ],
-                    );
+                                ),
+                              )
+                            : const SizedBox.shrink();
+                    //         Stack(
+                    //   children: [
+
+                    //     Positioned(
+                    //       top: constraints.maxHeight / 2,
+                    //       left: constraints.maxWidth / 2,
+                    //       child: const Align(
+                    //         alignment: Alignment.center,
+                    //         child: CircularProgressIndicator(),
+                    //       ),
+                    //     ),
+
+                    //     if (!currentState.hasValue && !currentState.isLoading)
+                    //       const Positioned.fill(
+                    //         child: SizedBox(
+                    //           child: FittedBox(
+                    //             child: Text(
+                    //               "ERROR - NO PREVIOUS IMAGE",
+                    //               style: TextStyle(
+                    //                 color: Colors.white,
+                    //                 fontFamily: 'Poppins',
+                    //               ),
+                    //             ),
+                    //           ),
+                    //         ),
+                    //       ),
+
+                    //     if (currentState.hasValue)
+                    //       Positioned.fill(
+                    //         child: HeroPicture(
+                    //           onTap: () {
+                    //             Navigator.of(context).push(
+                    //               MaterialPageRoute<void>(
+                    //                 builder: (BuildContext context) {
+                    //                   return HeroPicture(
+                    //                     onTap: () {
+                    //                       Navigator.of(context).pop();
+                    //                     },
+                    //                     picture:
+                    //                         currentState.value!.displayPicture,
+                    //                   );
+                    //                 },
+                    //               ),
+                    //             );
+                    //           },
+                    //           picture: currentState.value!.displayPicture,
+                    //         ),
+                    //       ),
+                    //     // Align(
+                    //     //   alignment: Alignment.topCenter,
+                    //     //   child: Container(
+                    //     //     height: constraints.maxHeight * 0.06,
+                    //     //     width: constraints.maxWidth,
+                    //     //     decoration: BoxDecoration(
+                    //     //       gradient: LinearGradient(
+                    //     //         begin: const Alignment(0.0, -1),
+                    //     //         end: const Alignment(0.0, 0.2),
+                    //     //         colors: <Color>[
+                    //     //           const Color.fromRGBO(25, 27, 29, 1),
+                    //     //           Colors.black12.withOpacity(0.0)
+                    //     //         ],
+                    //     //       ),
+                    //     //     ),
+                    //     //   ),
+                    //     // ),
+                    //     // Align(
+                    //     //   alignment: Alignment.bottomCenter,
+                    //     //   child: Container(
+                    //     //     height: constraints.maxHeight * 0.06,
+                    //     //     width: constraints.maxWidth,
+                    //     //     decoration: BoxDecoration(
+                    //     //       gradient: LinearGradient(
+                    //     //         begin: const Alignment(0.0, 0.8),
+                    //     //         end: const Alignment(0.0, -1),
+                    //     //         colors: <Color>[
+                    //     //           const Color.fromRGBO(25, 27, 29, 1),
+                    //     //           Colors.black12.withOpacity(0.0)
+                    //     //         ],
+                    //     //       ),
+                    //     //     ),
+                    //     //   ),
+                    //     // ),
+                    //   ],
+                    // );
                   },
                 ),
               ),
@@ -363,41 +398,60 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
                                 currentState.value!.arts.length)
                             ? GestureDetector(
                                 onTap: () async {
-                                  var result = await transferStyleController
-                                      .transferStyle(
+                                  await transferStyleController.transferStyle(
                                     currentState.value!.arts[index].image,
                                   );
-                                  if (result != null) {
-                                    return await showDialog(
-                                      context: context,
-                                      builder: (context) => AlertDialog(
-                                        title: const Text(
-                                          'Atenção',
-                                          style: TextStyle(
-                                            fontFamily: 'Roboto',
-                                          ),
+
+                                  final state =
+                                      ref.read(transferStyleControllerProvider);
+
+                                  if (state.hasValue && state.value!.isSaved) {
+                                    var snackBar = const SnackBar(
+                                      content: Text(
+                                        'Imagens transformadas salvas!',
+                                        style: TextStyle(
+                                          fontFamily: 'Roboto',
                                         ),
-                                        content: Text(
-                                          result,
-                                          style: const TextStyle(
-                                            fontFamily: 'Roboto',
-                                          ),
-                                        ),
-                                        actions: <Widget>[
-                                          TextButton(
-                                            onPressed: () =>
-                                                navigatorForDialogs.pop(),
-                                            child: const Text(
-                                              'Ok',
-                                              style: TextStyle(
-                                                fontFamily: 'Roboto',
-                                              ),
-                                            ),
-                                          ),
-                                        ],
                                       ),
                                     );
+                                    //! Special condition to check if widget is mounted to avoid unknown errors
+                                    //! Should be used before every .of(context) that is used inside an async method in a State
+                                    if (!mounted) return;
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(snackBar);
                                   }
+
+                                  // if (result != null) {
+                                  //   return await showDialog(
+                                  //     context: context,
+                                  //     builder: (context) => AlertDialog(
+                                  //       title: const Text(
+                                  //         'Atenção',
+                                  //         style: TextStyle(
+                                  //           fontFamily: 'Roboto',
+                                  //         ),
+                                  //       ),
+                                  //       content: Text(
+                                  //         result,
+                                  //         style: const TextStyle(
+                                  //           fontFamily: 'Roboto',
+                                  //         ),
+                                  //       ),
+                                  //       actions: <Widget>[
+                                  //         TextButton(
+                                  //           onPressed: () =>
+                                  //               navigatorForDialogs.pop(),
+                                  //           child: const Text(
+                                  //             'Ok',
+                                  //             style: TextStyle(
+                                  //               fontFamily: 'Roboto',
+                                  //             ),
+                                  //           ),
+                                  //         ),
+                                  //       ],
+                                  //     ),
+                                  //   );
+                                  // }
                                 },
                                 child: Container(
                                   height: 100.0,
