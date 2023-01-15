@@ -36,7 +36,6 @@ dependencies:
   cupertino_icons: ^1.0.5
   device_info_plus: ^8.0.0
   enough_convert: ^1.6.0
-  flutter_launcher_icons: ^0.11.0
   flutter_overlay_loader: ^2.0.0
   flutter_native_splash: ^2.2.16
   flutter_riverpod: ^2.1.3
@@ -64,6 +63,7 @@ dev_dependencies:
     sdk: flutter
   auto_route_generator: ^5.0.3
   build_runner: ^2.3.3
+  flutter_launcher_icons: ^0.11.0
   flutter_lints: ^2.0.1
   freezed: ^2.3.2
   json_serializable: ^6.5.4
@@ -72,18 +72,23 @@ dev_dependencies:
 # following page: https://dart.dev/tools/pub/pubspec
 
 flutter_icons:
-  android: "launcher_icon"
+  android: "launcher_icon_android"
   ios: true
   image_path: "assets/logo/logo.png"
-  adaptive_icon_background: "assets/background/background.jpg"
+  image_path_ios: "assets/logo/logo.png"
+  adaptive_icon_foreground: "assets/logo/logo.png"
+  adaptive_icon_background: "#191B1D"
+  # adaptive_icon_background: "assets/background/background.jpg"
   min_sdk_android: 21 # android min sdk min:16, default 21
 
 flutter_native_splash:
-  background_image: "assets/background/background.jpg"
+  # background_image: "assets/background/background.jpg"
+  color: "#191B1D"
   image: assets/logo/logo.png
   android_12:
     image: assets/logo/logo.png
-    color: "#114f55"
+    color: "#191B1D"
+    icon_background_color: "#191B1D"
 
 # The following section is specific to Flutter.
 flutter:

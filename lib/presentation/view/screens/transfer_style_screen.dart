@@ -27,8 +27,8 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
 
     ref.listen<AsyncValue>(
       transferStyleControllerProvider,
-      (_, state) async {
-        if (state.isLoading || state.isReloading) {
+      (previousState, currentState) async {
+        if (currentState.isLoading || currentState.isRefreshing) {
           //print("MOSTRA LOADER OVERLAY");
           //context.loaderOverlay.show();
           if (!Loader.isShown) {
@@ -37,7 +37,7 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
               progressIndicator: const CircularProgressIndicator.adaptive(),
             );
           }
-        } else if (state.hasError) {
+        } else if (currentState.hasError) {
           if (Loader.isShown) {
             Loader.hide();
           }
@@ -51,7 +51,7 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
                 ),
               ),
               content: Text(
-                state.error.toString(),
+                currentState.error.toString(),
                 style: const TextStyle(
                   fontFamily: 'Roboto',
                 ),
@@ -76,14 +76,17 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
         } else {
           //print("ESCONDE LOADER OVERLAY");
           //context.loaderOverlay.hide();
-          Loader.hide();
+          if (Loader.isShown) {
+            Loader.hide();
+          }
         }
       },
     );
 
     return WillPopScope(
       onWillPop: () async {
-        if (currentState.hasValue && currentState.value!.isSaved) {
+        if (currentState.hasError ||
+            (currentState.hasValue && currentState.value!.isSaved)) {
           return true;
         }
         bool wantToDiscard = true;
@@ -265,27 +268,40 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
                 child: LayoutBuilder(
                   builder: (context, constraints) {
                     return (currentState.hasValue)
-                        ? HeroPicture(
-                            onTap: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute<void>(
-                                  builder: (BuildContext innerContext) {
-                                    return Scaffold(
-                                      body: HeroPicture(
-                                        onTap: () {
-                                          Navigator.of(innerContext).pop();
+                        ? Stack(
+                            children: [
+                              const Positioned.fill(
+                                child: Align(
+                                  alignment: Alignment.center,
+                                  child: CircularProgressIndicator(),
+                                ),
+                              ),
+                              Positioned.fill(
+                                child: HeroPicture(
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute<void>(
+                                        builder: (BuildContext innerContext) {
+                                          return Scaffold(
+                                            body: HeroPicture(
+                                              onTap: () {
+                                                Navigator.of(innerContext)
+                                                    .pop();
+                                              },
+                                              picture: currentState
+                                                  .value!.displayPicture,
+                                            ),
+                                          );
                                         },
-                                        picture:
-                                            currentState.value!.displayPicture,
                                       ),
                                     );
                                   },
+                                  picture: currentState.value!.displayPicture,
                                 ),
-                              );
-                            },
-                            picture: currentState.value!.displayPicture,
+                              ),
+                            ],
                           )
-                        : (!currentState.isReloading && currentState.hasError)
+                        : (!currentState.isRefreshing && currentState.hasError)
                             ? SizedBox(
                                 height: constraints.maxHeight,
                                 width: constraints.maxWidth,
