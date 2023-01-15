@@ -117,16 +117,7 @@ class PictureDataSourceImpl implements PictureDataSource {
       default:
         return const Error(AppException.general("Unknown image source."));
     }
-    // Temporary FIX for bug in permission_handler of DENIED status
-    // if (Platform.isAndroid) {
-    //   final androidInfo = await _deviceInfoPlugin.androidInfo;
-    //   if (androidInfo.version.sdkInt <= 32) {
-    //     /// use [Permissions.storage.status]
-    //     permissionSource = Permission.storage;
-    //   }
-    // }
 
-    //var status = await Permission.photos.status;
     print(
         "PERMISSION $permissionSource STATUS: ${await permissionSource.status}");
     if (await permissionSource.request().isGranted) {

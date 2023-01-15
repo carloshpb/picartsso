@@ -14,7 +14,6 @@ class App extends ConsumerWidget {
     return MaterialApp.router(
       title: 'PicArtsso',
       debugShowCheckedModeBanner: false,
-      //theme: ThemeData.dark(),
       theme: ThemeData(
         colorSchemeSeed: const Color(0xFF636363),
         useMaterial3: true,

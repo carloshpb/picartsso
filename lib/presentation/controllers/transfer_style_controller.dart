@@ -16,12 +16,6 @@ import 'state/pic_arts_state.dart';
 final transferStyleControllerProvider = StateNotifierProvider.autoDispose<
     TransferStyleController, AsyncValue<PicArtsState>>(
   (ref) => TransferStyleController(
-    // ref.watch(domain_provider_module.getChosenPicUseCase),
-    // ref.watch(domain_provider_module.saveImagesGalleryUseCase),
-    // ref.watch(domain_provider_module.getTransformedImagesUseCase),
-    // ref.watch(domain_provider_module.getArtsUseCase),
-    // ref.watch(domain_provider_module.transferStyleUseCase),
-    // ref.watch(domain_provider_module.pickNewCustomArtUseCase),
     ref.watch(artService),
     ref.watch(pictureImageService),
     ref.watch(transferStyleService),
@@ -29,20 +23,9 @@ final transferStyleControllerProvider = StateNotifierProvider.autoDispose<
 );
 
 class TransferStyleController extends StateNotifier<AsyncValue<PicArtsState>> {
-  // final GetChosenPicUseCase _getChosenPicUseCase;
-  // final SaveImagesGalleryUseCase _saveImagesGalleryUseCase;
-  // final GetTransformedImagesUseCase _getTransformedImagesUseCase;
-  // final GetArtsUseCase _getArtsUseCase;
-  // final TransferStyleUseCase _transferStyleUseCase;
-  // final PickNewCustomArtUseCase _pickNewCustomArtUseCase;
-
   final ArtService _artService;
   final PictureImageService _pictureImageService;
   final TransferStyleService _transferStyleService;
-
-  // late Uint8List _chosenPic;
-  // late Map<String, Uint8List> _transformedPics;
-  // late List<StyleImage> _arts;
 
   TransferStyleController(
     this._artService,
@@ -53,18 +36,6 @@ class TransferStyleController extends StateNotifier<AsyncValue<PicArtsState>> {
   }
 
   void _init() {
-    //state = const AsyncValue.loading();
-    // _arts = _getArtsUseCase.execute();
-    // _chosenPic = _getChosenPicUseCase.execute();
-
-    // state = await AsyncValue.guard<PicArtsState>(() async {
-    //   return PicArtsState(
-    //     arts: listArts,
-    //     displayPicture: chosenPic,
-    //     imageDataType: imageDataType,
-    //   );
-    // });
-
     _artService.allArtsInOrder.when(
       (successArtsList) {
         state = AsyncValue.data(
@@ -120,39 +91,8 @@ class TransferStyleController extends StateNotifier<AsyncValue<PicArtsState>> {
             'Não há nenhuma foto / imagem transformada para salvar.'),
         StackTrace.current,
       ).copyWithPrevious(state);
-      // state = AsyncValue.data(oldStateValue);
-      // return 'Não há nenhuma foto / imagem transformada para salvar.';
     }
   }
-
-  // Map<String, Uint8List>? getTransformedPics() {
-  //   try {
-  //     var transformedImagesMap = _getTransformedImagesUseCase.execute();
-  //     if (transformedImagesMap.containsKey('float16') &&
-  //         transformedImagesMap.containsKey('int8') &&
-  //         transformedImagesMap['float16'] != null &&
-  //         transformedImagesMap['float16']!.isNotEmpty &&
-  //         transformedImagesMap['int8'] != null &&
-  //         transformedImagesMap['int8']!.isNotEmpty) {
-  //       return transformedImagesMap;
-  //     }
-  //     return null;
-  //   } on Exception {
-  //     return null;
-  //   }
-  // }
-
-  // Uint8List getChosenPic() {
-  //   return _chosenPic;
-  // }
-
-  // Uint8List? getSelectedTransformedPic() {
-  //   var transf = getTransformedPics();
-  //   if (transf != null && state.value != null) {
-  //     return transf[state.value];
-  //   }
-  //   return null;
-  // }
 
   void selectSpecificBinaryType(String type) {
     var oldState = state.value!;
@@ -166,13 +106,7 @@ class TransferStyleController extends StateNotifier<AsyncValue<PicArtsState>> {
     }
   }
 
-  // List<StyleImage> getListOfArts() {
-  //   var list = _getArtsUseCase.execute();
-  //   return list;
-  // }
-
   Future<void> transferStyle(Uint8List styleArt) async {
-    //var oldStateValue = state.value!;
     state = const AsyncLoading<PicArtsState>().copyWithPrevious(state);
 
     // Put here to show Loader Overlay working - Screen freezes when TF is executed
@@ -203,8 +137,6 @@ class TransferStyleController extends StateNotifier<AsyncValue<PicArtsState>> {
   }
 
   Future<void> addNewCustomArt() async {
-    // var oldStateValue = state.value!;
-    // state = const AsyncValue.loading();
     state = const AsyncLoading<PicArtsState>().copyWithPrevious(state);
 
     var pickNewCustomArtResult =

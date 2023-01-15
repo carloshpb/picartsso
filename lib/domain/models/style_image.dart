@@ -18,25 +18,4 @@ class StyleImage with _$StyleImage {
 
   factory StyleImage.fromJson(Map<String, Object?> json) =>
       _$StyleImageFromJson(json);
-
-  // Map<String, dynamic> toMap() {
-  //   return <String, dynamic>{
-  //     'artName': artName,
-  //     'authorName': authorName,
-  //     'image': String.fromCharCodes(image),
-  //   };
-  // }
-
-  // factory StyleImage.fromMap(Map<String, dynamic> map) {
-  //   return StyleImage(
-  //     map['artName'] as String,
-  //     map['authorName'] as String,
-  //     Uint8List.fromList((map['image'] as String).codeUnits),
-  //   );
-  // }
-
-  // String toJson() => json.encode(toMap());
-
-  // factory StyleImage.fromJson(String source) =>
-  //     StyleImage.fromMap(json.decode(source) as Map<String, dynamic>);
 }

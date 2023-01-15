@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../router/app_router.dart';
 import '../../controllers/transfer_style_controller.dart';
 import '../widgets/animations/hero_picture.dart';
-//import 'full_size_pic_screen.dart';
 
 class TransferStyleScreen extends ConsumerStatefulWidget {
   const TransferStyleScreen({Key? key}) : super(key: key);
@@ -19,7 +18,6 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
   @override
   Widget build(BuildContext context) {
     var router = ref.watch(goRouterProvider);
-    //final navigatorForDialogs = Navigator.of(context);
 
     final currentState = ref.watch(transferStyleControllerProvider);
     final transferStyleController =
@@ -29,8 +27,6 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
       transferStyleControllerProvider,
       (previousState, currentState) async {
         if (currentState.isLoading || currentState.isRefreshing) {
-          //print("MOSTRA LOADER OVERLAY");
-          //context.loaderOverlay.show();
           if (!Loader.isShown) {
             Loader.show(
               context,
@@ -74,8 +70,6 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
             ),
           );
         } else {
-          //print("ESCONDE LOADER OVERLAY");
-          //context.loaderOverlay.hide();
           if (Loader.isShown) {
             Loader.hide();
           }
@@ -141,14 +135,6 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
           elevation: 0.0,
           surfaceTintColor: Colors.transparent,
           scrolledUnderElevation: 0.0,
-          // title: const FittedBox(
-          //   child: Text(
-          //     'Transferência de Estilo',
-          //     style: TextStyle(
-          //       fontFamily: 'Roboto',
-          //     ),
-          //   ),
-          // ),
           actions: [
             TextButton(
               onPressed: (!currentState.hasError &&
@@ -209,50 +195,6 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
                         if (!mounted) return;
                         ScaffoldMessenger.of(context).showSnackBar(snackBar);
                       }
-                      // if (result != null) {
-                      //   return await showDialog(
-                      //     context: context,
-                      //     builder: (context) => AlertDialog(
-                      //       title: const Text(
-                      //         'Atenção',
-                      //         style: TextStyle(
-                      //           fontFamily: 'Roboto',
-                      //         ),
-                      //       ),
-                      //       content: Text(
-                      //         result,
-                      //         style: const TextStyle(
-                      //           fontFamily: 'Roboto',
-                      //         ),
-                      //       ),
-                      //       actions: <Widget>[
-                      //         TextButton(
-                      //           onPressed: () =>
-                      //               navigatorForDialogs.pop(), //<-- SEE HERE
-                      //           child: const Text(
-                      //             'Ok',
-                      //             style: TextStyle(
-                      //               fontFamily: 'Roboto',
-                      //             ),
-                      //           ),
-                      //         ),
-                      //       ],
-                      //     ),
-                      //   );
-                      // } else {
-                      //   var snackBar = const SnackBar(
-                      //     content: Text(
-                      //       'Imagens transformadas salvas!',
-                      //       style: TextStyle(
-                      //         fontFamily: 'Roboto',
-                      //       ),
-                      //     ),
-                      //   );
-                      //   //! Special condition to check if widget is mounted to avoid unknown errors
-                      //   //! Should be used before every .of(context) that is used inside an async method in a State
-                      //   if (!mounted) return;
-                      //   ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                      // }
                     }
                   : null,
             ),
@@ -316,90 +258,6 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
                                 ),
                               )
                             : const SizedBox.shrink();
-                    //         Stack(
-                    //   children: [
-
-                    //     Positioned(
-                    //       top: constraints.maxHeight / 2,
-                    //       left: constraints.maxWidth / 2,
-                    //       child: const Align(
-                    //         alignment: Alignment.center,
-                    //         child: CircularProgressIndicator(),
-                    //       ),
-                    //     ),
-
-                    //     if (!currentState.hasValue && !currentState.isLoading)
-                    //       const Positioned.fill(
-                    //         child: SizedBox(
-                    //           child: FittedBox(
-                    //             child: Text(
-                    //               "ERROR - NO PREVIOUS IMAGE",
-                    //               style: TextStyle(
-                    //                 color: Colors.white,
-                    //                 fontFamily: 'Poppins',
-                    //               ),
-                    //             ),
-                    //           ),
-                    //         ),
-                    //       ),
-
-                    //     if (currentState.hasValue)
-                    //       Positioned.fill(
-                    //         child: HeroPicture(
-                    //           onTap: () {
-                    //             Navigator.of(context).push(
-                    //               MaterialPageRoute<void>(
-                    //                 builder: (BuildContext context) {
-                    //                   return HeroPicture(
-                    //                     onTap: () {
-                    //                       Navigator.of(context).pop();
-                    //                     },
-                    //                     picture:
-                    //                         currentState.value!.displayPicture,
-                    //                   );
-                    //                 },
-                    //               ),
-                    //             );
-                    //           },
-                    //           picture: currentState.value!.displayPicture,
-                    //         ),
-                    //       ),
-                    //     // Align(
-                    //     //   alignment: Alignment.topCenter,
-                    //     //   child: Container(
-                    //     //     height: constraints.maxHeight * 0.06,
-                    //     //     width: constraints.maxWidth,
-                    //     //     decoration: BoxDecoration(
-                    //     //       gradient: LinearGradient(
-                    //     //         begin: const Alignment(0.0, -1),
-                    //     //         end: const Alignment(0.0, 0.2),
-                    //     //         colors: <Color>[
-                    //     //           const Color.fromRGBO(25, 27, 29, 1),
-                    //     //           Colors.black12.withOpacity(0.0)
-                    //     //         ],
-                    //     //       ),
-                    //     //     ),
-                    //     //   ),
-                    //     // ),
-                    //     // Align(
-                    //     //   alignment: Alignment.bottomCenter,
-                    //     //   child: Container(
-                    //     //     height: constraints.maxHeight * 0.06,
-                    //     //     width: constraints.maxWidth,
-                    //     //     decoration: BoxDecoration(
-                    //     //       gradient: LinearGradient(
-                    //     //         begin: const Alignment(0.0, 0.8),
-                    //     //         end: const Alignment(0.0, -1),
-                    //     //         colors: <Color>[
-                    //     //           const Color.fromRGBO(25, 27, 29, 1),
-                    //     //           Colors.black12.withOpacity(0.0)
-                    //     //         ],
-                    //     //       ),
-                    //     //     ),
-                    //     //   ),
-                    //     // ),
-                    //   ],
-                    // );
                   },
                 ),
               ),
@@ -436,59 +294,13 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
                                     ScaffoldMessenger.of(context)
                                         .showSnackBar(snackBar);
                                   }
-
-                                  // if (result != null) {
-                                  //   return await showDialog(
-                                  //     context: context,
-                                  //     builder: (context) => AlertDialog(
-                                  //       title: const Text(
-                                  //         'Atenção',
-                                  //         style: TextStyle(
-                                  //           fontFamily: 'Roboto',
-                                  //         ),
-                                  //       ),
-                                  //       content: Text(
-                                  //         result,
-                                  //         style: const TextStyle(
-                                  //           fontFamily: 'Roboto',
-                                  //         ),
-                                  //       ),
-                                  //       actions: <Widget>[
-                                  //         TextButton(
-                                  //           onPressed: () =>
-                                  //               navigatorForDialogs.pop(),
-                                  //           child: const Text(
-                                  //             'Ok',
-                                  //             style: TextStyle(
-                                  //               fontFamily: 'Roboto',
-                                  //             ),
-                                  //           ),
-                                  //         ),
-                                  //       ],
-                                  //     ),
-                                  //   );
-                                  // }
                                 },
                                 child: Container(
                                   height: 100.0,
                                   width: 100.0,
                                   decoration: BoxDecoration(
-                                    // border: Border.all(
-                                    //   color: Colors.red.shade400,
-                                    // ),
                                     shape: BoxShape.rectangle,
                                     borderRadius: BorderRadius.circular(8.0),
-                                    // image: DecorationImage(
-                                    //   fit: BoxFit.fill,
-                                    //   image: MemoryImage(
-                                    //     ref
-                                    //         .watch(transfer_style_view_model
-                                    //             .provider)
-                                    //         .value!
-                                    //         .arts[index]
-                                    //         .image,
-                                    //   ),
-                                    // ),
                                   ),
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.circular(8.0),
@@ -521,9 +333,6 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
                                   width: 100.0,
                                   alignment: Alignment.center,
                                   decoration: const BoxDecoration(
-                                    // border: Border.all(
-                                    //   color: Colors.red.shade800,
-                                    // ),
                                     shape: BoxShape.rectangle,
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(8.0)),
@@ -534,12 +343,9 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
                                   ),
                                 ),
                               ),
-
                         separatorBuilder: (ctx, _) => const SizedBox(
                           width: 20.0,
                         ),
-                        // itemCount:
-                        //     StyleImageConstants.listStyleImages.length,
                         itemCount: currentState.value!.arts.length + 1,
                       )
                     : const SizedBox.shrink(),

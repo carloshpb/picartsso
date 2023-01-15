@@ -12,15 +12,11 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../controllers/home_controller.dart';
 
 class HomeScreen extends ConsumerWidget {
-  //final ImagePicker _picker = ImagePicker();
-  //final CameraDescription camera;
-
   final String _tensorFlowLiteUri =
       'https://www.tensorflow.org/lite/examples/style_transfer/overview';
 
   const HomeScreen({
     Key? key,
-    //required this.camera,
   }) : super(key: key);
 
   @override
@@ -28,9 +24,7 @@ class HomeScreen extends ConsumerWidget {
     final url = Uri.parse(_tensorFlowLiteUri);
     final mediaQuery = MediaQuery.of(context);
     final router = GoRouter.of(context);
-    // final navigatorForDialogs = Navigator.of(context);
 
-    // final homeState = ref.watch(homeControllerProvider);
     final homeController = ref.watch(homeControllerProvider.notifier);
 
     // Listener do deal with Error and Loading
@@ -91,7 +85,6 @@ class HomeScreen extends ConsumerWidget {
                               // TODO : Tratar erro
                               // temporary splash remove
                               FlutterNativeSplash.remove();
-                              //navigatorForDialogs.pop();
                               router.pop();
                             };
                           },
@@ -103,7 +96,6 @@ class HomeScreen extends ConsumerWidget {
                           // TODO : Tratar erro
                           // temporary splash remove
                           FlutterNativeSplash.remove();
-                          //navigatorForDialogs.pop();
                           router.pop();
                         },
                   child: const Text(
@@ -302,33 +294,6 @@ class HomeScreen extends ConsumerWidget {
                         ),
                         maxLines: 3,
                       ),
-                      // child: Stack(
-                      //   children: [
-                      //     AutoSizeText(
-                      //       "Aplique efeitos de artes ou de qualquer imagem de sua escolha nas fotos desejadas por você!",
-                      //       textAlign: TextAlign.center,
-                      //       style: TextStyle(
-                      //         fontFamily: 'Poppins',
-                      //         fontSize: 30.0,
-                      //         foreground: Paint()
-                      //           ..style = PaintingStyle.stroke
-                      //           ..strokeWidth = 4
-                      //           ..color = Colors.black87,
-                      //       ),
-                      //       maxLines: 3,
-                      //     ),
-                      //     const AutoSizeText(
-                      //       "Aplique efeitos de artes ou de qualquer imagem de sua escolha nas fotos desejadas por você!",
-                      //       textAlign: TextAlign.center,
-                      //       style: TextStyle(
-                      //         color: Colors.white,
-                      //         fontFamily: 'Poppins',
-                      //         fontSize: 30.0,
-                      //       ),
-                      //       maxLines: 3,
-                      //     ),
-                      //   ],
-                      // ),
                     ),
                     // Pick with Camera
                     Container(
@@ -352,11 +317,6 @@ class HomeScreen extends ConsumerWidget {
                           ),
                         ),
                         onPressed: () async {
-                          // Loader.show(
-                          //   context,
-                          //   progressIndicator:
-                          //       const CircularProgressIndicator.adaptive(),
-                          // );
                           await homeController
                               .pickImageFromSource(ImageSource.camera);
 
@@ -368,58 +328,7 @@ class HomeScreen extends ConsumerWidget {
                                 error: (error, stackTrace) => null,
                                 orElse: () => router.push('/pick'),
                               );
-
-                          // if (!homeState.hasError && homeState.) {
-                          //   router.push('/pick');
-                          // }
-                          // Loader.hide();
-                          // if (result == null) {
-                          //   router.push('/pick');
-                          // } else {
-                          //   late final void Function() alertButtonFunction;
-                          //   late final String alertMessage;
-                          //   result.maybeWhen(
-                          //     noPic: () {
-                          //       return;
-                          //     },
-                          //     orElse: () async {
-                          //       alertMessage = result.message();
-                          //       alertButtonFunction = () => router.pop();
-                          //     },
-                          //   );
-                          //   await showDialog(
-                          //     context: context,
-                          //     builder: (context) => AlertDialog(
-                          //       title: const Text(
-                          //         'Atenção',
-                          //         style: TextStyle(
-                          //           fontFamily: 'Roboto',
-                          //         ),
-                          //       ),
-                          //       content: Text(
-                          //         alertMessage,
-                          //         style: const TextStyle(
-                          //           fontFamily: 'Roboto',
-                          //         ),
-                          //       ),
-                          //       actions: <Widget>[
-                          //         TextButton(
-                          //           onPressed: alertButtonFunction,
-                          //           child: const Text(
-                          //             'Ok',
-                          //             style: TextStyle(
-                          //               fontFamily: 'Roboto',
-                          //             ),
-                          //           ),
-                          //         ),
-                          //       ],
-                          //     ),
-                          //   );
-                          // }
                         },
-                        // style: ElevatedButton.styleFrom(
-                        //   backgroundColor: const Color.fromARGB(255, 228, 66, 17),
-                        // ),
                         child: const Padding(
                           padding: EdgeInsets.all(8.0),
                           child: AutoSizeText(
@@ -463,14 +372,8 @@ class HomeScreen extends ConsumerWidget {
                           ),
                         ),
                         onPressed: () async {
-                          // Loader.show(
-                          //   context,
-                          //   progressIndicator:
-                          //       const CircularProgressIndicator.adaptive(),
-                          // );
                           await homeController
                               .pickImageFromSource(ImageSource.gallery);
-                          // Loader.hide();
 
                           if (Loader.isShown) {
                             Loader.hide();
@@ -480,61 +383,7 @@ class HomeScreen extends ConsumerWidget {
                                 error: (error, stackTrace) => null,
                                 orElse: () => router.push('/pick'),
                               );
-
-                          // if (result == null) {
-                          //   router.push('/pick');
-                          // } else {
-                          //   late final void Function() alertButtonFunction;
-                          //   late final String alertMessage;
-                          //   result.when(
-                          //     general: (String message) async {
-                          //       alertButtonFunction = () {
-                          //         return;
-                          //       };
-                          //       alertMessage = message;
-                          //     },
-                          //     noPic: () {
-                          //       return;
-                          //     },
-                          //     permission: (_) async {
-                          //       alertMessage =
-                          //           "O aplicativo não tem permissão para acessar a galeria. Tente novamente e conceda permissão para acessar, caso queira.";
-                          //       alertButtonFunction = () => router.pop();
-                          //     },
-                          //   );
-                          //   await showDialog(
-                          //     context: context,
-                          //     builder: (context) => AlertDialog(
-                          //       title: const Text(
-                          //         'Atenção',
-                          //         style: TextStyle(
-                          //           fontFamily: 'Roboto',
-                          //         ),
-                          //       ),
-                          //       content: Text(
-                          //         alertMessage,
-                          //         style: const TextStyle(
-                          //           fontFamily: 'Roboto',
-                          //         ),
-                          //       ),
-                          //       actions: <Widget>[
-                          //         TextButton(
-                          //           onPressed: alertButtonFunction,
-                          //           child: const Text(
-                          //             'Ok',
-                          //             style: TextStyle(
-                          //               fontFamily: 'Roboto',
-                          //             ),
-                          //           ),
-                          //         ),
-                          //       ],
-                          //     ),
-                          //   );
-                          // }
                         },
-                        // style: ElevatedButton.styleFrom(
-                        //   primary: const Color.fromARGB(255, 228, 66, 17),
-                        // ),
                         child: const Padding(
                           padding: EdgeInsets.all(8.0),
                           child: AutoSizeText(
