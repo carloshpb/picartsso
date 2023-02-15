@@ -27,14 +27,21 @@ class HomeScreen extends ConsumerWidget {
 
     final homeController = ref.watch(homeControllerProvider.notifier);
 
+    FlutterNativeSplash.remove();
+
     // Listener do deal with Error and Loading
     ref.listen<AsyncValue>(
       homeControllerProvider,
       (_, state) async {
+        print("START LISTENER");
         if (state.hasError) {
+          print("HAS ERROR!");
+
           if (Loader.isShown) {
+            print("LOADER IS SHOWING");
             Loader.hide();
           }
+          print("ERROR : ${state.error}");
 
           var isAppException = state.error is AppException;
           String title = (isAppException)

@@ -1,5 +1,5 @@
 import 'package:multiple_result/multiple_result.dart';
-import 'package:tflite_flutter_plugin_2/tflite_flutter_plugin_2.dart';
+import 'package:tflite_flutter/tflite_flutter.dart';
 
 import '../../exceptions/app_exception.dart';
 

@@ -34,36 +34,36 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   auto_size_text: ^3.0.0
   cupertino_icons: ^1.0.5
-  device_info_plus: ^8.0.0
+  device_info_plus: ^8.1.0
   enough_convert: ^1.6.0
+  flutter_launcher_icons: ^0.11.0
   flutter_overlay_loader: ^2.0.0
   flutter_native_splash: ^2.2.16
-  flutter_riverpod: ^2.1.3
+  flutter_riverpod: ^2.2.0
   freezed_annotation: ^2.2.0
-  go_router: ^6.0.1
+  go_router: ^6.0.6
   image: ^3.2.2
   image_gallery_saver: ^1.7.1
-  image_picker: ^0.8.6
-  json_annotation: ^4.7.0
+  image_picker: ^0.8.6+1
+  json_annotation: ^4.8.0
   # loader_overlay: ^2.0.7
   multiple_result: ^4.0.0
   path: ^1.8.2
-  path_provider: ^2.0.11
+  path_provider: ^2.0.12
   permission_handler: ^10.2.0
-  shared_preferences: ^2.0.16
-  tflite_flutter_plugin_2:
+  shared_preferences: ^2.0.17
+  tflite_flutter:
     git:
       url: https://github.com/carloshpb/tflite_flutter_plugin.git
       ref: master
   transparent_image: ^2.0.0
-  url_launcher: ^6.1.7
+  url_launcher: ^6.1.9
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   auto_route_generator: ^5.0.3
   build_runner: ^2.3.3
-  flutter_launcher_icons: ^0.11.0
   flutter_lints: ^2.0.1
   freezed: ^2.3.2
   json_serializable: ^6.5.4
@@ -72,23 +72,18 @@ dev_dependencies:
 # following page: https://dart.dev/tools/pub/pubspec
 
 flutter_icons:
-  android: "launcher_icon_android"
+  android: "launcher_icon"
   ios: true
   image_path: "assets/logo/logo.png"
-  image_path_ios: "assets/logo/logo.png"
-  adaptive_icon_foreground: "assets/logo/logo.png"
-  adaptive_icon_background: "#191B1D"
-  # adaptive_icon_background: "assets/background/background.jpg"
+  adaptive_icon_background: "assets/background/background.jpg"
   min_sdk_android: 21 # android min sdk min:16, default 21
 
 flutter_native_splash:
-  # background_image: "assets/background/background.jpg"
-  color: "#191B1D"
+  background_image: "assets/background/background.jpg"
   image: assets/logo/logo.png
   android_12:
     image: assets/logo/logo.png
-    color: "#191B1D"
-    icon_background_color: "#191B1D"
+    color: "#114f55"
 
 # The following section is specific to Flutter.
 flutter:
@@ -146,10 +141,6 @@ flutter:
         - asset: assets/fonts/EB_Garamond/EBGaramond-ExtraBoldItalic.ttf
           weight: 800
           style: italic
-    - family: Jonathan
-      fonts:
-        - asset: assets/fonts/Jonathan/Jonathan.ttf
-          style: normal
     - family: Merienda
       fonts:
         - asset: assets/fonts/Merienda/Merienda-Regular.ttf

@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:multiple_result/multiple_result.dart';
 import 'package:picartsso/exceptions/app_exception.dart';
-import 'package:tflite_flutter_plugin_2/tflite_flutter_plugin_2.dart';
+import 'package:tflite_flutter/tflite_flutter.dart';
 
 import '../ai_models_datasource.dart';
 
