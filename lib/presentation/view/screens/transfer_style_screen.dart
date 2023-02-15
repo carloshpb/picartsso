@@ -271,8 +271,8 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
                         itemBuilder: (ctx, index) => (index !=
                                 currentState.value!.arts.length)
                             ? GestureDetector(
-                                onTap: () async {
-                                  await transferStyleController.transferStyle(
+                                onTap: () {
+                                  transferStyleController.transferStyle(
                                     currentState.value!.arts[index].image,
                                   );
 

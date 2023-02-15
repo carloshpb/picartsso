@@ -106,35 +106,68 @@ class TransferStyleController extends StateNotifier<AsyncValue<PicArtsState>> {
     }
   }
 
-  Future<void> transferStyle(Uint8List styleArt) async {
+  void transferStyle(Uint8List styleArt) {
     state = const AsyncLoading<PicArtsState>().copyWithPrevious(state);
 
     // Put here to show Loader Overlay working - Screen freezes when TF is executed
-    await Future.delayed(const Duration(milliseconds: 300));
+    //await Future.delayed(const Duration(milliseconds: 300));
 
-    var transformedPicsResult = await _transferStyleService.transferStyle(
+    _transferStyleService
+        .transferStyle(
       state.value!.lastPicture,
       styleArt,
-    );
-
-    transformedPicsResult.when(
-      (successTransformedPic) {
-        state = AsyncData(
-          state.value!.copyWith(
-            displayPicture: successTransformedPic[state.value!.imageDataType]!,
-            isTransferedStyleToImage: true,
-            isSaved: false,
-          ),
-        );
-      },
-      (error) {
-        state = AsyncValue<PicArtsState>.error(
-          error,
-          StackTrace.current,
-        ).copyWithPrevious(state);
-      },
-    );
+    )
+        .then((result) {
+      result.when(
+        (successTransformedPic) {
+          state = AsyncData(
+            state.value!.copyWith(
+              displayPicture:
+                  successTransformedPic[state.value!.imageDataType]!,
+              isTransferedStyleToImage: true,
+              isSaved: false,
+            ),
+          );
+        },
+        (error) {
+          state = AsyncValue<PicArtsState>.error(
+            error,
+            StackTrace.current,
+          ).copyWithPrevious(state);
+        },
+      );
+    });
   }
+
+  // Future<void> transferStyle(Uint8List styleArt) async {
+  //   state = const AsyncLoading<PicArtsState>().copyWithPrevious(state);
+
+  //   // Put here to show Loader Overlay working - Screen freezes when TF is executed
+  //   await Future.delayed(const Duration(milliseconds: 300));
+
+  //   var transformedPicsResult = await _transferStyleService.transferStyle(
+  //     state.value!.lastPicture,
+  //     styleArt,
+  //   );
+
+  //   transformedPicsResult.when(
+  //     (successTransformedPic) {
+  //       state = AsyncData(
+  //         state.value!.copyWith(
+  //           displayPicture: successTransformedPic[state.value!.imageDataType]!,
+  //           isTransferedStyleToImage: true,
+  //           isSaved: false,
+  //         ),
+  //       );
+  //     },
+  //     (error) {
+  //       state = AsyncValue<PicArtsState>.error(
+  //         error,
+  //         StackTrace.current,
+  //       ).copyWithPrevious(state);
+  //     },
+  //   );
+  // }
 
   Future<void> addNewCustomArt() async {
     state = const AsyncLoading<PicArtsState>().copyWithPrevious(state);
