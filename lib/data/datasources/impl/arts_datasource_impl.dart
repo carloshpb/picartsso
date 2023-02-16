@@ -133,12 +133,13 @@ class ArtsDataSourceImpl implements ArtsDataSource {
     final defaultArts = <StyleImage>[];
 
     for (var artPath in imagePaths) {
-      var pathDecoded = Uri.decodeComponent(artPath);
-      var cleanedPath = pathDecoded.replaceAll('assets/style_imgs/', '');
+      print("IMAGE PATH: $artPath");
+      //var pathDecoded = Uri.decodeComponent(artPath);
+      var cleanedPath = artPath.replaceAll('assets/style_imgs/', '');
       cleanedPath = cleanedPath.replaceAll('.jpg', '');
       cleanedPath = cleanedPath.replaceAll('_', ' ');
       var separatedNames = cleanedPath.split('--');
-      var styleImageByteData = await rootBundle.load(pathDecoded);
+      var styleImageByteData = await rootBundle.load(artPath);
       var image = styleImageByteData.buffer.asUint8List();
       var newStyleImage = StyleImage(
         artName: separatedNames[0],

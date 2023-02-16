@@ -141,6 +141,10 @@ flutter:
         - asset: assets/fonts/EB_Garamond/EBGaramond-ExtraBoldItalic.ttf
           weight: 800
           style: italic
+    - family: Jonathan
+      fonts:
+        - asset: assets/fonts/Jonathan/Jonathan.ttf
+          style: normal
     - family: Merienda
       fonts:
         - asset: assets/fonts/Merienda/Merienda-Regular.ttf
