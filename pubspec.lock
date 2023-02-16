@@ -297,11 +297,12 @@ packages:
   flutter_launcher_icons:
     dependency: "direct main"
     description:
-      name: flutter_launcher_icons
-      sha256: ce0e501cfc258907842238e4ca605e74b7fd1cdf04b3b43e86c43f3e40a1592c
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.11.0"
+      path: "."
+      ref: "upgrade-image-4.0.10"
+      resolved-ref: "17981e515420ddcd6eca2a0c8ec566a4c07bb711"
+      url: "https://github.com/carloshpb/flutter_launcher_icons.git"
+    source: git
+    version: "0.11.0+1"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -314,10 +315,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_native_splash
-      sha256: "6777a3abb974021a39b5fdd2d46a03ca390e03903b6351f21d10e7ecc969f12d"
+      sha256: "048bd1f1dc0e5ea25899f702815934d9a9e916fe23451c320e7dd94d5e3ad933"
       url: "https://pub.dev"
     source: hosted
-    version: "2.2.16"
+    version: "2.2.17"
   flutter_overlay_loader:
     dependency: "direct main"
     description:
@@ -388,10 +389,10 @@ packages:
     dependency: "direct main"
     description:
       name: go_router
-      sha256: "5a0b2e0bc88a006c09d2b419004ffabecf83a74520b8852ea148f22e82634c27"
+      sha256: "6dd6b05db749756996b727521b9b9b4ee0968ea4aeb59af2e59383683d6ef34f"
       url: "https://pub.dev"
     source: hosted
-    version: "6.0.6"
+    version: "6.0.7"
   graphs:
     dependency: transitive
     description:
@@ -436,10 +437,10 @@ packages:
     dependency: "direct main"
     description:
       name: image
-      sha256: "8e9d133755c3e84c73288363e6343157c383a0c6c56fc51afcc5d4d7180306d6"
+      sha256: "483a389d6ccb292b570c31b3a193779b1b0178e7eb571986d9a49904b6861227"
       url: "https://pub.dev"
     source: hosted
-    version: "3.3.0"
+    version: "4.0.15"
   image_gallery_saver:
     dependency: "direct main"
     description:

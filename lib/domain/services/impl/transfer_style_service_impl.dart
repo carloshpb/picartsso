@@ -47,6 +47,14 @@ class TransferStyleServiceImpl implements TransferStyleService {
       return Future.error("Invalid origin image");
     }
 
+    /// The content image must be RGB images with pixel values being float32 numbers between [0..1].
+    if(decodedOriginalImage.format != image_formatter.Format.float32 || decodedOriginalImage.numChannels != 3) {
+      decodedOriginalImage = decodedOriginalImage.convert(
+      format: image_formatter.Format.float32, // Float32
+      numChannels: 3, // RGB
+    );
+    }
+
     var decodedStyleImage = image_formatter.decodeImage(stylePicture);
     // style_image 256 256 3
 
@@ -54,36 +62,68 @@ class TransferStyleServiceImpl implements TransferStyleService {
       return Future.error("Invalid style image");
     }
 
+    /// The content image and the style image must be RGB images with pixel values being float32 numbers between [0..1].
+    
+    if(decodedStyleImage.format != image_formatter.Format.float32 || decodedStyleImage.numChannels != 3) {
+      decodedStyleImage = decodedStyleImage.convert(
+      format: image_formatter.Format.float32, // Float32
+      numChannels: 3, // RGB
+    );
+    }
+
+    var preprocessedContentImage = image_formatter.copyResize(
+      decodedOriginalImage,
+      width: modelTransferImageSize,
+      height: modelTransferImageSize,
+    );
+
+    var preprocessedStyleImage = image_formatter.copyResize(
+      decodedStyleImage,
+      width: modelPredictionImageSize,
+      height: modelPredictionImageSize,
+    );
+
+    preprocessedContentImage.toUint8List();
+
+    _imageToByteListUInt8
+
+    UInt8 typ = ;
+
     //Resize images
-    var modelTransferImageFloat16 = image_formatter.copyResize(
-        decodedOriginalImage,
-        width: modelTransferImageSize,
-        height: modelTransferImageSize);
+    // var modelTransferImageFloat16 = image_formatter.copyResize(
+    //   decodedOriginalImage,
+    //   width: modelTransferImageSize,
+    //   height: modelTransferImageSize,
+    // );
 
-    var modelTransferImageInt8 = modelTransferImageFloat16.clone();
+    // var modelTransferImageInt8 = modelTransferImageFloat16.clone();
 
-    var modelTransferInputFloat16 = _imageToByteListUInt8(
-        modelTransferImageFloat16, modelTransferImageSize, 0, 255);
+    // var modelTransferInputFloat16 = _imageToByteListUInt8(
+    //     modelTransferImageFloat16, modelTransferImageSize, 0, 255);
 
-    var modelTransferInputInt8 = _imageToByteListUInt8(
-        modelTransferImageInt8, modelTransferImageSize, 0, 255);
+    // var modelTransferInputInt8 = _imageToByteListUInt8(
+    //     modelTransferImageInt8, modelTransferImageSize, 0, 255);
 
     print(
-        "Style Image Size : ${decodedStyleImage.height} ${decodedStyleImage.width} ${decodedStyleImage.xOffset} ${decodedStyleImage.yOffset}");
+        "Content Image Size : ${preprocessedContentImage.height} ${preprocessedContentImage.width} ${preprocessedContentImage.} ${preprocessedContentImage.yOffset}");
 
-    var modelPredictionImageFloat16 = image_formatter.copyResize(
-        decodedStyleImage,
-        width: modelPredictionImageSize,
-        height: modelPredictionImageSize);
+    print(
+        "Style Image Size : ${preprocessedStyleImage.height} ${preprocessedStyleImage.width} ${preprocessedStyleImage.xOffset} ${preprocessedStyleImage.yOffset}");
 
-    var modelPredictionImageInt8 = modelPredictionImageFloat16.clone();
+    // var modelPredictionImageFloat16 = image_formatter.copyResize(
+    //   decodedStyleImage,
+    //   width: modelPredictionImageSize,
+    //   height: modelPredictionImageSize,
+    // );
+
+    // var modelPredictionImageInt8 = modelPredictionImageFloat16.clone();
 
     // content_image 384 384 3
-    var modelPredictionInputFloat16 = _imageToByteListUInt8(
-        modelPredictionImageFloat16, modelPredictionImageSize, 0, 255);
+    // var modelPredictionInputFloat16 = _imageToByteListUInt8(
+    //     modelPredictionImageFloat16, modelPredictionImageSize, 0, 255);
 
-    var modelPredictionInputInt8 = _imageToByteListUInt8(
-        modelPredictionImageInt8, modelPredictionImageSize, 0, 255);
+    // var modelPredictionInputInt8 = _imageToByteListUInt8(
+    //     modelPredictionImageInt8, modelPredictionImageSize, 0, 255);
 
     // var modelPredictionInputImage =
     //     imageFormatter.decodeImage(modelPredictionInput);
