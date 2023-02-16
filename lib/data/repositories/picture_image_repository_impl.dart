@@ -49,11 +49,10 @@ class PictureImageRepositoryImpl implements PictureImageRepository {
   }
 
   @override
-  Map<String, Uint8List> get transformedImages =>
-      _pictureDataSource.transformedImages;
+  Uint8List get transformedImage => _pictureDataSource.transformedImage;
 
   @override
-  set transformedImages(Map<String, Uint8List> transformedImages) {
-    _pictureDataSource.transformedImages = transformedImages;
+  set transformedImage(Uint8List transformedImage) {
+    _pictureDataSource.transformedImage = transformedImage;
   }
 }

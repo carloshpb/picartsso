@@ -43,6 +43,5 @@ class PictureImageServiceImpl implements PictureImageService {
       _pictureImageRepository.saveImageToGallery(image);
 
   @override
-  Map<String, Uint8List> get transformedImages =>
-      _pictureImageRepository.transformedImages;
+  Uint8List get transformedImage => _pictureImageRepository.transformedImage;
 }

@@ -7,6 +7,7 @@ part 'app_exception.freezed.dart';
 class AppException with _$AppException {
   const factory AppException.general(String message) = AppGeneralException;
   const factory AppException.noPic() = NoPictureException;
+  const factory AppException.invalidImage(String image) = InvalidImageException;
   const factory AppException.permission(Permission permission) =
       PermissionFailure;
 }
@@ -16,6 +17,7 @@ extension AppExceptionMessage on AppException {
     return when(
       general: (msg) => msg,
       noPic: () => "Não foi escolhido nenhuma imagem.",
+      invalidImage: (image) => "Imagem inválida : $image",
       permission: (permission) {
         String source;
         switch (permission.value) {

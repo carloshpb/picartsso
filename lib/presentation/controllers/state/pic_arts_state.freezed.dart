@@ -19,7 +19,6 @@ mixin _$PicArtsState {
   List<StyleImage> get arts => throw _privateConstructorUsedError;
   Uint8List get lastPicture => throw _privateConstructorUsedError;
   Uint8List get displayPicture => throw _privateConstructorUsedError;
-  String get imageDataType => throw _privateConstructorUsedError;
   bool get isTransferedStyleToImage => throw _privateConstructorUsedError;
   bool get isSaved => throw _privateConstructorUsedError;
 
@@ -38,7 +37,6 @@ abstract class $PicArtsStateCopyWith<$Res> {
       {List<StyleImage> arts,
       Uint8List lastPicture,
       Uint8List displayPicture,
-      String imageDataType,
       bool isTransferedStyleToImage,
       bool isSaved});
 }
@@ -59,7 +57,6 @@ class _$PicArtsStateCopyWithImpl<$Res, $Val extends PicArtsState>
     Object? arts = null,
     Object? lastPicture = null,
     Object? displayPicture = null,
-    Object? imageDataType = null,
     Object? isTransferedStyleToImage = null,
     Object? isSaved = null,
   }) {
@@ -76,10 +73,6 @@ class _$PicArtsStateCopyWithImpl<$Res, $Val extends PicArtsState>
           ? _value.displayPicture
           : displayPicture // ignore: cast_nullable_to_non_nullable
               as Uint8List,
-      imageDataType: null == imageDataType
-          ? _value.imageDataType
-          : imageDataType // ignore: cast_nullable_to_non_nullable
-              as String,
       isTransferedStyleToImage: null == isTransferedStyleToImage
           ? _value.isTransferedStyleToImage
           : isTransferedStyleToImage // ignore: cast_nullable_to_non_nullable
@@ -104,7 +97,6 @@ abstract class _$$_PicArtsStateCopyWith<$Res>
       {List<StyleImage> arts,
       Uint8List lastPicture,
       Uint8List displayPicture,
-      String imageDataType,
       bool isTransferedStyleToImage,
       bool isSaved});
 }
@@ -123,7 +115,6 @@ class __$$_PicArtsStateCopyWithImpl<$Res>
     Object? arts = null,
     Object? lastPicture = null,
     Object? displayPicture = null,
-    Object? imageDataType = null,
     Object? isTransferedStyleToImage = null,
     Object? isSaved = null,
   }) {
@@ -140,10 +131,6 @@ class __$$_PicArtsStateCopyWithImpl<$Res>
           ? _value.displayPicture
           : displayPicture // ignore: cast_nullable_to_non_nullable
               as Uint8List,
-      imageDataType: null == imageDataType
-          ? _value.imageDataType
-          : imageDataType // ignore: cast_nullable_to_non_nullable
-              as String,
       isTransferedStyleToImage: null == isTransferedStyleToImage
           ? _value.isTransferedStyleToImage
           : isTransferedStyleToImage // ignore: cast_nullable_to_non_nullable
@@ -163,7 +150,6 @@ class _$_PicArtsState implements _PicArtsState {
       {required final List<StyleImage> arts,
       required this.lastPicture,
       required this.displayPicture,
-      required this.imageDataType,
       required this.isTransferedStyleToImage,
       required this.isSaved})
       : _arts = arts;
@@ -181,15 +167,13 @@ class _$_PicArtsState implements _PicArtsState {
   @override
   final Uint8List displayPicture;
   @override
-  final String imageDataType;
-  @override
   final bool isTransferedStyleToImage;
   @override
   final bool isSaved;
 
   @override
   String toString() {
-    return 'PicArtsState(arts: $arts, lastPicture: $lastPicture, displayPicture: $displayPicture, imageDataType: $imageDataType, isTransferedStyleToImage: $isTransferedStyleToImage, isSaved: $isSaved)';
+    return 'PicArtsState(arts: $arts, lastPicture: $lastPicture, displayPicture: $displayPicture, isTransferedStyleToImage: $isTransferedStyleToImage, isSaved: $isSaved)';
   }
 
   @override
@@ -202,8 +186,6 @@ class _$_PicArtsState implements _PicArtsState {
                 .equals(other.lastPicture, lastPicture) &&
             const DeepCollectionEquality()
                 .equals(other.displayPicture, displayPicture) &&
-            (identical(other.imageDataType, imageDataType) ||
-                other.imageDataType == imageDataType) &&
             (identical(
                     other.isTransferedStyleToImage, isTransferedStyleToImage) ||
                 other.isTransferedStyleToImage == isTransferedStyleToImage) &&
@@ -216,7 +198,6 @@ class _$_PicArtsState implements _PicArtsState {
       const DeepCollectionEquality().hash(_arts),
       const DeepCollectionEquality().hash(lastPicture),
       const DeepCollectionEquality().hash(displayPicture),
-      imageDataType,
       isTransferedStyleToImage,
       isSaved);
 
@@ -232,7 +213,6 @@ abstract class _PicArtsState implements PicArtsState {
       {required final List<StyleImage> arts,
       required final Uint8List lastPicture,
       required final Uint8List displayPicture,
-      required final String imageDataType,
       required final bool isTransferedStyleToImage,
       required final bool isSaved}) = _$_PicArtsState;
 
@@ -242,8 +222,6 @@ abstract class _PicArtsState implements PicArtsState {
   Uint8List get lastPicture;
   @override
   Uint8List get displayPicture;
-  @override
-  String get imageDataType;
   @override
   bool get isTransferedStyleToImage;
   @override

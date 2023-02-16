@@ -43,7 +43,6 @@ class TransferStyleController extends StateNotifier<AsyncValue<PicArtsState>> {
             arts: successArtsList,
             lastPicture: kTransparentImage,
             displayPicture: _pictureImageService.chosenPic,
-            imageDataType: 'float16',
             isTransferedStyleToImage: false,
             isSaved: false,
           ),
@@ -61,15 +60,9 @@ class TransferStyleController extends StateNotifier<AsyncValue<PicArtsState>> {
   Future<void> saveImageInGallery() async {
     state = const AsyncValue<PicArtsState>.loading().copyWithPrevious(state);
 
-    var transformedImagesMap = _pictureImageService.transformedImages;
-    if (transformedImagesMap.containsKey('float16') &&
-        transformedImagesMap.containsKey('int8') &&
-        transformedImagesMap['float16'] != null &&
-        transformedImagesMap['float16']!.isNotEmpty &&
-        transformedImagesMap['int8'] != null &&
-        transformedImagesMap['int8']!.isNotEmpty) {
+    if (state.value?.displayPicture != Uint8List(0)) {
       var saveImagesResult = await _pictureImageService
-          .saveAllImagesToGallery(transformedImagesMap);
+          .saveImageToGallery(state.value!.displayPicture);
       saveImagesResult.when(
         (success) {
           state = AsyncValue.data(
@@ -94,17 +87,17 @@ class TransferStyleController extends StateNotifier<AsyncValue<PicArtsState>> {
     }
   }
 
-  void selectSpecificBinaryType(String type) {
-    var oldState = state.value!;
-    if (oldState.isTransferedStyleToImage) {
-      state = AsyncData(
-        oldState.copyWith(
-          displayPicture: _pictureImageService.transformedImages[type]!,
-          imageDataType: type,
-        ),
-      );
-    }
-  }
+  // void selectSpecificBinaryType(String type) {
+  //   var oldState = state.value!;
+  //   if (oldState.isTransferedStyleToImage) {
+  //     state = AsyncData(
+  //       oldState.copyWith(
+  //         displayPicture: _pictureImageService.transformedImages[type]!,
+  //         imageDataType: type,
+  //       ),
+  //     );
+  //   }
+  // }
 
   void transferStyle(Uint8List styleArt) {
     state = const AsyncLoading<PicArtsState>().copyWithPrevious(state);
@@ -112,31 +105,28 @@ class TransferStyleController extends StateNotifier<AsyncValue<PicArtsState>> {
     // Put here to show Loader Overlay working - Screen freezes when TF is executed
     //await Future.delayed(const Duration(milliseconds: 300));
 
-    _transferStyleService
-        .transferStyle(
+    var result = _transferStyleService.transferStyle(
       state.value!.lastPicture,
       styleArt,
-    )
-        .then((result) {
-      result.when(
-        (successTransformedPic) {
-          state = AsyncData(
-            state.value!.copyWith(
-              displayPicture:
-                  successTransformedPic[state.value!.imageDataType]!,
-              isTransferedStyleToImage: true,
-              isSaved: false,
-            ),
-          );
-        },
-        (error) {
-          state = AsyncValue<PicArtsState>.error(
-            error,
-            StackTrace.current,
-          ).copyWithPrevious(state);
-        },
-      );
-    });
+    );
+
+    result.when(
+      (successTransformedPic) {
+        state = AsyncData(
+          state.value!.copyWith(
+            displayPicture: successTransformedPic,
+            isTransferedStyleToImage: true,
+            isSaved: false,
+          ),
+        );
+      },
+      (error) {
+        state = AsyncValue<PicArtsState>.error(
+          error,
+          StackTrace.current,
+        ).copyWithPrevious(state);
+      },
+    );
   }
 
   // Future<void> transferStyle(Uint8List styleArt) async {

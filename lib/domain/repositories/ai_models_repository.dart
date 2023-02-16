@@ -7,6 +7,6 @@ abstract class AiModelsRepository {
   Future<Result<void, AppException>> loadAiModels();
   Result<Interpreter, AppException> get interpreterPredictionFloat16;
   Result<Interpreter, AppException> get interpreterTransformFloat16;
-  Result<Interpreter, AppException> get interpreterPredictionInt8;
-  Result<Interpreter, AppException> get interpreterTransformInt8;
+  // Result<Interpreter, AppException> get interpreterPredictionInt8;
+  // Result<Interpreter, AppException> get interpreterTransformInt8;
 }

@@ -136,38 +136,38 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
           surfaceTintColor: Colors.transparent,
           scrolledUnderElevation: 0.0,
           actions: [
-            TextButton(
-              onPressed: (!currentState.hasError &&
-                      currentState.hasValue &&
-                      currentState.value!.isTransferedStyleToImage &&
-                      currentState.value!.imageDataType != 'float16')
-                  ? () {
-                      transferStyleController
-                          .selectSpecificBinaryType('float16');
-                    }
-                  : null,
-              child: const Text(
-                "Float16",
-                style: TextStyle(
-                  fontFamily: 'EBGaramond',
-                ),
-              ),
-            ),
-            TextButton(
-              onPressed: (currentState.hasValue &&
-                      currentState.value!.isTransferedStyleToImage &&
-                      currentState.value!.imageDataType != 'int8')
-                  ? () {
-                      transferStyleController.selectSpecificBinaryType('int8');
-                    }
-                  : null,
-              child: const Text(
-                "Int8",
-                style: TextStyle(
-                  fontFamily: 'EBGaramond',
-                ),
-              ),
-            ),
+            // TextButton(
+            //   onPressed: (!currentState.hasError &&
+            //           currentState.hasValue &&
+            //           currentState.value!.isTransferedStyleToImage &&
+            //           currentState.value!.imageDataType != 'float16')
+            //       ? () {
+            //           transferStyleController
+            //               .selectSpecificBinaryType('float16');
+            //         }
+            //       : null,
+            //   child: const Text(
+            //     "Float16",
+            //     style: TextStyle(
+            //       fontFamily: 'EBGaramond',
+            //     ),
+            //   ),
+            // ),
+            // TextButton(
+            //   onPressed: (currentState.hasValue &&
+            //           currentState.value!.isTransferedStyleToImage &&
+            //           currentState.value!.imageDataType != 'int8')
+            //       ? () {
+            //           transferStyleController.selectSpecificBinaryType('int8');
+            //         }
+            //       : null,
+            //   child: const Text(
+            //     "Int8",
+            //     style: TextStyle(
+            //       fontFamily: 'EBGaramond',
+            //     ),
+            //   ),
+            // ),
             IconButton(
               icon: const Icon(
                 Icons.save_outlined,
