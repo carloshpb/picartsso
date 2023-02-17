@@ -42,27 +42,39 @@ class TransferStyleServiceImpl implements TransferStyleService {
   @override
   Result<Uint8List, AppException> transferStyle(
       Uint8List originalPicture, Uint8List stylePicture) {
-    image_formatter.Image decodedContentImage;
-    image_formatter.Image decodedStyleImage;
+    Uint8List preprocessedContentImage;
+    Uint8List preprocessedStyleImage;
+
+    var decodedOriginalImage = image_formatter.decodeImage(originalPicture);
+    if (decodedOriginalImage == null) {
+      throw AppException.invalidImage(originalPicture.toString());
+    }
+
+    var decodedStyleImage = image_formatter.decodeImage(stylePicture);
+    if (decodedStyleImage == null) {
+      throw AppException.invalidImage(stylePicture.toString());
+    }
+
     try {
-      decodedContentImage = _loadImage(originalPicture);
-      decodedStyleImage = _loadImage(stylePicture);
+      preprocessedContentImage =
+          _loadImage(decodedOriginalImage, imageContentSize);
+      preprocessedStyleImage = _loadImage(decodedStyleImage, imageStyleSize);
     } on AppException catch (e) {
       return Error(e);
     }
 
-    var preprocessedContentImage = image_formatter.copyResize(
-      decodedContentImage,
-      width: imageContentSize,
-      height: imageContentSize,
-    );
+    // var preprocessedContentImage = image_formatter.copyResize(
+    //   decodedContentImage,
+    //   width: imageContentSize,
+    //   height: imageContentSize,
+    // );
     // )..convert(format: image_formatter.Format.int32);
 
-    var preprocessedStyleImage = image_formatter.copyResize(
-      decodedStyleImage,
-      width: imageStyleSize,
-      height: imageStyleSize,
-    );
+    // var preprocessedStyleImage = image_formatter.copyResize(
+    //   decodedStyleImage,
+    //   width: imageStyleSize,
+    //   height: imageStyleSize,
+    // );
     // )..convert(format: image_formatter.Format.int32);
 
     // print(
@@ -133,7 +145,7 @@ class TransferStyleServiceImpl implements TransferStyleService {
     // final transformedPictures = <String, Uint8List>{};
 
     final encodedTransformedPicture =
-        encodeOutputImage(outputImageData, decodedContentImage);
+        encodeOutputImage(outputImageData, decodedOriginalImage);
 
     // if (transformedPictures['int8']!.isEmpty) {
     //   return const Error(
@@ -181,10 +193,16 @@ class TransferStyleServiceImpl implements TransferStyleService {
     //     image_formatter.Image.rgb(inputSize, inputSize);
 
     // TODO : Pode dar problema aqui ao ter usado o Image.empty
-    var image = image_formatter.Image.fromResized(
-      image_formatter.Image.empty(),
-      width: inputSize,
+    // var image = image_formatter.Image.fromResized(
+    //   image_formatter.Image.empty(),
+    //   width: inputSize,
+    //   height: inputSize,
+    // );
+
+    var image = image_formatter.Image(
       height: inputSize,
+      width: inputSize,
+      numChannels: 3,
     );
 
     for (var x = 0; x < imageArray[0].length; x++) {
@@ -198,44 +216,49 @@ class TransferStyleServiceImpl implements TransferStyleService {
     return image;
   }
 
-  // HELPER : Convert Image to Uint8List
-  // Uint8List _imageToByteListUInt8(
-  //   image_formatter.Image image,
-  //   int inputSize,
-  //   double mean,
-  //   double std,
-  // ) {
-  //   var convertedBytes = Float32List(1 * inputSize * inputSize * 3);
-  //   var buffer = Float32List.view(convertedBytes.buffer);
-  //   int pixelIndex = 0;
+  // HELPER : Convert Image to Uint8List in Float32List byte format
+  Uint8List _imageToByteListFloat32(
+    image_formatter.Image image,
+    int inputSize,
+    double mean,
+    double std,
+  ) {
+    var convertedBytes = Float32List(1 * inputSize * inputSize * 3);
+    var buffer = Float32List.view(convertedBytes.buffer);
+    int pixelIndex = 0;
 
-  //   for (var i = 0; i < inputSize; i++) {
-  //     for (var j = 0; j < inputSize; j++) {
-  //       var pixel = image.getPixel(j, i);
-  //       buffer[pixelIndex++] = (image_formatter.getRed(pixel) - mean) / std;
-  //       buffer[pixelIndex++] = (image_formatter.getGreen(pixel) - mean) / std;
-  //       buffer[pixelIndex++] = (image_formatter.getBlue(pixel) - mean) / std;
-  //     }
-  //   }
-  //   return convertedBytes.buffer.asUint8List();
-  // }
+    for (var i = 0; i < inputSize; i++) {
+      for (var j = 0; j < inputSize; j++) {
+        var pixel = image.getPixel(j, i);
+        buffer[pixelIndex++] = (pixel.r - mean) / std;
+        buffer[pixelIndex++] = (pixel.g - mean) / std;
+        buffer[pixelIndex++] = (pixel.b - mean) / std;
+      }
+    }
+    return convertedBytes.buffer.asUint8List();
+  }
 
   /// Load image from Uint8List to Image in format Float32 and RGB
-  image_formatter.Image _loadImage(Uint8List image) {
-    var decodedImage = image_formatter.decodeImage(image);
-    if (decodedImage == null) {
-      throw AppException.invalidImage(image.toString());
-    }
-
+  Uint8List _loadImage(image_formatter.Image image, int sizeForType) {
     /// The image must be RGB images with pixel values being float32 numbers between [0..1].
-    if (decodedImage.format != image_formatter.Format.float32 ||
-        decodedImage.numChannels != 3) {
-      decodedImage = decodedImage.convert(
-        format: image_formatter.Format.float32, // Float32
-        numChannels: 3, // RGB
-      );
-    }
-    return decodedImage;
+    // if (decodedImage.format != image_formatter.Format.float32 ||
+    //     decodedImage.numChannels != 3) {
+    //   decodedImage = decodedImage.convert(
+    //     format: image_formatter.Format.float32, // Float32
+    //     numChannels: 3, // RGB
+    //   );
+    // }
+
+    var preprocessedContentImage = image_formatter.copyResize(
+      image,
+      width: imageContentSize,
+      height: imageContentSize,
+    );
+
+    var imageFloat32AsUint8 =
+        _imageToByteListFloat32(preprocessedContentImage, sizeForType, 0, 255);
+
+    return imageFloat32AsUint8;
   }
 
   /// Function to run style prediction on preprocessed style image.

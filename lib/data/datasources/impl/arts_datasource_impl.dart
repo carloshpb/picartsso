@@ -133,7 +133,6 @@ class ArtsDataSourceImpl implements ArtsDataSource {
     final defaultArts = <StyleImage>[];
 
     for (var artPath in imagePaths) {
-      print("IMAGE PATH: $artPath");
       //var pathDecoded = Uri.decodeComponent(artPath);
       var cleanedPath = artPath.replaceAll('assets/style_imgs/', '');
       cleanedPath = cleanedPath.replaceAll('.jpg', '');
