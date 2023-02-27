@@ -192,8 +192,9 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
                         );
                         //! Special condition to check if widget is mounted to avoid unknown errors
                         //! Should be used before every .of(context) that is used inside an async method in a State
-                        if (!mounted) return;
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                        }
                       }
                     }
                   : null,
@@ -290,9 +291,10 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
                                     );
                                     //! Special condition to check if widget is mounted to avoid unknown errors
                                     //! Should be used before every .of(context) that is used inside an async method in a State
-                                    if (!mounted) return;
-                                    ScaffoldMessenger.of(context)
-                                        .showSnackBar(snackBar);
+                                    if (ctx.mounted) {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(snackBar);
+                                    }
                                   }
                                 },
                                 child: Container(
