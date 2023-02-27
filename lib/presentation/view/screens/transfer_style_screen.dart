@@ -3,6 +3,7 @@ import 'package:flutter_overlay_loader/flutter_overlay_loader.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../router/app_router.dart';
+import '../../controllers/state/pic_arts_state.dart';
 import '../../controllers/transfer_style_controller.dart';
 import '../widgets/animations/hero_picture.dart';
 
@@ -18,6 +19,7 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
   @override
   Widget build(BuildContext context) {
     var router = ref.watch(goRouterProvider);
+    final theme = Theme.of(context);
 
     final currentState = ref.watch(transferStyleControllerProvider);
     final transferStyleController =
@@ -69,6 +71,21 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
               ],
             ),
           );
+        } else if (currentState.hasValue &&
+            (currentState.value! as PicArtsState).isSaved) {
+          var snackBar = const SnackBar(
+            content: Text(
+              'Imagens transformadas salvas!',
+              style: TextStyle(
+                fontFamily: 'Roboto',
+              ),
+            ),
+          );
+          //! Special condition to check if widget is mounted to avoid unknown errors
+          //! Should be used before every .of(context) that is used inside an async method in a State
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(snackBar);
+          }
         } else {
           if (Loader.isShown) {
             Loader.hide();
@@ -176,27 +193,8 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
               onPressed: (currentState.hasValue &&
                       currentState.value!.isTransferedStyleToImage &&
                       !currentState.value!.isSaved)
-                  ? () async {
-                      await transferStyleController.saveImageInGallery();
-
-                      final state = ref.read(transferStyleControllerProvider);
-
-                      if (state.hasValue && state.value!.isSaved) {
-                        var snackBar = const SnackBar(
-                          content: Text(
-                            'Imagens transformadas salvas!',
-                            style: TextStyle(
-                              fontFamily: 'Roboto',
-                            ),
-                          ),
-                        );
-                        //! Special condition to check if widget is mounted to avoid unknown errors
-                        //! Should be used before every .of(context) that is used inside an async method in a State
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                        }
-                      }
-                    }
+                  ? () async =>
+                      await transferStyleController.saveImageInGallery()
                   : null,
             ),
           ],
@@ -219,27 +217,37 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
                                   child: CircularProgressIndicator(),
                                 ),
                               ),
+                              // Positioned.fill(
+                              //   child: HeroPicture(
+                              //     onTap: () {
+                              //       Navigator.of(context).push(
+                              //         MaterialPageRoute<void>(
+                              //           builder: (BuildContext innerContext) {
+                              //             return Scaffold(
+                              //               body: HeroPicture(
+                              //                 onTap: () {
+                              //                   Navigator.of(innerContext)
+                              //                       .pop();
+                              //                 },
+                              //                 picture: currentState
+                              //                     .value!.displayPicture,
+                              //               ),
+                              //             );
+                              //           },
+                              //         ),
+                              //       );
+                              //     },
+                              //     picture: currentState.value!.displayPicture,
+                              //   ),
+                              // ),
                               Positioned.fill(
-                                child: HeroPicture(
-                                  onTap: () {
-                                    Navigator.of(context).push(
-                                      MaterialPageRoute<void>(
-                                        builder: (BuildContext innerContext) {
-                                          return Scaffold(
-                                            body: HeroPicture(
-                                              onTap: () {
-                                                Navigator.of(innerContext)
-                                                    .pop();
-                                              },
-                                              picture: currentState
-                                                  .value!.displayPicture,
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    );
-                                  },
-                                  picture: currentState.value!.displayPicture,
+                                child: FittedBox(
+                                  fit: BoxFit.contain,
+                                  child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(12.0),
+                                    child: Image.memory(
+                                        currentState.value!.displayPicture),
+                                  ),
                                 ),
                               ),
                             ],
@@ -272,31 +280,10 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
                         itemBuilder: (ctx, index) => (index !=
                                 currentState.value!.arts.length)
                             ? GestureDetector(
-                                onTap: () {
-                                  transferStyleController.transferStyle(
-                                    currentState.value!.arts[index].image,
-                                  );
-
-                                  final state =
-                                      ref.read(transferStyleControllerProvider);
-
-                                  if (state.hasValue && state.value!.isSaved) {
-                                    var snackBar = const SnackBar(
-                                      content: Text(
-                                        'Imagens transformadas salvas!',
-                                        style: TextStyle(
-                                          fontFamily: 'Roboto',
-                                        ),
-                                      ),
-                                    );
-                                    //! Special condition to check if widget is mounted to avoid unknown errors
-                                    //! Should be used before every .of(context) that is used inside an async method in a State
-                                    if (ctx.mounted) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(snackBar);
-                                    }
-                                  }
-                                },
+                                onTap: () =>
+                                    transferStyleController.transferStyle(
+                                  currentState.value!.arts[index].image,
+                                ),
                                 child: Container(
                                   height: 100.0,
                                   width: 100.0,
@@ -334,14 +321,15 @@ class _TransferStyleScreenState extends ConsumerState<TransferStyleScreen> {
                                   height: 100.0,
                                   width: 100.0,
                                   alignment: Alignment.center,
-                                  decoration: const BoxDecoration(
+                                  decoration: BoxDecoration(
+                                    color: theme.colorScheme.onBackground,
                                     shape: BoxShape.rectangle,
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(8.0)),
+                                    borderRadius: const BorderRadius.all(
+                                        Radius.circular(8.0)),
                                   ),
-                                  child: const Icon(
+                                  child: Icon(
                                     Icons.add_a_photo,
-                                    color: Colors.white,
+                                    color: theme.colorScheme.background,
                                   ),
                                 ),
                               ),
