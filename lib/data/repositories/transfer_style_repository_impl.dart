@@ -1,47 +1,55 @@
 import 'dart:typed_data';
-
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:multiple_result/multiple_result.dart';
-import 'package:image/image.dart' as image_formatter;
+import 'package:image/image.dart';
 import 'package:tflite_flutter/tflite_flutter.dart';
 
-import '../../../data/repositories/ai_models_repository_impl.dart';
-import '../../../data/repositories/picture_image_repository_impl.dart';
-import '../../../exceptions/app_exception.dart';
-import '../../repositories/ai_models_repository.dart';
-import '../../repositories/picture_image_repository.dart';
-import '../transfer_style_service.dart';
+import '../../domain/repositories/transfer_style_repository.dart';
 
-final transferStyleService = Provider<TransferStyleService>(
-  (ref) => TransferStyleServiceImpl(
-    ref.watch(aiModelsRepository),
-    ref.watch(pictureImageRepository),
-  ),
-);
+class TransferStyleRepositoryImpl implements TransferStyleRepository {
+  final _predictionModelFileFloat16 =
+      'models/magenta_arbitrary-image-stylization-v1-256_fp16_prediction_1.tflite';
+  final _transformModelFileFloat16 =
+      'models/magenta_arbitrary-image-stylization-v1-256_fp16_transfer_1.tflite';
 
-class TransferStyleServiceImpl implements TransferStyleService {
-  final AiModelsRepository _aiModelsRepository;
-  final PictureImageRepository _pictureImageRepository;
+  final _predictionModelFileInt8 =
+      'models/magenta_arbitrary-image-stylization-v1-256_int8_prediction_1.tflite';
+  final _transformModelFileInt8 =
+      'models/magenta_arbitrary-image-stylization-v1-256_int8_transfer_1.tflite';
 
-  TransferStyleServiceImpl(
-    this._aiModelsRepository,
-    this._pictureImageRepository,
-  );
+  final Map<String, Uint8List> _transformedPictures = {};
 
   // A imagem do conteúdo deve ser (1, 384, 384, 3). Recortamos a imagem centralmente e a redimensionamos.
-  static const int imageContentSize = 384;
+  static const int MODEL_TRANSFER_IMAGE_SIZE = 384;
 
   // O tamanho da imagem do estilo deve ser (1, 256, 256, 3). Recortamos a imagem centralmente e a redimensionamos.
-  static const int imageStyleSize = 256;
+  static const int MODEL_PREDICTION_IMAGE_SIZE = 256;
+
+  // A classe Interpreter tem a função de carregar um modelo e conduzir a inferência do modelo.
+  // Inferência é o termo que descreve o ato de utilizar uma rede neural para
+  // fornecer insights após ela ter sido treinada. É como se alguém que
+  // estudou algum assunto (passou por treinamento) e se formou,
+  // estivesse indo trabalhar em um cenário da vida real (inferência).
+  late Interpreter interpreterPredictionFloat16;
+  late Interpreter interpreterTransformFloat16;
+  late Interpreter interpreterPredictionInt8;
+  late Interpreter interpreterTransformInt8;
 
   // Função que carregará os modelos
   @override
-  Future<Result<void, AppException>> loadModel() =>
-      _aiModelsRepository.loadAiModels();
+  Future<void> loadModel() async {
+    // TODO Exception
+    interpreterPredictionFloat16 =
+        await Interpreter.fromAsset(_predictionModelFileFloat16);
+    interpreterTransformFloat16 =
+        await Interpreter.fromAsset(_transformModelFileFloat16);
+    interpreterPredictionInt8 =
+        await Interpreter.fromAsset(_predictionModelFileInt8);
+    interpreterTransformInt8 =
+        await Interpreter.fromAsset(_transformModelFileInt8);
+  }
 
   @override
-  Result<Uint8List, AppException> transferStyle(
-      Uint8List originalPicture, Uint8List stylePicture) {
+  Future<Map<String, Uint8List>> transfer(
+      Uint8List originalPicture, Uint8List stylePicture) async {
     Uint8List preprocessedContentImage;
     Uint8List preprocessedStyleImage;
 
@@ -130,61 +138,36 @@ class TransferStyleServiceImpl implements TransferStyleService {
   }
 
   // HELPER
-  Uint8List encodeOutputImage(
-      List<List<List<List<double>>>> outputImageDataLists,
-      image_formatter.Image decodedOriginalImage) {
+  Uint8List encodeOutputImage(List<List<List<List<double>>>> outputImageData,
+      Image decodedOriginalImage) {
     var outputImage =
-        _convertArrayToImage(outputImageDataLists, imageContentSize);
-
-    var rotateOutputImage = image_formatter.copyRotate(
-      outputImage,
-      angle: 90,
-    );
-
-    var flipOutputImage = image_formatter.flipHorizontal(rotateOutputImage);
-
-    var resultImage = image_formatter.copyResize(flipOutputImage,
+        _convertArrayToImage(outputImageData, MODEL_TRANSFER_IMAGE_SIZE);
+    var rotateOutputImageFloat16 = copyRotate(outputImage, 90);
+    var flipOutputImage = flipHorizontal(rotateOutputImageFloat16);
+    var resultImage = copyResize(flipOutputImage,
         width: decodedOriginalImage.width, height: decodedOriginalImage.height);
-
-    // TODO : Pode dar problema por conta dessa parte
-    return image_formatter.encodeJpg(resultImage);
+    var encodedImage = Uint8List.fromList(encodeJpg(resultImage));
+    return encodedImage;
   }
 
-  // BELLOW HELPERS ARE LOCAL BECAUSE THEY ARE ONLY GOING TO BE USED INSIDE THIS SERVICE
-
   // HELPER : Convert Array to Image
-  image_formatter.Image _convertArrayToImage(
+  Image _convertArrayToImage(
       List<List<List<List<double>>>> imageArray, int inputSize) {
-    // image_formatter.Image image =
-    //     image_formatter.Image.rgb(inputSize, inputSize);
-
-    // TODO : Pode dar problema aqui ao ter usado o Image.empty
-    // var image = image_formatter.Image.fromResized(
-    //   image_formatter.Image.empty(),
-    //   width: inputSize,
-    //   height: inputSize,
-    // );
-
-    var image = image_formatter.Image(
-      height: inputSize,
-      width: inputSize,
-      numChannels: 3,
-    );
-
+    Image image = Image.rgb(inputSize, inputSize);
     for (var x = 0; x < imageArray[0].length; x++) {
       for (var y = 0; y < imageArray[0][0].length; y++) {
         var r = (imageArray[0][x][y][0] * 255).toInt();
         var g = (imageArray[0][x][y][1] * 255).toInt();
         var b = (imageArray[0][x][y][2] * 255).toInt();
-        image.setPixelRgb(x, y, r, g, b);
+        image.setPixelRgba(x, y, r, g, b);
       }
     }
     return image;
   }
 
-  // HELPER : Convert Image to Uint8List in Float32List byte format
-  Uint8List _imageToByteListFloat32(
-    image_formatter.Image image,
+  // HELPER : Convert Image to Uint8List
+  Uint8List _imageToByteListUInt8(
+    Image image,
     int inputSize,
     double mean,
     double std,
@@ -196,34 +179,14 @@ class TransferStyleServiceImpl implements TransferStyleService {
     for (var i = 0; i < inputSize; i++) {
       for (var j = 0; j < inputSize; j++) {
         var pixel = image.getPixel(j, i);
-        buffer[pixelIndex++] = (pixel.r - mean) / std;
-        buffer[pixelIndex++] = (pixel.g - mean) / std;
-        buffer[pixelIndex++] = (pixel.b - mean) / std;
+        buffer[pixelIndex++] = (getRed(pixel) - mean) / std;
+        buffer[pixelIndex++] = (getGreen(pixel) - mean) / std;
+        buffer[pixelIndex++] = (getBlue(pixel) - mean) / std;
       }
     }
     return convertedBytes.buffer.asUint8List();
   }
 
-  /// Load image from Uint8List to Image in format Float32 and RGB
-  Uint8List _loadImage(image_formatter.Image image, int sizeForType) {
-    /// The image must be RGB images with pixel values being float32 numbers between [0..1].
-    // if (decodedImage.format != image_formatter.Format.float32 ||
-    //     decodedImage.numChannels != 3) {
-    //   decodedImage = decodedImage.convert(
-    //     format: image_formatter.Format.float32, // Float32
-    //     numChannels: 3, // RGB
-    //   );
-    // }
-
-    var preprocessedContentImage = image_formatter.copyResize(
-      image,
-      width: imageContentSize,
-      height: imageContentSize,
-    );
-
-    var imageFloat32AsUint8 =
-        _imageToByteListFloat32(preprocessedContentImage, sizeForType, 0, 255);
-
-    return imageFloat32AsUint8;
-  }
+  @override
+  Map<String, Uint8List> get transformedImages => _transformedPictures;
 }
