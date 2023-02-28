@@ -58,6 +58,7 @@ class TransferStyleServiceImpl implements TransferStyleService {
     try {
       preprocessedContentImage =
           _loadImage(decodedOriginalImage, imageContentSize);
+
       preprocessedStyleImage = _loadImage(decodedStyleImage, imageStyleSize);
     } on AppException catch (e) {
       return Error(e);
@@ -80,7 +81,7 @@ class TransferStyleServiceImpl implements TransferStyleService {
     // print(
     //     "Prediction Image Size : ${modelPredictionInputImage?.height} ${modelPredictionInputImage?.width} ${modelPredictionInputImage?.xOffset} ${modelPredictionInputImage?.yOffset}");
 
-    // Preparing for Prediction
+    // Preparing for Prediction Content Image
     // style_image 1 256 256 3
     var inputsForPrediction = [preprocessedStyleImage];
 
@@ -97,13 +98,16 @@ class TransferStyleServiceImpl implements TransferStyleService {
 
     try {
       _aiModelsRepository.interpreterPredictionFloat16.when(
-          (interpreterPrediction) {
-        // got the loaded style prediction model
-        interpreterPrediction.runForMultipleInputs(
-            inputsForPrediction, outputsForPrediction);
-      }, (error) {
-        throw error;
-      });
+        (interpreterPrediction) {
+          // got the loaded style prediction model
+          // RUN INPUTS FOR PREDICTION
+          interpreterPrediction.runForMultipleInputs(
+              inputsForPrediction, outputsForPrediction);
+        },
+        (error) {
+          throw error;
+        },
+      );
     } on AppException catch (e) {
       return Error(e);
     }
@@ -177,11 +181,11 @@ class TransferStyleServiceImpl implements TransferStyleService {
     var resultImage = image_formatter.copyResize(flipOutputImage,
         width: decodedOriginalImage.width, height: decodedOriginalImage.height);
 
-    // var encodedImage =
-    //     Uint8List.fromList(image_formatter.encodeJpg(resultImage));
+    var encodedImage =
+        Uint8List.fromList(image_formatter.encodeJpg(resultImage));
 
     // TODO : Pode dar problema por conta dessa parte
-    return image_formatter.encodeJpg(resultImage);
+    return encodedImage;
   }
 
   // BELLOW HELPERS ARE LOCAL BECAUSE THEY ARE ONLY GOING TO BE USED INSIDE THIS SERVICE
@@ -202,7 +206,6 @@ class TransferStyleServiceImpl implements TransferStyleService {
     var image = image_formatter.Image(
       height: inputSize,
       width: inputSize,
-      numChannels: 3,
     );
 
     for (var x = 0; x < imageArray[0].length; x++) {
@@ -251,8 +254,8 @@ class TransferStyleServiceImpl implements TransferStyleService {
 
     var preprocessedContentImage = image_formatter.copyResize(
       image,
-      width: imageContentSize,
-      height: imageContentSize,
+      width: sizeForType,
+      height: sizeForType,
     );
 
     var imageFloat32AsUint8 =
