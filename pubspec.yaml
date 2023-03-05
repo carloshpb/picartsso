@@ -38,13 +38,13 @@ dependencies:
   enough_convert: ^1.6.0
   flutter_launcher_icons: ^0.12.0
   flutter_overlay_loader: ^2.0.0
-  flutter_native_splash: ^2.2.18
-  flutter_riverpod: ^2.2.0
+  flutter_native_splash: ^2.2.19
+  flutter_riverpod: ^2.3.0
   freezed_annotation: ^2.2.0
   go_router: ^6.2.0
   image: ^4.0.15
   image_gallery_saver: ^1.7.1
-  image_picker: ^0.8.6+3
+  image_picker: ^0.8.6+4
   json_annotation: ^4.8.0
   # loader_overlay: ^2.0.7
   multiple_result: ^4.0.0
